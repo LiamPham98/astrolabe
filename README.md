@@ -4,7 +4,7 @@ Luồng làm tính năng của team, chạy trên Claude Code. Repo này là m�
 
 | Plugin | Ở đâu | Nội dung |
 |---|---|---|
-| `feature-workflow` | `plugins/feature-workflow/` | Skill của team: `feature-flow`, `feature-why`, `spec-check`, kèm mẫu file |
+| `feature-workflow` | `plugins/feature-workflow/` | Skill của team: `feature-setup`, `feature-flow`, `feature-why`, `spec-check`, kèm mẫu file |
 | `finolabs-vibecode` | `vendor/finolabs-vibecode/` | Bản ghim của finolabs: điều phối, điểm khôi phục, kiểm, review, cửa merge |
 | `pstack` | `vendor/pstack/` | Bản ghim của pstack: thiết kế, phản biện thiết kế, statechart, code, blast-radius |
 | `mattpocock-skills` | `vendor/mattpocock-skills/` | Bản ghim skill của Matt Pocock: grill, spec, ticket |
@@ -38,31 +38,32 @@ Người làm vẫn chỉnh từng công tắc. Chi tiết trong [`plugins/featu
 
 ## Cài đặt
 
-**1. Cài plugin** (một lần mỗi máy), gõ trong Claude Code:
+**1. Gõ tay hai lệnh** trong Claude Code (một lần mỗi máy):
 
 ```text
 /plugin marketplace add <github-user>/feature-workflow
 /plugin install feature-workflow@feature-workflow
-/plugin install finolabs-vibecode@feature-workflow
-/plugin install pstack@feature-workflow
-/plugin install mattpocock-skills@feature-workflow
 ```
 
-Đã cài finolabs-vibecode, pstack hoặc skill của Matt từ nguồn khác thì gỡ bản đó trước, để không có hai bản cùng chạy.
+Chưa đẩy lên GitHub thì dùng đường dẫn thư mục: `/plugin marketplace add ~/feature-workflow`.
 
-**2. Chuẩn bị repo dự án** (một lần mỗi repo):
+**2. Mở phiên mới trong repo dự án và gõ:**
 
-```bash
-git clone <repo này> ~/feature-workflow
-~/feature-workflow/scripts/init-project.sh /đường/dẫn/repo-dự-án
+```text
+/feature-setup
 ```
 
-Script tạo `docs/flow-rules.md` từ mẫu (nếu chưa có) và thư mục `docs/features/`. Sau đó, trong repo dự án:
+`/feature-setup` kiểm tra rồi báo cáo trước, hỏi duyệt, sau đó mới làm:
 
-1. Sửa `docs/flow-rules.md` cho đúng repo.
-2. Chạy `/setup-matt-pocock-skills`, chọn lưu spec dạng markdown local.
-3. Adopt cửa `merge_check.py` của finolabs-vibecode. Chưa adopt thì MR không có cửa cứng.
-4. Cài Java và TLC nếu dùng `/statechart`.
+- cài ba plugin còn lại, cảnh báo bản trùng cài từ nguồn khác;
+- tạo `docs/features/` và `docs/flow-rules.md`;
+- đọc code và hỏi vài câu để soạn file luật duyệt cho đúng repo;
+- in sẵn `/setup` (finolabs) và `/setup-matt-pocock-skills` để anh gõ, vì hai skill này chỉ người gõ được;
+- kiểm công cụ cho `/statechart`.
+
+Chạy lại bao nhiêu lần cũng được: nó chỉ làm phần còn thiếu, không ghi đè file luật đã có.
+
+**Cài tay (không dùng `/feature-setup`)**: cài thêm `finolabs-vibecode@feature-workflow`, `pstack@feature-workflow`, `mattpocock-skills@feature-workflow`. Sau đó chạy `scripts/init-project.sh <repo-dự-án>`, sửa `docs/flow-rules.md`, rồi gõ `/setup-matt-pocock-skills` và `/setup` trong repo dự án.
 
 ## Dùng
 

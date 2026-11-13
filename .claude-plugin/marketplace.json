@@ -1,12 +1,14 @@
 {
   "name": "feature-workflow",
-  "owner": { "name": "feature-workflow" },
+  "owner": {
+    "name": "feature-workflow"
+  },
   "description": "Luồng làm tính năng của team, gom chung bộ skill của team với bản ghim của finolabs-vibecode, pstack và skill của Matt Pocock.",
   "plugins": [
     {
       "name": "feature-workflow",
       "source": "./plugins/feature-workflow",
-      "description": "feature-flow, feature-why, spec-check và các mẫu file của luồng."
+      "description": "feature-setup, feature-flow, feature-why, spec-check và các mẫu file của luồng."
     },
     {
       "name": "finolabs-vibecode",

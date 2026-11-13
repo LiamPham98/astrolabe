@@ -1,5 +1,13 @@
 # Cheat-sheet: làm một tính năng
 
+## 0. Lần đầu trong repo
+
+```
+/feature-setup
+```
+
+Kiểm tra, hỏi duyệt, rồi cài phần còn thiếu. Chạy lại được.
+
 ## 1. Bắt đầu
 
 ```
