@@ -20,7 +20,7 @@ Agent chọn công tắc, đọc `docs/flow-rules.md`, ghi biên lai, rồi trì
 
 | Bật khi | Công tắc | Thêm bước |
 |---|---|---|
-| Cần chứng minh giá trị | `why` | bước Why, đọc chỉ số sau ra mắt |
+| Cần chứng minh giá trị | `why` | `feature-why`, đọc chỉ số sau ra mắt |
 | Yêu cầu mơ hồ | `unclear` | `/grill-with-docs` |
 | Nhiều phiên, người, MR | `multi` | `/to-spec`, `spec-check` |
 | Vượt biên hàm | `cross` | `/architect` |
@@ -33,7 +33,7 @@ Agent chọn công tắc, đọc `docs/flow-rules.md`, ghi biên lai, rồi trì
 
 ## 4. Bốn lần dừng
 
-1. **Chốt có làm**: đọc `why.md`. Chọn không làm thì dừng.
+1. **Chốt có làm**: đọc `why.md` (do `feature-why` ghi). Chọn không làm thì dừng.
 2. **Duyệt spec**: đọc spec và `spec-check.md`.
 3. **Chốt thiết kế**: checkpoint của architect, finding interrogate, kết quả statechart.
 4. **Duyệt và merge** mỗi MR: checks, review-gate, blast-radius, rủi ro đã chấp nhận. Người làm tự merge.

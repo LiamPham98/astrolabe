@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "finolabs-vibecode",
+  "owner": {
+    "name": "FINOLABS",
+    "url": "https://github.com/finolabs"
+  },
+  "description": "Distribution channel for the finolabs-vibecode plugin.",
+  "plugins": [
+    {
+      "name": "finolabs-vibecode",
+      "source": "./",
+      "description": "Engineering practice for AI coding agents: routing, delegation, review and security gates, verification, versioning and open source readiness.",
+      "homepage": "https://github.com/finolabs/finolabs-vibecode",
+      "repository": "https://github.com/finolabs/finolabs-vibecode",
+      "license": "MIT",
+      "category": "development",
+      "keywords": [
+        "coding-router",
+        "delegation",
+        "orchestration",
+        "code-review",
+        "security-review",
+        "versioning",
+        "verification",
+        "agent-skills"
+      ]
+    }
+  ]
+}

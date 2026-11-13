@@ -1,14 +1,21 @@
 # feature-workflow
 
-Luồng làm tính năng của team, chạy trên Claude Code. Ghép ba bộ skill có sẵn (finolabs, Matt Pocock, pstack) thành một luồng có xương sống cố định và các giai đoạn tuỳ chọn, cộng thêm hai skill phân tích viết theo cấu trúc của vibebiz.
+Luồng làm tính năng của team, chạy trên Claude Code. Repo này là một **plugin marketplace** gom bốn plugin vào một chỗ:
 
-Luồng chốt ngày 13/11/2026.
+| Plugin | Ở đâu | Nội dung |
+|---|---|---|
+| `feature-workflow` | `plugins/feature-workflow/` | Skill của team: `feature-flow`, `feature-why`, `spec-check`, kèm mẫu file |
+| `finolabs-vibecode` | `vendor/finolabs-vibecode/` | Bản ghim của finolabs: điều phối, điểm khôi phục, kiểm, review, cửa merge |
+| `pstack` | `vendor/pstack/` | Bản ghim của pstack: thiết kế, phản biện thiết kế, statechart, code, blast-radius |
+| `mattpocock-skills` | `vendor/mattpocock-skills/` | Bản ghim skill của Matt Pocock: grill, spec, ticket |
+
+Bản ghim, giấy phép và thay đổi so với upstream ghi trong [`UPSTREAM.md`](UPSTREAM.md). Luồng chốt ngày 13/11/2026.
 
 ## Luồng
 
 ```
 0  Điều phối         /feature-flow          preset + công tắc, đọc file luật, ghi biên lai
-1  Có nên làm không? why                     (tuỳ chọn)  ── Dừng: chốt có làm
+1  Có nên làm không? feature-why             (tuỳ chọn)  ── Dừng: chốt có làm
 2  Hiểu yêu cầu      /grill-with-docs → /to-spec → spec-check
                                              (tuỳ chọn)  ── Dừng: duyệt spec
 3  Thiết kế          /architect (+ /interrogate, /statechart)
@@ -27,36 +34,34 @@ Luồng chốt ngày 13/11/2026.
 - medium: bật `unclear`, `cross`;
 - large: bật `why`, `unclear`, `multi`, `cross`, `contest`, `state`, `repo`.
 
-Người làm vẫn chỉnh từng công tắc. Chi tiết trong [`skills/feature-flow/SKILL.md`](skills/feature-flow/SKILL.md).
-
-## Có gì trong repo
-
-```
-skills/
-  feature-flow/     dẫn luồng; templates/ có flow.md, decisions.md, flow-rules.md
-  why/              bước "có nên làm không"; templates/why.md
-  spec-check/       soát spec + checklist sẵn sàng, chỉ đọc
-scripts/install.sh  cài vào repo dự án
-docs/cheat-sheet.md một trang cho team
-UPSTREAM.md         bản ghim của ba bộ skill, phần tham khảo từ vibebiz
-```
+Người làm vẫn chỉnh từng công tắc. Chi tiết trong [`plugins/feature-workflow/skills/feature-flow/SKILL.md`](plugins/feature-workflow/skills/feature-flow/SKILL.md).
 
 ## Cài đặt
 
-Điều kiện: repo dự án đã cài pstack, skill của Matt và bộ finolabs, đúng bản ghim trong [`UPSTREAM.md`](UPSTREAM.md).
+**1. Cài plugin** (một lần mỗi máy), gõ trong Claude Code:
+
+```text
+/plugin marketplace add <github-user>/feature-workflow
+/plugin install feature-workflow@feature-workflow
+/plugin install finolabs-vibecode@feature-workflow
+/plugin install pstack@feature-workflow
+/plugin install mattpocock-skills@feature-workflow
+```
+
+Đã cài finolabs-vibecode, pstack hoặc skill của Matt từ nguồn khác thì gỡ bản đó trước, để không có hai bản cùng chạy.
+
+**2. Chuẩn bị repo dự án** (một lần mỗi repo):
 
 ```bash
 git clone <repo này> ~/feature-workflow
-~/feature-workflow/scripts/install.sh /đường/dẫn/repo-dự-án
+~/feature-workflow/scripts/init-project.sh /đường/dẫn/repo-dự-án
 ```
 
-Script chép ba skill vào `.claude/skills/`, tạo `docs/flow-rules.md` từ mẫu (nếu chưa có) và thư mục `docs/features/`. Thêm `--force` để ghi đè skill đã cài.
-
-Sau khi cài, làm một lần cho mỗi repo:
+Script tạo `docs/flow-rules.md` từ mẫu (nếu chưa có) và thư mục `docs/features/`. Sau đó, trong repo dự án:
 
 1. Sửa `docs/flow-rules.md` cho đúng repo.
 2. Chạy `/setup-matt-pocock-skills`, chọn lưu spec dạng markdown local.
-3. Adopt cửa `merge_check.py` của finolabs. Chưa adopt thì MR không có cửa cứng.
+3. Adopt cửa `merge_check.py` của finolabs-vibecode. Chưa adopt thì MR không có cửa cứng.
 4. Cài Java và TLC nếu dùng `/statechart`.
 
 ## Dùng
@@ -65,12 +70,27 @@ Sau khi cài, làm một lần cho mỗi repo:
 /feature-flow large mở lại kỳ đã khóa
 ```
 
-Mỗi tính năng có một thư mục `docs/features/<slug>/` chứa biên lai (`flow.md`), kết quả bước Why (`why.md`), kết quả soát spec (`spec-check.md`) và sổ quyết định (`decisions.md`). Xem [`docs/cheat-sheet.md`](docs/cheat-sheet.md).
+Mỗi tính năng có một thư mục `docs/features/<slug>/` chứa:
+
+- `flow.md`: biên lai quy trình;
+- `why.md`: kết quả bước Why;
+- `spec-check.md`: kết quả soát spec;
+- `decisions.md`: sổ quyết định.
+
+Xem [`docs/cheat-sheet.md`](docs/cheat-sheet.md).
+
+## Cập nhật bản ghim
+
+```bash
+./scripts/update-vendor.sh pstack <commit>
+```
+
+Rồi làm theo các bước trong [`UPSTREAM.md`](UPSTREAM.md). Không sửa trực tiếp trong `vendor/`.
 
 ## Còn treo
 
 - Giấy phép vibebiz: làm rõ trước khi lấy thêm bất kỳ phần nào trực tiếp từ code gốc.
 - `post_review.py` và `merge_check.py` có chạy với MR trên GitLab không.
 - `restore-point` có chụp thay đổi chưa commit không.
-- Nguồn của skill `statechart`; có cài `deslop` hay không.
-- Điền bản ghim của pstack và finolabs trong `UPSTREAM.md`.
+- Có gom `deslop` (plugin `cursor-team-kit`) hay không.
+- pstack lấy từ `cursor/plugins`. Nếu team đang dùng bản mirror `backnotprop/pstack` (đã viết lại một số skill cho trung lập với harness), đổi nguồn trong `scripts/update-vendor.sh` và `UPSTREAM.md`.

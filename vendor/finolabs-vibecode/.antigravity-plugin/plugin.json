@@ -1,0 +1,31 @@
+{
+  "$schema": "https://antigravity.google/schemas/v1/plugin.json",
+  "name": "finolabs-vibecode",
+  "displayName": "Finolabs Vibecode",
+  "description": "25 skills and 3 agents (fnl-reviewer, fnl-security-reviewer, fnl-navigator) for review routing, verification, setup, run hygiene and quota on demand.",
+  "version": "0.2.6-dev",
+  "logo": "assets/icon.svg",
+  "author": {
+    "name": "FINOLABS",
+    "url": "https://github.com/finolabs"
+  },
+  "homepage": "https://github.com/finolabs/finolabs-vibecode",
+  "repository": "https://github.com/finolabs/finolabs-vibecode",
+  "license": "MIT",
+  "keywords": [
+    "coding-router",
+    "delegation",
+    "orchestration",
+    "code-review",
+    "security-review",
+    "versioning",
+    "verification",
+    "agent-skills"
+  ],
+  "suggestedPrompts": [
+    "Route this change through the coding router and tell me the depth you chose.",
+    "Use delegate to coordinate this spec with one session per task.",
+    "Use /setup scan to refresh my local agent inventory, then /setup mode to show effective settings.",
+    "Use /setup to choose Quick or Advanced, then show add <feature>, instructions and check."
+  ]
+}
