@@ -2,9 +2,11 @@
 
 Mọi thay đổi đáng chú ý của plugin `astrolabe` ghi ở đây. Định dạng theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/), version theo [SemVer](https://semver.org/) giai đoạn 0 (`0.y.z`: MINOR khi phá vỡ, PATCH khi tương thích). Ngày ghi `YYYY-MM-DD` theo Keep a Changelog. Ba bộ upstream có version riêng, xem `UPSTREAM.md`.
 
-Chưa có bản nào gắn tag.
+Bản gắn tag đầu tiên là `v0.5.0`; các bản trước chưa gắn tag.
 
 ## [Unreleased]
+
+## [0.5.0] - 2026-11-16
 
 ### Thay đổi phá vỡ
 
