@@ -3,13 +3,17 @@
 #
 #   ./scripts/setup-machine.sh
 #
+# Bộ skill upstream (marketplace, repo GitHub, plugin, skill luồng cần) khai trong upstream.json
+# ở gốc repo; marketplace và plugin của chính repo này đọc từ .claude-plugin/marketplace.json.
+# Thêm, bỏ hay đổi một bộ thì sửa upstream.json, không sửa script này.
+#
 # Script làm:
 # 1. Ghi vào ~/.claude/settings.json (giữ mọi key khác, sao lưu bản cũ):
-#    - extraKnownMarketplaces: ba marketplace upstream với "autoUpdate": true,
-#      và marketplace feature-workflow (thư mục repo này);
-#    - enabledPlugins: bốn plugin của luồng.
+#    - extraKnownMarketplaces: các marketplace upstream với "autoUpdate": true,
+#      và marketplace của repo này (nguồn directory);
+#    - enabledPlugins: plugin của repo này và plugin upstream.
 # 2. Thêm marketplace còn thiếu, cài plugin còn thiếu.
-# 3. Gỡ bản ghim cũ <bộ>@feature-workflow nếu còn.
+# 3. Gỡ plugin cũ khai trong "retired" của upstream.json nếu còn.
 # 4. Chuyển skill rời trong ~/.claude/skills trùng tên với skill của plugin sang
 #    ~/.claude/skills-backup-<ngày>/ (không xoá; ~/.agents/skills giữ nguyên cho Codex, Antigravity).
 # 5. Kiểm các skill mà luồng gọi tới vẫn còn trong plugin upstream.
@@ -26,35 +30,63 @@ for c in python3 python; do
   if command -v "$c" >/dev/null && "$c" -c "import sys" >/dev/null 2>&1; then PY="$c"; break; fi
 done
 [[ -n "$PY" ]] || { echo "Cần Python 3." >&2; exit 1; }
+[[ -f "$HUB/upstream.json" ]] || { echo "Không thấy $HUB/upstream.json." >&2; exit 1; }
 
 # Đường dẫn repo này ở dạng của hệ điều hành (Windows cần C:\..., không phải /c/...).
 HUB_NATIVE="$HUB"
 command -v cygpath >/dev/null && HUB_NATIVE="$(cygpath -w "$HUB")"
 
+# In một danh sách từ upstream.json và marketplace.json, mỗi dòng một mục:
+#   hub-marketplace  tên marketplace của repo này
+#   marketplaces     "<marketplace> <repo GitHub>" của từng bộ upstream
+#   wanted           mọi plugin cần bật, dạng <plugin>@<marketplace>
+#   retired          plugin cũ cần gỡ
+manifest() {
+  "$PY" -I -X utf8 - "$HUB_NATIVE" "$1" <<'PY' | tr -d '\r'
+import json, os, sys
+hub, key = sys.argv[1], sys.argv[2]
+up = json.load(open(os.path.join(hub, "upstream.json"), encoding="utf-8"))
+mk = json.load(open(os.path.join(hub, ".claude-plugin", "marketplace.json"), encoding="utf-8"))
+if key == "hub-marketplace":
+    rows = [mk["name"]]
+elif key == "marketplaces":
+    rows = [f'{u["marketplace"]} {u["repo"]}' for u in up["upstream"]]
+elif key == "wanted":
+    rows = [f'{p["name"]}@{mk["name"]}' for p in mk.get("plugins", [])]
+    rows += [f'{u["plugin"]}@{u["marketplace"]}' for u in up["upstream"]]
+elif key == "retired":
+    rows = up.get("retired", [])
+else:
+    sys.exit(f"khoá lạ: {key}")
+print("\n".join(rows))
+PY
+}
+
+HUB_MK="$(manifest hub-marketplace)"
+WANTED="$(manifest wanted)"
+
 echo "== 1. Ghi ~/.claude/settings.json"
 "$PY" -I -X utf8 - "$HUB_NATIVE" <<'PY'
 import json, os, shutil, sys, time
 hub = sys.argv[1]
+up = json.load(open(os.path.join(hub, "upstream.json"), encoding="utf-8"))
+hub_mk = json.load(open(os.path.join(hub, ".claude-plugin", "marketplace.json"), encoding="utf-8"))
 path = os.path.expanduser("~/.claude/settings.json")
 st = json.load(open(path, encoding="utf-8")) if os.path.exists(path) else {}
 before = json.dumps(st, sort_keys=True)
 
 mk = st.setdefault("extraKnownMarketplaces", {})
-upstream = {
-    "finolabs-vibecode": "finolabs/finolabs-vibecode",
-    "mattpocock": "mattpocock/skills",
-    "cursor-plugins": "cursor/plugins",
-}
-for name, repo in upstream.items():
-    mk[name] = {"source": {"source": "github", "repo": repo}, "autoUpdate": True}
-mk["feature-workflow"] = {"source": {"source": "directory", "path": hub}}
+for u in up["upstream"]:
+    mk[u["marketplace"]] = {"source": {"source": "github", "repo": u["repo"]}, "autoUpdate": True}
+mk[hub_mk["name"]] = {"source": {"source": "directory", "path": hub}}
 
 ep = st.setdefault("enabledPlugins", {})
-for old in ("finolabs-vibecode", "pstack", "mattpocock-skills"):
-    ep.pop(f"{old}@feature-workflow", None)
-for pid in ("feature-workflow@feature-workflow", "finolabs-vibecode@finolabs-vibecode",
-            "mattpocock-skills@mattpocock", "pstack@cursor-plugins"):
-    ep[pid] = True
+for pid in up.get("retired", []):
+    ep.pop(pid, None)
+for p in hub_mk.get("plugins", []):
+    ep[f'{p["name"]}@{hub_mk["name"]}'] = True
+for u in up["upstream"]:
+    ep[f'{u["plugin"]}@{u["marketplace"]}'] = True
 
 if json.dumps(st, sort_keys=True) == before:
     print("Không đổi.")
@@ -75,33 +107,32 @@ known="$(claude plugin marketplace list 2>/dev/null || true)"
 add_mk() {  # <tên> <nguồn>
   if grep -qw -- "$1" <<<"$known"; then echo "Đã có marketplace $1"; else claude plugin marketplace add "$2"; fi
 }
-add_mk finolabs-vibecode finolabs/finolabs-vibecode
-add_mk mattpocock mattpocock/skills
-add_mk cursor-plugins cursor/plugins
-add_mk feature-workflow "$HUB_NATIVE"
-claude plugin marketplace update finolabs-vibecode
-claude plugin marketplace update mattpocock
-claude plugin marketplace update cursor-plugins
-claude plugin marketplace update feature-workflow
+# Đọc qua fd 3 để lệnh claude trong vòng lặp không ăn mất stdin của vòng lặp.
+while read -r name repo <&3; do
+  add_mk "$name" "$repo"
+done 3< <(manifest marketplaces)
+add_mk "$HUB_MK" "$HUB_NATIVE"
+while read -r name _ <&3; do
+  claude plugin marketplace update "$name"
+done 3< <(manifest marketplaces)
+claude plugin marketplace update "$HUB_MK"
 
 installed="$(claude plugin list --json)"
 has_plugin() { grep -q "\"id\": \"$1\"" <<<"$installed"; }
-for pid in feature-workflow@feature-workflow finolabs-vibecode@finolabs-vibecode \
-           mattpocock-skills@mattpocock pstack@cursor-plugins; do
+for pid in $WANTED; do
   if has_plugin "$pid"; then echo "Đã cài $pid"; else claude plugin install "$pid" --scope user; fi
 done
 
-echo "== 3. Gỡ bản ghim cũ"
-for pid in finolabs-vibecode@feature-workflow pstack@feature-workflow mattpocock-skills@feature-workflow; do
+echo "== 3. Gỡ plugin cũ"
+for pid in $(manifest retired); do
   if has_plugin "$pid"; then claude plugin uninstall "$pid"; else echo "Không còn $pid"; fi
 done
 
 echo "== 4. Skill rời trùng tên"
-"$PY" -I -X utf8 - "$(claude plugin list --json)" <<'PY'
+"$PY" -I -X utf8 - "$WANTED" "$(claude plugin list --json)" <<'PY'
 import json, os, shutil, sys, time
-plugins = json.loads(sys.argv[1])
-wanted = {"finolabs-vibecode@finolabs-vibecode", "mattpocock-skills@mattpocock",
-          "pstack@cursor-plugins", "feature-workflow@feature-workflow"}
+wanted = set(sys.argv[1].split())
+plugins = json.loads(sys.argv[2])
 
 def plugin_skills(root):
     """Tên skill một plugin nạp: danh sách "skills" trong plugin.json, hoặc skills/*/SKILL.md."""
@@ -147,17 +178,11 @@ print("  " + " ".join(dupes))
 PY
 
 echo "== 5. Skill luồng cần"
-"$PY" -I -X utf8 - "$(claude plugin list --json)" <<'PY'
+"$PY" -I -X utf8 - "$HUB_NATIVE" "$(claude plugin list --json)" <<'PY'
 import json, os, sys
-need = {
-    "finolabs-vibecode@finolabs-vibecode": ["coding-router", "restore-point", "checks", "review-gate",
-                                             "security-review-gate", "setup"],
-    "pstack@cursor-plugins": ["architect", "interrogate", "statechart", "poteto-mode", "blast-radius",
-                              "how", "setup-pstack"],
-    "mattpocock-skills@mattpocock": ["grill-with-docs", "grilling", "domain-modeling", "to-spec",
-                                     "to-tickets", "setup-matt-pocock-skills"],
-}
-paths = {p["id"]: p["installPath"] for p in json.loads(sys.argv[1])}
+up = json.load(open(os.path.join(sys.argv[1], "upstream.json"), encoding="utf-8"))
+need = {f'{u["plugin"]}@{u["marketplace"]}': u.get("skills", []) for u in up["upstream"]}
+paths = {p["id"]: p["installPath"] for p in json.loads(sys.argv[2])}
 bad = []
 for pid, skills in need.items():
     root = paths.get(pid)

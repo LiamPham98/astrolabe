@@ -7,20 +7,21 @@ Luồng làm tính năng của team, chạy trên Claude Code. Repo tên `astrol
 
 ```
 ~/code/
-├─ astrolabe/                 repo này (trung tâm)
-│  ├─ workspace.json           repo đồng cấp + space Orrery + nơi lưu local dự phòng
-│  ├─ rules/common.md          luật duyệt chung
-│  ├─ features/<slug>/         tài liệu tính năng local, chỉ khi chưa đồng bộ Orrery
-│  ├─ .claude/settings.json    khai báo repo đồng cấp, plugin cho team
-│  ├─ CLAUDE.md                ngữ cảnh khi mở phiên ở đây
-│  ├─ plugins/                 plugin của team
-│  ├─ scripts/setup-machine.sh cài cho máy, chạy một lần
+├─ astrolabe/                  repo này (trung tâm)
+│  ├─ workspace.json            repo đồng cấp + nơi lưu tài liệu
+│  ├─ upstream.json             bộ skill upstream cần cài và skill luồng cần
+│  ├─ rules/common.md           luật duyệt chung
+│  ├─ features/<slug>/          tài liệu tính năng nhiều repo (docsBackend: local)
+│  ├─ .claude/settings.json     khai báo repo đồng cấp, sinh theo máy (gitignore)
+│  ├─ CLAUDE.md                 ngữ cảnh khi mở phiên ở đây
+│  ├─ plugins/                  plugin của team
+│  ├─ scripts/setup-machine.sh  cài cho máy, chạy một lần
 │  └─ .claude-plugin/marketplace.json
-├─ my-api/             repo đồng cấp
+├─ my-api/                     repo đồng cấp (tên ví dụ)
 │  ├─ .claude/feature-workflow.json   { "workspace": "../astrolabe" }
-│  ├─ docs/flow-rules.md       luật riêng, bổ sung cho luật chung
-│  └─ docs/features/<slug>/    tài liệu tính năng local, chỉ khi chưa đồng bộ Orrery
-└─ my-web/                 repo đồng cấp
+│  ├─ docs/flow-rules.md        luật riêng, bổ sung cho luật chung
+│  └─ docs/features/<slug>/     tài liệu tính năng một repo (docsBackend: local)
+└─ my-web/                     repo đồng cấp (tên ví dụ)
 ```
 
 | Plugin | Cài từ | Nội dung |
@@ -30,7 +31,7 @@ Luồng làm tính năng của team, chạy trên Claude Code. Repo tên `astrol
 | `pstack` | Marketplace `cursor-plugins` (GitHub, tự cập nhật) | Bản dựng cho Claude Code: thiết kế, phản biện thiết kế, statechart, code, blast-radius |
 | `mattpocock-skills` | Marketplace `mattpocock` (GitHub, tự cập nhật) | Skill của Matt Pocock: grill, spec, ticket |
 
-Nguồn, giấy phép và cách cập nhật ghi trong [`UPSTREAM.md`](UPSTREAM.md). Luồng chốt ngày 13/11/2026; chuyển sang bản upstream mới nhất ngày 16/11/2026.
+Ba bộ upstream khai trong [`upstream.json`](upstream.json); nguồn, giấy phép và cách cập nhật ghi trong [`UPSTREAM.md`](UPSTREAM.md). Luồng chốt ngày 13/11/2026; chuyển sang bản upstream mới nhất ngày 16/11/2026.
 
 ## Luồng
 
@@ -67,7 +68,7 @@ Người làm vẫn chỉnh từng công tắc. Chi tiết trong [`plugins/featu
 ./scripts/setup-machine.sh
 ```
 
-Script ghi marketplace và plugin vào `~/.claude/settings.json` (sao lưu bản cũ), cài bốn plugin, bật tự cập nhật cho ba bộ upstream, gỡ bản ghim cũ `<bộ>@feature-workflow`, chuyển skill rời trùng tên trong `~/.claude/skills` sang `~/.claude/skills-backup-<ngày>/`, rồi kiểm các skill luồng cần. Chạy lại bao nhiêu lần cũng được.
+Script đọc `upstream.json` và `.claude-plugin/marketplace.json`, ghi marketplace và plugin vào `~/.claude/settings.json` (sao lưu bản cũ), cài plugin của repo này cùng các bộ upstream, bật tự cập nhật cho bộ upstream, gỡ plugin cũ liệt kê trong `retired`, chuyển skill rời trùng tên trong `~/.claude/skills` sang `~/.claude/skills-backup-<ngày>/`, rồi kiểm các skill luồng cần. Chạy lại bao nhiêu lần cũng được.
 
 Bộ skill của Matt cài qua `npx skills` cho Codex, Antigravity nằm ở `~/.agents/skills`; script không đụng tới. Khi `npx skills add` hay `update`, bỏ chọn Claude Code để không sinh lại symlink trùng.
 
@@ -79,10 +80,10 @@ Bộ skill của Matt cài qua `npx skills` cho Codex, Antigravity nằm ở `~/
 
 Ở repo trung tâm, `/feature-workflow:feature-setup`:
 
-- kiểm bốn plugin và bản trùng, chỉ lại `scripts/setup-machine.sh` khi thiếu;
+- kiểm plugin theo `upstream.json` và bản trùng, chỉ lại `scripts/setup-machine.sh` khi thiếu;
 - tìm các repo git cùng thư mục cha, hỏi đưa repo nào vào workspace;
-- kiểm phiên có Orrery và thấy space `orrery.space` (mặc định `personal`) không;
-- hỏi nơi lưu local dự phòng khi phiên không có Orrery (`featureDocs`):
+- hỏi nơi lưu tài liệu (`docsBackend`): `local` (mặc định, file markdown trong git) hay `orrery`; với `orrery`, kiểm phiên có Orrery và thấy space `orrery.space` không;
+- hỏi thư mục local (`featureDocs`):
   - `auto`: tính năng một repo lưu trong repo đó, nhiều repo lưu ở trung tâm;
   - `central`: lưu hết ở trung tâm;
   - `project`: lưu hết trong repo dự án;
@@ -95,7 +96,7 @@ Chạy lại bao nhiêu lần cũng được: nó chỉ làm phần còn thiếu
 
 **Cho cả team**: mỗi đồng đội clone repo này và các repo dự án vào cùng thư mục cha, rồi chạy `./scripts/setup-machine.sh`. Plugin upstream cập nhật theo từng máy, nên hai máy có thể đang ở hai bản khác nhau trong một lúc.
 
-**Cài tay**: với mỗi repo dự án chạy `scripts/init-project.sh ../<repo>` từ repo này; rồi gõ `/mattpocock-skills:setup-matt-pocock-skills` và `/finolabs-vibecode:setup` trong từng repo.
+**Cài tay**: với mỗi repo dự án chạy `scripts/init-project.sh <đường-dẫn-repo>` từ repo này (repo nên nằm cùng thư mục cha, nhưng ở đâu cũng được, miễn cùng ổ đĩa); rồi gõ `/mattpocock-skills:setup-matt-pocock-skills` và `/finolabs-vibecode:setup` trong từng repo.
 
 **Một repo đơn lẻ, không workspace**: mở phiên trong repo đó và gõ `/feature-workflow:feature-setup`; nó nhận ra không có workspace và setup riêng repo đó.
 
@@ -110,7 +111,12 @@ Skill của plugin luôn gọi kèm tên plugin: `/<plugin>:<skill>`. Gõ `/feat
 /feature-workflow:feature-flow large mở lại kỳ đã khóa
 ```
 
-Mỗi tính năng có một thư mục tính năng trong Orrery, ở `<space>:<repo>/features/<slug>/` (space theo `orrery.space`, mặc định `personal`). Phiên không có Orrery thì ghi local theo `featureDocs`, rồi đồng bộ lên Orrery ở phiên sau. Spec và ticket cũng nằm trong thư mục này. `GLOSSARY.md` và ADR nằm ở `<repo>/GLOSSARY.md` và `<repo>/adr/`, dùng chung cho mọi tính năng của repo, và đổi qua changeset của Orrery. Chỉ luật duyệt nằm trong git. Thư mục tính năng chứa:
+Mỗi tính năng có một thư mục tính năng. Vị trí theo `docsBackend` trong `workspace.json` (hoặc `.claude/feature-workflow.json` ở repo đơn lẻ):
+
+- `local` (mặc định): file markdown trong git, ở `docs/features/<slug>/` của repo hoặc `features/<slug>/` của repo trung tâm, theo `featureDocs`. `GLOSSARY.md` và ADR (`docs/adr/`) nằm trong repo và đổi qua MR. Không cần dịch vụ ngoài.
+- `orrery`: note trong [Orrery](#tuỳ-biến) ở `<space>:<repo>/features/<slug>/`; `GLOSSARY.md` và ADR ở `<repo>/`, đổi qua changeset. Phiên không có Orrery thì ghi local theo `featureDocs`, rồi đồng bộ lên ở phiên sau.
+
+Luật duyệt luôn nằm trong git. Thư mục tính năng chứa:
 
 - `flow.md`: biên lai quy trình;
 - `why.md`: kết quả bước Why;
@@ -120,9 +126,25 @@ Mỗi tính năng có một thư mục tính năng trong Orrery, ở `<space>:<r
 
 Xem [`docs/cheat-sheet.md`](docs/cheat-sheet.md). Không biết dùng skill nào thì gõ `/feature-workflow:feature-help <câu hỏi>`.
 
+## Tuỳ biến
+
+Mọi thứ riêng của một team nằm trong file cấu hình, không nằm trong skill hay script:
+
+| Muốn đổi | Sửa ở |
+|---|---|
+| Thêm, bỏ hay thay bộ skill upstream; skill luồng cần kiểm | `upstream.json` (`upstream[]`: `marketplace`, `repo`, `plugin`, `skills`; `retired[]`: plugin cũ cần gỡ) |
+| Nơi lưu tài liệu tính năng | `docsBackend` (`local` hoặc `orrery`) và `featureDocs` (`auto`, `central`, `project`) trong `workspace.json` |
+| Space Orrery (chỉ khi `docsBackend: orrery`) | `orrery.space` trong `workspace.json` |
+| Repo trong workspace | `projects` trong `workspace.json`, hoặc chạy `scripts/init-project.sh` |
+| Việc luôn cần người duyệt | `rules/common.md` (chung) và `docs/flow-rules.md` (từng repo) |
+
+`.claude/settings.json` của repo trung tâm sinh theo từng máy nên nằm trong `.gitignore`. Team muốn commit danh sách repo đồng cấp thì bỏ dòng đó trong fork của mình.
+
+Orrery là dịch vụ lưu note qua MCP; chỉ cần khi chọn `docsBackend: orrery`.
+
 ## Cập nhật
 
-Ba bộ upstream tự cập nhật khi upstream phát hành bản mới (tăng `version`). Sau một lần cập nhật, chạy lại `./scripts/setup-machine.sh` để kiểm skill luồng cần vẫn còn. Chi tiết trong [`UPSTREAM.md`](UPSTREAM.md).
+Các bộ upstream tự cập nhật khi upstream phát hành bản mới (tăng `version`). Sau một lần cập nhật, chạy lại `./scripts/setup-machine.sh` để kiểm skill luồng cần vẫn còn. Chi tiết trong [`UPSTREAM.md`](UPSTREAM.md).
 
 ## Còn treo
 
@@ -134,3 +156,7 @@ Ba bộ upstream tự cập nhật khi upstream phát hành bản mới (tăng `
 
 - `restore-point` chụp cả thay đổi chưa commit: nó lưu snapshot của working tree lên một ref local, không đụng index, nhánh hay HEAD.
 - Mọi skill luồng này gọi tới đều có trong bản upstream: `scripts/setup-machine.sh` kiểm ở bước 5 mỗi lần chạy.
+
+## Giấy phép
+
+MIT, xem [`LICENSE`](LICENSE). Ba bộ upstream có giấy phép riêng, xem [`UPSTREAM.md`](UPSTREAM.md).

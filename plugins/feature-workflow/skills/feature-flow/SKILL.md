@@ -33,13 +33,56 @@ Tìm workspace khi bắt đầu:
 2. Gốc repo đang mở có `.claude/feature-workflow.json`: phiên đang ở **repo đồng cấp**. Repo trung tâm là `workspace` trong file đó, tính từ repo đang mở.
 3. Không có cả hai: đơn lẻ.
 
-Ở kiểu workspace, đọc `workspace.json` để biết `featureDocs` và danh sách repo.
+Ở kiểu workspace, đọc `workspace.json` để biết `docsBackend`, `featureDocs` và danh sách repo.
 
-## Tài liệu trong Orrery
+## Nơi lưu tài liệu
 
-`<slug>` là tên tính năng viết thường, không dấu, nối bằng gạch ngang. Mọi tài liệu của luồng, trừ luật duyệt, nằm trong Orrery và được đọc, ghi qua công cụ MCP của Orrery. Luật duyệt (`rules/common.md`, `docs/flow-rules.md`) vẫn nằm trong git để sửa qua MR.
+`<slug>` là tên tính năng viết thường, không dấu, nối bằng gạch ngang. Luật duyệt (`rules/common.md`, `docs/flow-rules.md`) luôn nằm trong git để sửa qua MR. Các tài liệu còn lại lưu theo `docsBackend`, đọc trong `workspace.json` (kiểu workspace) hoặc `.claude/feature-workflow.json` (kiểu đơn lẻ):
 
-**Space**: `orrery.space` trong `workspace.json` (kiểu workspace) hoặc trong `.claude/feature-workflow.json` (kiểu đơn lẻ). Thiếu thì dùng `personal`.
+| `docsBackend` | Tài liệu tính năng | `GLOSSARY.md`, ADR |
+|---|---|---|
+| `local` (mặc định, cả khi thiếu khoá) | file trong git, ở thư mục theo mục "Thư mục local" | `GLOSSARY.md` và `docs/adr/` trong repo, đổi qua MR |
+| `orrery` | note trong Orrery, theo mục "Orrery" | note trong Orrery, đổi qua changeset |
+
+Giá trị khác hai giá trị trên thì nói một câu và dùng `local`.
+
+Thư mục tính năng chứa cùng các file ở mọi backend:
+
+| File | Ai ghi | Nội dung |
+|---|---|---|
+| `flow.md` | feature-flow | Biên lai: preset, công tắc, lý do, các cửa đã qua |
+| `why.md` | skill `feature-why` | Kết quả bước Why |
+| `spec.md`, `issues/` | `/mattpocock-skills:to-spec`, `/mattpocock-skills:to-tickets` | Spec và ticket, ghi theo `docs/agents/issue-tracker.md` của repo |
+| `spec-check.md` | skill `spec-check` | Kết quả soát spec |
+| `decisions.md` | mọi bước | Sổ quyết định, chỉ ghi thêm |
+
+Mỗi file có frontmatter `type` (`flow`, `why`, `spec`, `ticket`, `spec-check`, `decisions`, `adr`, `glossary`), `repo`, `feature` (trừ `GLOSSARY.md` và ADR) và `status` khi có. `GLOSSARY.md` và ADR dùng chung cho mọi tính năng của repo; `/mattpocock-skills:grill-with-docs` và cửa chốt thiết kế ghi chúng.
+
+Mẫu của `flow.md` và `decisions.md` nằm trong thư mục `templates/` cạnh file SKILL.md này. Mẫu `why.md` nằm cạnh skill `feature-why`.
+
+### Thư mục local
+
+Dùng khi `docsBackend` là `local`, và làm nơi dự phòng khi `docsBackend` là `orrery` mà phiên không kết nối Orrery.
+
+| Kiểu | `featureDocs` | Tính năng một repo | Tính năng nhiều repo (`repo` bật) |
+|---|---|---|---|
+| Đơn lẻ | — | `docs/features/<slug>/` | — |
+| Workspace | `auto` (mặc định) | `docs/features/<slug>/` của repo đó | `features/<slug>/` của repo trung tâm |
+| Workspace | `central` | `features/<slug>/` của repo trung tâm | `features/<slug>/` của repo trung tâm |
+| Workspace | `project` | `docs/features/<slug>/` của repo đó | `docs/features/<slug>/` của repo chính của tính năng (hỏi repo nào) |
+
+Với `docsBackend: local`:
+
+- Ghi thêm vào `decisions.md` bằng cách nối vào cuối file; không sửa mục đã có.
+- Spec và ticket nằm ở nơi `docs/agents/issue-tracker.md` của repo quy định (cấu hình "Local markdown" của `/mattpocock-skills:setup-matt-pocock-skills`). Ghi đường dẫn của chúng vào `flow.md`.
+- File tính năng là file trong git: commit cùng MR đầu tiên của tính năng, rồi cập nhật trong các MR sau. Mô tả mỗi MR dán đường dẫn `flow.md` và `spec.md`.
+- ADR ghi vào `docs/adr/` của repo, đánh số tăng dần; `GLOSSARY.md` nằm ở gốc repo.
+
+### Orrery
+
+Chỉ áp khi `docsBackend` là `orrery`. Tài liệu đọc, ghi qua công cụ MCP của Orrery.
+
+**Space**: `orrery.space` cùng file với `docsBackend`. Thiếu thì dùng `personal`.
 
 **Bố cục**: folder theo repo trước, theo tính năng sau. `<repo>` là tên repo của tính năng một repo, hoặc tên repo trung tâm của tính năng nhiều repo.
 
@@ -52,18 +95,9 @@ Tìm workspace khi bắt đầu:
    └─ issues/01-<slug>.md
 ```
 
-| Note | Ai ghi | Nội dung |
-|---|---|---|
-| `flow.md` | feature-flow | Biên lai: preset, công tắc, lý do, các cửa đã qua, revision đã đọc |
-| `why.md` | skill `feature-why` | Kết quả bước Why |
-| `spec.md`, `issues/` | `/mattpocock-skills:to-spec`, `/mattpocock-skills:to-tickets` | Spec và ticket, ghi thẳng vào Orrery theo `docs/agents/issue-tracker.md` của repo |
-| `spec-check.md` | skill `spec-check` | Kết quả soát spec |
-| `decisions.md` | mọi bước | Sổ quyết định, chỉ ghi thêm |
-| `GLOSSARY.md`, `adr/` | `/mattpocock-skills:grill-with-docs`, cửa chốt thiết kế | Thuật ngữ và ADR của repo, dùng chung cho mọi tính năng |
-
 **Cách ghi**:
 
-- Mỗi note có frontmatter `type` (`flow`, `why`, `spec`, `ticket`, `spec-check`, `decisions`, `adr`, `glossary`), `repo`, `feature` (trừ `GLOSSARY.md` và ADR) và `status` khi có. Server tự gán `id`.
+- Server tự gán `id` cho note.
 - Tạo note từ mẫu bằng `note_create`. Ghi thêm vào `decisions.md` bằng `note_edit` với `op: append`. Sửa note bằng `note_edit` hoặc `note_update`, luôn với `base_revision` vừa đọc; gặp `conflict` thì đọc lại, gộp, rồi ghi lại.
 - Note trỏ nhau bằng wikilink, ví dụ mục `design` trong `decisions.md` trỏ `[[<repo>/adr/0003-<slug>]]`.
 - `GLOSSARY.md` và ADR là note dùng chung cho cả repo: đổi chúng bằng `changeset_submit` (`op: note.create` hoặc `note.update`), để một người khác tác giả duyệt trong client của họ. Agent không bao giờ tự duyệt changeset. Ghi id changeset vào `flow.md`; trước khi changeset được duyệt, note chưa có trong Orrery, nên bước sau đọc nội dung từ changeset (`changeset_read`). Người làm nói space không có người duyệt thứ hai thì ghi thẳng và ghi `review-risk` vào `decisions.md`.
@@ -71,22 +105,11 @@ Tìm workspace khi bắt đầu:
 
 **Chép từ repo lên Orrery**: skill của Matt (`domain-modeling`, qua `grill-with-docs`) luôn ghi `GLOSSARY.md` và `docs/adr/` vào repo. Sau mỗi lần chạy grill, so các file đó với note trong `<repo>/`: file mới hoặc đã đổi thì đưa lên Orrery như trên, rồi hỏi người làm có xoá bản trong repo không.
 
-**Khi phiên không kết nối Orrery** (không có công cụ `note_create`, hoặc `whoami` lỗi): nói một câu, rồi ghi local vào thư mục ở bảng dưới, và ghi `orrery: chưa đồng bộ` ở đầu `flow.md`. Spec và ticket khi đó ghi cạnh `flow.md`. Lần sau phiên có Orrery:
+**Khi phiên không kết nối Orrery** (không có công cụ `note_create`, hoặc `whoami` lỗi): nói một câu, rồi ghi vào thư mục local ở mục trên, và ghi `orrery: chưa đồng bộ` ở đầu `flow.md`. Spec và ticket khi đó ghi cạnh `flow.md`. Lần sau phiên có Orrery:
 
 1. Với mỗi file local, đọc note cùng tên trong Orrery.
 2. Note chưa có: tạo từ file local. Note đã có và khác file local: không ghi đè; trình hai bản và hỏi người làm giữ bản nào. Với `decisions.md`, chỉ append các mục `D-###` mà Orrery chưa có.
 3. Xong thì xoá dòng `orrery: chưa đồng bộ` trong note `flow.md`, và hỏi người làm có xoá các file local không.
-
-Thư mục local khi không có Orrery:
-
-| Kiểu | `featureDocs` | Tính năng một repo | Tính năng nhiều repo (`repo` bật) |
-|---|---|---|---|
-| Đơn lẻ | — | `docs/features/<slug>/` | — |
-| Workspace | `auto` | `docs/features/<slug>/` của repo đó | `features/<slug>/` của repo trung tâm |
-| Workspace | `central` | `features/<slug>/` của repo trung tâm | `features/<slug>/` của repo trung tâm |
-| Workspace | `project` | `docs/features/<slug>/` của repo đó | `docs/features/<slug>/` của repo chính của tính năng (hỏi repo nào) |
-
-Mẫu của `flow.md` và `decisions.md` nằm trong thư mục `templates/` cạnh file SKILL.md này. Mẫu `why.md` nằm cạnh skill `feature-why`.
 
 ## Giai đoạn 0: Điều phối
 
@@ -149,7 +172,7 @@ Không chạy `/pstack:how` riêng: Phase A (Ground) của `architect` đã ch�
 2. Khi bật `contest`: in lệnh `/pstack:interrogate` trên thiết kế vừa ra. Chỉ giữ finding chạy lại được.
 3. Khi bật `state`: in lệnh `/pstack:statechart` trên thiết kế, **trước khi viết code**. Đường lỗi TLC tìm ra thì sửa thiết kế ngay ở giai đoạn này.
 4. **Cửa: chốt thiết kế.** Gộp checkpoint của architect, finding của interrogate và kết quả statechart thành một lần duyệt. Ghi quyết định thiết kế vào `decisions.md`.
-5. **ADR**: với mỗi quyết định thiết kế khó đảo ngược, sẽ gây thắc mắc nếu không có lý do ghi lại, và là kết quả của một lựa chọn thật giữa các phương án, ghi một ADR theo `ADR-FORMAT.md` của skill `domain-modeling` (plugin `mattpocock-skills`) vào `<repo>/adr/` trong Orrery, bằng `changeset_submit`. Lấy số tiếp theo sau số lớn nhất đã có trong folder đó. Tính năng nhiều repo ghi ADR vào repo cung cấp hợp đồng. Mục `design` trong `decisions.md` trỏ tới ADR bằng wikilink.
+5. **ADR**: với mỗi quyết định thiết kế khó đảo ngược, sẽ gây thắc mắc nếu không có lý do ghi lại, và là kết quả của một lựa chọn thật giữa các phương án, ghi một ADR theo `ADR-FORMAT.md` của skill `domain-modeling` (plugin `mattpocock-skills`), ở nơi lưu ADR theo `docsBackend` (mục "Nơi lưu tài liệu"): `docs/adr/` của repo với `local`, `<repo>/adr/` trong Orrery bằng `changeset_submit` với `orrery`. Lấy số tiếp theo sau số lớn nhất đã có. Tính năng nhiều repo ghi ADR vào repo cung cấp hợp đồng. Mục `design` trong `decisions.md` trỏ tới ADR (đường dẫn file với `local`, wikilink với `orrery`).
 
 ## Trước khi code
 

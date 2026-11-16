@@ -1,8 +1,6 @@
 {
   "version": 1,
+  "docsBackend": "local",
   "featureDocs": "auto",
-  "orrery": {
-    "space": "personal"
-  },
   "projects": []
 }

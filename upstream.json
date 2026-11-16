@@ -1,0 +1,27 @@
+{
+  "upstream": [
+    {
+      "marketplace": "finolabs-vibecode",
+      "repo": "finolabs/finolabs-vibecode",
+      "plugin": "finolabs-vibecode",
+      "skills": ["coding-router", "restore-point", "checks", "review-gate", "security-review-gate", "setup"]
+    },
+    {
+      "marketplace": "cursor-plugins",
+      "repo": "cursor/plugins",
+      "plugin": "pstack",
+      "skills": ["architect", "interrogate", "statechart", "poteto-mode", "blast-radius", "how", "setup-pstack"]
+    },
+    {
+      "marketplace": "mattpocock",
+      "repo": "mattpocock/skills",
+      "plugin": "mattpocock-skills",
+      "skills": ["grill-with-docs", "grilling", "domain-modeling", "to-spec", "to-tickets", "setup-matt-pocock-skills"]
+    }
+  ],
+  "retired": [
+    "finolabs-vibecode@feature-workflow",
+    "pstack@feature-workflow",
+    "mattpocock-skills@feature-workflow"
+  ]
+}

@@ -1,6 +1,6 @@
 ---
 name: feature-help
-description: "Trả lời câu hỏi về luồng feature-workflow: đang ở giai đoạn nào, gõ lệnh gì tiếp, skill nào hợp, lệnh nào không dùng, tài liệu nằm đâu trong Orrery. Khi câu hỏi chỉ thuộc một bộ (finolabs, pstack, Matt), trỏ sang skill trợ giúp của bộ đó. Chỉ đọc. Dùng khi gõ /feature-workflow:feature-help hoặc khi người làm hỏi nên dùng skill nào."
+description: "Trả lời câu hỏi về luồng feature-workflow: đang ở giai đoạn nào, gõ lệnh gì tiếp, skill nào hợp, lệnh nào không dùng, tài liệu nằm đâu (file local hoặc Orrery). Khi câu hỏi chỉ thuộc một bộ (finolabs, pstack, Matt), trỏ sang skill trợ giúp của bộ đó. Chỉ đọc. Dùng khi gõ /feature-workflow:feature-help hoặc khi người làm hỏi nên dùng skill nào."
 ---
 
 # feature-help: hỏi về luồng
@@ -21,7 +21,7 @@ Trả lời từ các file này, không từ trí nhớ. Hai nguồn nói khác 
 
 Chỉ làm khi câu hỏi gắn với một tính năng cụ thể ("tôi làm tiếp gì", "tính năng X tới đâu rồi").
 
-- Tìm `flow.md` của tính năng trong Orrery: `note_search` trong folder `<repo>/features/` (cách tìm space và folder theo "Tài liệu trong Orrery" của `feature-flow`). Phiên không có Orrery thì tìm trong thư mục local.
+- Tìm `flow.md` của tính năng theo `docsBackend` (mục "Nơi lưu tài liệu" của `feature-flow`): `local` thì tìm trong thư mục local; `orrery` thì `note_search` trong folder `<repo>/features/` của space, và tìm cả thư mục local khi phiên không có Orrery.
 - Đọc preset, công tắc đã bật, các cửa đã qua, MR đã merge, và id changeset còn chờ duyệt.
 - Suy ra giai đoạn hiện tại và bước tiếp theo. Ghi revision của `flow.md` đã đọc trong câu trả lời.
 
@@ -32,7 +32,7 @@ Không tìm thấy `flow.md` thì nói tính năng chưa bắt đầu và đưa 
 | Người làm muốn | Trả lời bằng lệnh |
 |---|---|
 | Bắt đầu một tính năng | `/feature-workflow:feature-flow <small\|medium\|large> <mô tả>` |
-| Cài máy, thêm repo, sửa workspace, cấu hình Orrery | `/feature-workflow:feature-setup` |
+| Cài máy, thêm repo, sửa workspace, chọn nơi lưu tài liệu | `/feature-workflow:feature-setup` |
 | Biết tính năng có đáng làm không | `/feature-workflow:feature-why`, hoặc bật `why` trong `feature-flow` |
 | Soát một spec đã có | `/feature-workflow:spec-check` |
 | Chọn preset | bảng "Chọn quy mô" trong `docs/cheat-sheet.md` |

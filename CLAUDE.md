@@ -2,11 +2,12 @@
 
 Repo này vừa là plugin marketplace của luồng làm tính năng, vừa là trung tâm của một workspace gồm nhiều repo đồng cấp nằm cùng thư mục cha.
 
-- `workspace.json`: danh sách repo đồng cấp (`projects`, đường dẫn tương đối như `../my-api`) space Orrery lưu tài liệu tính năng (`orrery.space`, mặc định `personal`), và nơi lưu local dự phòng khi phiên không có Orrery (`featureDocs`: `auto`, `central` hoặc `project`).
+- `workspace.json`: danh sách repo đồng cấp (`projects`, đường dẫn tương đối như `../my-api`), nơi lưu tài liệu tính năng (`docsBackend`: `local` mặc định hoặc `orrery`), thư mục local (`featureDocs`: `auto`, `central` hoặc `project`) và space Orrery (`orrery.space`, chỉ khi `docsBackend: orrery`).
 - `rules/common.md`: luật duyệt chung cho mọi repo trong workspace. Mỗi repo có thể bổ sung trong `docs/flow-rules.md` của nó.
-- Mọi tài liệu trừ luật duyệt nằm trong Orrery: tài liệu tính năng (biên lai, why, spec, ticket, soát spec, sổ quyết định) ở `<repo>/features/<slug>/`; `GLOSSARY.md` và ADR ở `<repo>/`. `features/<slug>/` trong repo này chỉ chứa bản local chưa đồng bộ.
-- `.claude/settings.json`: khai báo các repo đồng cấp (`permissions.additionalDirectories`) và plugin cho team.
-- `plugins/`: plugin của team. Ba bộ finolabs-vibecode, pstack, mattpocock-skills cài từ marketplace upstream bằng `scripts/setup-machine.sh`; xem `UPSTREAM.md`.
+- Tài liệu tính năng (biên lai, why, spec, ticket, soát spec, sổ quyết định), `GLOSSARY.md` và ADR lưu theo `docsBackend`; cách đọc ghi ở mục "Nơi lưu tài liệu" của skill `feature-flow`. Luật duyệt luôn nằm trong git.
+- `.claude/settings.json`: khai báo các repo đồng cấp (`permissions.additionalDirectories`), sinh theo máy, nằm trong `.gitignore`.
+- `upstream.json`: các bộ skill upstream (finolabs-vibecode, pstack, mattpocock-skills) mà `scripts/setup-machine.sh` cài, và skill luồng cần kiểm; xem `UPSTREAM.md`.
+- `plugins/`: plugin của team.
 
 Khi phiên mở ở đây:
 
