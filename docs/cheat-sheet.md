@@ -10,7 +10,14 @@ Mọi lệnh dưới đây có tiền tố tên plugin (`/pstack:…`, `/mattpoc
 
 Kiểm tra, hỏi duyệt, rồi cài phần còn thiếu. Chạy lại được.
 
+Workspace: chạy ở repo trung tâm `feature-workflow` để setup mọi repo đồng cấp một lần. Thêm repo mới thì chạy lại.
+
 ## 1. Bắt đầu
+
+Mở phiên ở đâu:
+
+- tính năng một repo: trong repo đó;
+- tính năng nhiều repo: ở repo trung tâm.
 
 ```
 /feature-workflow:feature-flow <small|medium|large> <mô tả>

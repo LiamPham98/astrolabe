@@ -8,6 +8,8 @@
 - Công tắc bật: <danh sách>
 - Spec: <đường dẫn hoặc link issue, hoặc "không có">
 - Repo: <danh sách>
+- Thư mục tính năng: <đường dẫn>
+- Luật duyệt đã đọc: <rules/common.md của workspace, docs/flow-rules.md của từng repo>
 
 ## Công tắc
 

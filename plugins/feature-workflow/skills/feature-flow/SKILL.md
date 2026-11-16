@@ -20,9 +20,33 @@ Cách gọi: `/feature-workflow:feature-flow <small|medium|large> <mô tả tín
 - **Mọi lệnh sau giai đoạn 2 đều kèm đường dẫn spec** (file hoặc link issue).
 - Không dùng `/mattpocock-skills:implement` của Matt hay `none.md implement`. "Không adopt path Matt" chỉ có nghĩa là không dùng chuỗi implement của Matt; vẫn dùng `/mattpocock-skills:grill-with-docs` và `/mattpocock-skills:to-spec`.
 
+## Workspace
+
+Luồng chạy được theo hai kiểu:
+
+- **Đơn lẻ**: một repo, không có workspace.
+- **Workspace**: một repo trung tâm (có `workspace.json` và `.claude-plugin/marketplace.json` ở gốc) cùng các repo đồng cấp nằm chung thư mục cha.
+
+Tìm workspace khi bắt đầu:
+
+1. Gốc repo đang mở có `workspace.json`: phiên đang ở **repo trung tâm**. Các repo đồng cấp là danh sách `projects`, đường dẫn tính từ repo trung tâm.
+2. Gốc repo đang mở có `.claude/feature-workflow.json`: phiên đang ở **repo đồng cấp**. Repo trung tâm là `workspace` trong file đó, tính từ repo đang mở.
+3. Không có cả hai: đơn lẻ.
+
+Ở kiểu workspace, đọc `workspace.json` để biết `featureDocs` và danh sách repo.
+
 ## Thư mục của một tính năng
 
-Mọi file do luồng này tạo nằm ở `docs/features/<slug>/`, với `<slug>` là tên tính năng viết thường, không dấu, nối bằng gạch ngang:
+`<slug>` là tên tính năng viết thường, không dấu, nối bằng gạch ngang. Thư mục tính năng nằm ở:
+
+| Kiểu | `featureDocs` | Tính năng một repo | Tính năng nhiều repo (`repo` bật) |
+|---|---|---|---|
+| Đơn lẻ | — | `docs/features/<slug>/` | — |
+| Workspace | `auto` | `docs/features/<slug>/` của repo đó | `features/<slug>/` của repo trung tâm |
+| Workspace | `central` | `features/<slug>/` của repo trung tâm | `features/<slug>/` của repo trung tâm |
+| Workspace | `project` | `docs/features/<slug>/` của repo đó | `docs/features/<slug>/` của repo chính của tính năng (hỏi repo nào) |
+
+Mọi file do luồng này tạo nằm trong thư mục tính năng:
 
 | File | Ai ghi | Nội dung |
 |---|---|---|
@@ -38,7 +62,11 @@ Mẫu của `flow.md` và `decisions.md` nằm trong thư mục `templates/` c�
 ## Giai đoạn 0: Điều phối
 
 1. **coding-router**: nếu chưa có biên lai của coding-router cho tính năng này, load `coding-router` để inspect, chọn path và độ sâu. Path luôn là luồng này.
-2. **File luật**: đọc `docs/flow-rules.md`. Nếu chưa có, nói một câu rằng repo chưa có file luật và đề nghị tạo từ `templates/flow-rules.md` cạnh file SKILL.md này; tiếp tục với danh sách rỗng.
+2. **File luật**: luật áp cho tính năng là hợp của:
+   - ở kiểu workspace: `rules/common.md` của repo trung tâm;
+   - `docs/flow-rules.md` của **mỗi repo tính năng chạm tới**.
+
+   Luật riêng chỉ thêm việc hoặc siết cửa, không bỏ được việc của luật chung; hai file ghi khác nhau về cùng một việc thì lấy cửa chặt hơn. Thiếu file nào thì nói một câu và đề nghị chạy `/feature-workflow:feature-setup`; tiếp tục với phần đang có.
 3. **Preset và công tắc**: bắt đầu từ preset, rồi chỉnh từng công tắc theo tính năng thật.
 
    | Công tắc | Bật khi | Bật giai đoạn hoặc bước | S | M | L |
@@ -54,7 +82,7 @@ Mẫu của `flow.md` và `decisions.md` nằm trong thư mục `templates/` c�
 
    Hỏi những công tắc chưa rõ từ mô tả, tối đa 4 câu trong một lần hỏi. Đọc code liên quan nếu cần để trả lời thay vì hỏi.
 4. **Khóa theo file luật**: nếu tính năng chạm một việc trong file luật, cửa duyệt mà việc đó yêu cầu không được tắt, và bật `sec` nếu việc đó đánh dấu cần security review. Ghi rõ việc nào trong file luật bị chạm.
-5. **Biên lai**: ghi `flow.md` từ mẫu: preset, từng công tắc bật hay tắt kèm một dòng lý do, các repo liên quan, việc bị khóa theo file luật.
+5. **Thư mục tính năng và biên lai**: chọn thư mục tính năng theo bảng ở trên, rồi ghi `flow.md` từ mẫu: preset, từng công tắc bật hay tắt kèm một dòng lý do, các repo liên quan, việc bị khóa theo file luật (ghi rõ việc đó đến từ luật chung hay luật riêng của repo nào), đường dẫn thư mục tính năng.
 6. **Kế hoạch**: trình chuỗi lệnh sẽ gõ theo các công tắc đã bật. Chờ người làm đồng ý (xác nhận nhanh, không phải cửa).
 
 Preset small bỏ giai đoạn 1, 2, 3: đi thẳng tới restore-point rồi giai đoạn 4, để `poteto-mode` chạy playbook đầy đủ. Playbook tự gọi `how` và `architect` khi code vượt biên hàm.
@@ -87,7 +115,14 @@ Không chạy `/pstack:how` riêng: Phase A (Ground) của `architect` đã ch�
 
 ## Trước khi code
 
-In lệnh `/finolabs-vibecode:restore-point create` cho người làm gõ. Khi bật `repo`, gõ ở từng repo.
+In lệnh `/finolabs-vibecode:restore-point create` cho người làm gõ. Lệnh chạy trên repo đang mở của phiên. Khi bật `repo`, hoặc khi phiên đang ở repo trung tâm mà code nằm ở repo đồng cấp, in theo từng repo:
+
+```
+/cd ../<repo>
+/finolabs-vibecode:restore-point create
+```
+
+Xong thì nhắc `/cd` về lại repo trung tâm nếu luồng đang chạy từ đó.
 
 ## Giai đoạn 4: Lặp cho từng MR
 

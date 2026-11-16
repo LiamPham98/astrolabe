@@ -2,6 +2,8 @@
 
 Những việc dưới đây **luôn cần người duyệt**. Khi tính năng chạm một việc trong danh sách, `feature-flow` không được tắt cửa duyệt tương ứng, kể cả khi preset hay công tắc nói tắt.
 
+Nếu repo này thuộc một workspace (có `.claude/feature-workflow.json`), file này **bổ sung** cho luật chung `rules/common.md` của workspace: thêm việc riêng của repo, hoặc siết cửa chặt hơn. Không bỏ được việc nào của luật chung.
+
 Sửa file này bằng MR như mọi file khác. Mỗi việc ghi: việc gì, vì sao cần người duyệt, cửa nào bắt buộc, có bắt buộc security review không.
 
 <!--

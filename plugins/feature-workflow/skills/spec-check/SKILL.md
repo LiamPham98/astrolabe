@@ -11,9 +11,9 @@ Cấu trúc tham khảo bước soát và checklist sẵn sàng của vibebiz (f
 
 ## Đầu vào
 
-- Spec (đường dẫn trong `docs/features/<slug>/flow.md`).
+- `flow.md` trong thư mục tính năng (feature-flow chọn thư mục theo workspace), và spec theo đường dẫn ghi trong đó.
 - `why.md`, `decisions.md` của tính năng, nếu có.
-- `GLOSSARY.md`, `docs/flow-rules.md`.
+- `GLOSSARY.md`, và luật duyệt áp cho tính năng: `rules/common.md` của repo trung tâm (nếu có workspace) cùng `docs/flow-rules.md` của mỗi repo tính năng chạm tới.
 
 ## 1. Lập danh mục trước
 
@@ -60,7 +60,7 @@ Chạy hết tám lượt. Chữ cái là tiền tố mã phát hiện.
 
 ## 5. Đầu ra
 
-Ghi `docs/features/<slug>/feature-workflow:spec-check.md`:
+Ghi `spec-check.md` vào thư mục tính năng (đường dẫn trong `flow.md`):
 
 - **Kết luận**: `qua` hoặc `quay-lại`. Có phát hiện nghiêm trọng hoặc cao, hoặc mục 1, 2, 3, 11 của checklist không đạt, thì là `quay-lại`.
 - **Phát hiện**: mỗi phát hiện một dòng gồm mã (ví dụ `X-02`), mức, chỗ (file và mục), điều sai, và câu cần hỏi để sửa, viết sẵn để đưa vào grill hoặc to-spec.
