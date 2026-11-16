@@ -1,4 +1,4 @@
-# feature-workflow: repo trung tâm của workspace
+# astrolabe: repo trung tâm của workspace
 
 Repo này vừa là plugin marketplace của luồng làm tính năng, vừa là trung tâm của một workspace gồm nhiều repo đồng cấp nằm cùng thư mục cha.
 

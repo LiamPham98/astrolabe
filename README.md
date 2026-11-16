@@ -1,13 +1,13 @@
-# feature-workflow
+# astrolabe
 
-Luồng làm tính năng của team, chạy trên Claude Code. Repo này làm hai việc:
+Luồng làm tính năng của team, chạy trên Claude Code. Repo tên `astrolabe`; plugin và marketplace bên trong vẫn tên `feature-workflow`, nên lệnh vẫn gõ `/feature-workflow:<skill>`. Repo này làm hai việc:
 
 1. **Plugin marketplace** của skill team, cộng script cài ba bộ skill upstream (bản mới nhất, tự cập nhật).
 2. **Repo trung tâm của workspace**: các repo dự án nằm cùng thư mục cha dùng chung luồng, luật duyệt và tài liệu tính năng.
 
 ```
 ~/code/
-├─ feature-workflow/          repo này (trung tâm)
+├─ astrolabe/                 repo này (trung tâm)
 │  ├─ workspace.json           repo đồng cấp + space Orrery + nơi lưu local dự phòng
 │  ├─ rules/common.md          luật duyệt chung
 │  ├─ features/<slug>/         tài liệu tính năng local, chỉ khi chưa đồng bộ Orrery
@@ -17,7 +17,7 @@ Luồng làm tính năng của team, chạy trên Claude Code. Repo này làm ha
 │  ├─ scripts/setup-machine.sh cài cho máy, chạy một lần
 │  └─ .claude-plugin/marketplace.json
 ├─ my-api/             repo đồng cấp
-│  ├─ .claude/feature-workflow.json   { "workspace": "../feature-workflow" }
+│  ├─ .claude/feature-workflow.json   { "workspace": "../astrolabe" }
 │  ├─ docs/flow-rules.md       luật riêng, bổ sung cho luật chung
 │  └─ docs/features/<slug>/    tài liệu tính năng local, chỉ khi chưa đồng bộ Orrery
 └─ my-web/                 repo đồng cấp
@@ -59,7 +59,7 @@ Người làm vẫn chỉnh từng công tắc. Chi tiết trong [`plugins/featu
 
 ## Cài đặt
 
-**1. Đặt repo này cùng thư mục cha với các repo dự án**, ví dụ `~/code/feature-workflow`.
+**1. Đặt repo này cùng thư mục cha với các repo dự án**, ví dụ `~/code/astrolabe`.
 
 **2. Chạy một lần mỗi máy** (Git Bash trên Windows):
 
