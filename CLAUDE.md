@@ -1,17 +1,15 @@
-# astrolabe: plugin và repo trung tâm mẫu
+# astrolabe: mã nguồn plugin
 
-Repo này vừa là plugin marketplace của luồng làm tính năng (plugin ở `plugins/astrolabe/`, cài được thẳng từ GitHub), vừa dùng được làm repo trung tâm của một workspace gồm nhiều repo đồng cấp nằm cùng thư mục cha.
+Repo này là marketplace và mã nguồn của plugin `astrolabe` (luồng làm tính năng cho Claude Code). Người dùng cài thẳng từ GitHub; repo này không phải nơi chứa cấu hình hay tài liệu của dự án nào.
 
-- `workspace.json`: danh sách repo đồng cấp (`projects`, đường dẫn tương đối như `../my-api`), nơi lưu tài liệu tính năng (`docsBackend`: `local` mặc định hoặc `orrery`), thư mục local (`featureDocs`: `auto`, `central` hoặc `project`) và space Orrery (`orrery.space`, chỉ khi `docsBackend: orrery`).
-- `rules/common.md`: luật duyệt chung cho mọi repo trong workspace. Mỗi repo có thể bổ sung trong `docs/flow-rules.md` của nó.
-- Tài liệu tính năng (biên lai, why, spec, ticket, soát spec, sổ quyết định), `GLOSSARY.md` và ADR lưu theo `docsBackend`; cách đọc ghi ở mục "Nơi lưu tài liệu" của skill `astrolabe:flow`. Luật duyệt luôn nằm trong git.
-- `.claude/settings.json`: khai báo các repo đồng cấp (`permissions.additionalDirectories`), sinh theo máy, nằm trong `.gitignore`.
-- `plugins/astrolabe/`: plugin. `upstream.json` khai các bộ skill upstream (finolabs-vibecode, pstack, mattpocock-skills) mà `scripts/setup-machine.sh` cài, và skill luồng cần kiểm; xem `UPSTREAM.md`.
-- `scripts/`: lối tắt tới `plugins/astrolabe/scripts/` cho bản clone.
-- Đổi gì trong plugin thì tăng `version` trong `plugins/astrolabe/.claude-plugin/plugin.json`, để máy cài từ GitHub nhận bản mới.
+- `plugins/astrolabe/`: plugin. `skills/` gồm `flow`, `why`, `spec-check`, `setup`, `help`; mẫu file nằm trong `templates/` của từng skill.
+- `plugins/astrolabe/.claude-plugin/plugin.json`: manifest, có `userConfig` (`workspace_root`, `docs_backend`, `orrery_space`). Đổi gì trong plugin thì tăng `version`, để máy cài từ GitHub nhận bản mới.
+- `.claude-plugin/marketplace.json`: marketplace trỏ tới `plugins/astrolabe`. Mô tả plugin ở đây phải giống `plugin.json`.
+- `UPSTREAM.md`: ba bộ đồng hành tuỳ chọn (finolabs-vibecode, pstack, mattpocock-skills) và phần tham khảo từ vibebiz.
+- Plugin không ghi file nào vào repo dự án. Tài liệu tính năng và luật duyệt nằm ở Orrery hoặc thư mục dữ liệu của plugin; xem mục "Nơi lưu tài liệu" trong `plugins/astrolabe/skills/flow/SKILL.md`.
 
-Khi phiên mở ở đây:
+Khi sửa plugin:
 
-- Bắt đầu một tính năng bằng `/astrolabe:flow`.
-- Thêm repo hoặc chỉnh workspace bằng `/astrolabe:setup`.
-- Việc gắn với một repo (git, restore-point, MR, merge) làm trong repo đó. Lệnh chỉ người gõ được thì người làm `/cd ../<repo>` trước rồi mới gõ.
+- Thử bằng `claude --plugin-dir plugins/astrolabe`, và `claude plugin validate plugins/astrolabe` trước khi commit.
+- Ghi thay đổi vào mục `[Unreleased]` của `CHANGELOG.md`.
+- Repo public: không đưa tên repo, URL hay dữ liệu nội bộ vào ví dụ.
