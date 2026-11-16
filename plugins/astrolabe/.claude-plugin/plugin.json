@@ -1,6 +1,6 @@
 {
   "name": "astrolabe",
-  "version": "0.5.1-dev",
+  "version": "0.5.1",
   "description": "Luồng làm tính năng của team: setup cài đặt, flow dẫn luồng, why chốt có nên làm, spec-check soát spec trước khi thiết kế, help trả lời nên dùng skill nào.",
   "author": {
     "name": "LiamPham98",
