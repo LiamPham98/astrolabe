@@ -1,8 +1,0 @@
-.finolabs/
-.orchestration/
-.DS_Store
-CLAUDE.local.md
-evals/results/
-evals/*/plugins/
-__pycache__/
-*.pyc

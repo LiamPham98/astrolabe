@@ -6,7 +6,7 @@ Repo này vừa là plugin marketplace của luồng làm tính năng, vừa là
 - `rules/common.md`: luật duyệt chung cho mọi repo trong workspace. Mỗi repo có thể bổ sung trong `docs/flow-rules.md` của nó.
 - Mọi tài liệu trừ luật duyệt nằm trong Orrery: tài liệu tính năng (biên lai, why, spec, ticket, soát spec, sổ quyết định) ở `<repo>/features/<slug>/`; `GLOSSARY.md` và ADR ở `<repo>/`. `features/<slug>/` trong repo này chỉ chứa bản local chưa đồng bộ.
 - `.claude/settings.json`: khai báo các repo đồng cấp (`permissions.additionalDirectories`) và plugin cho team.
-- `plugins/`, `vendor/`: các plugin của marketplace. Không sửa `vendor/`; xem `UPSTREAM.md`.
+- `plugins/`: plugin của team. Ba bộ finolabs-vibecode, pstack, mattpocock-skills cài từ marketplace upstream bằng `scripts/setup-machine.sh`; xem `UPSTREAM.md`.
 
 Khi phiên mở ở đây:
 

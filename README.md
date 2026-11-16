@@ -2,7 +2,7 @@
 
 Luồng làm tính năng của team, chạy trên Claude Code. Repo này làm hai việc:
 
-1. **Plugin marketplace** gom bốn plugin vào một chỗ.
+1. **Plugin marketplace** của skill team, cộng script cài ba bộ skill upstream (bản mới nhất, tự cập nhật).
 2. **Repo trung tâm của workspace**: các repo dự án nằm cùng thư mục cha dùng chung luồng, luật duyệt và tài liệu tính năng.
 
 ```
@@ -13,7 +13,8 @@ Luồng làm tính năng của team, chạy trên Claude Code. Repo này làm ha
 │  ├─ features/<slug>/         tài liệu tính năng local, chỉ khi chưa đồng bộ Orrery
 │  ├─ .claude/settings.json    khai báo repo đồng cấp, plugin cho team
 │  ├─ CLAUDE.md                ngữ cảnh khi mở phiên ở đây
-│  ├─ plugins/ vendor/         plugin của marketplace
+│  ├─ plugins/                 plugin của team
+│  ├─ scripts/setup-machine.sh cài cho máy, chạy một lần
 │  └─ .claude-plugin/marketplace.json
 ├─ my-api/             repo đồng cấp
 │  ├─ .claude/feature-workflow.json   { "workspace": "../feature-workflow" }
@@ -22,14 +23,14 @@ Luồng làm tính năng của team, chạy trên Claude Code. Repo này làm ha
 └─ my-web/                 repo đồng cấp
 ```
 
-| Plugin | Ở đâu | Nội dung |
+| Plugin | Cài từ | Nội dung |
 |---|---|---|
-| `feature-workflow` | `plugins/feature-workflow/` | Skill của team: `feature-setup`, `feature-flow`, `feature-why`, `spec-check`, `feature-help`, kèm mẫu file |
-| `finolabs-vibecode` | `vendor/finolabs-vibecode/` | Bản ghim của finolabs: điều phối, điểm khôi phục, kiểm, review, cửa merge |
-| `pstack` | `vendor/pstack/` | Bản ghim của pstack (bản dựng cho Claude Code): thiết kế, phản biện thiết kế, statechart, code, blast-radius |
-| `mattpocock-skills` | `vendor/mattpocock-skills/` | Bản ghim skill của Matt Pocock: grill, spec, ticket |
+| `feature-workflow` | `plugins/feature-workflow/` (repo này) | Skill của team: `feature-setup`, `feature-flow`, `feature-why`, `spec-check`, `feature-help`, kèm mẫu file |
+| `finolabs-vibecode` | Marketplace `finolabs-vibecode` (GitHub, tự cập nhật) | Điều phối, điểm khôi phục, kiểm, review, cửa merge |
+| `pstack` | Marketplace `cursor-plugins` (GitHub, tự cập nhật) | Bản dựng cho Claude Code: thiết kế, phản biện thiết kế, statechart, code, blast-radius |
+| `mattpocock-skills` | Marketplace `mattpocock` (GitHub, tự cập nhật) | Skill của Matt Pocock: grill, spec, ticket |
 
-Bản ghim, giấy phép và thay đổi so với upstream ghi trong [`UPSTREAM.md`](UPSTREAM.md). Luồng chốt ngày 13/11/2026.
+Nguồn, giấy phép và cách cập nhật ghi trong [`UPSTREAM.md`](UPSTREAM.md). Luồng chốt ngày 13/11/2026; chuyển sang bản upstream mới nhất ngày 16/11/2026.
 
 ## Luồng
 
@@ -60,14 +61,15 @@ Người làm vẫn chỉnh từng công tắc. Chi tiết trong [`plugins/featu
 
 **1. Đặt repo này cùng thư mục cha với các repo dự án**, ví dụ `~/code/feature-workflow`.
 
-**2. Gõ tay hai lệnh** trong Claude Code (một lần mỗi máy):
+**2. Chạy một lần mỗi máy** (Git Bash trên Windows):
 
-```text
-/plugin marketplace add ~/code/feature-workflow
-/plugin install feature-workflow@feature-workflow
+```bash
+./scripts/setup-machine.sh
 ```
 
-Khi repo đã lên GitHub, dòng đầu có thể là `/plugin marketplace add <github-user>/feature-workflow`.
+Script ghi marketplace và plugin vào `~/.claude/settings.json` (sao lưu bản cũ), cài bốn plugin, bật tự cập nhật cho ba bộ upstream, gỡ bản ghim cũ `<bộ>@feature-workflow`, chuyển skill rời trùng tên trong `~/.claude/skills` sang `~/.claude/skills-backup-<ngày>/`, rồi kiểm các skill luồng cần. Chạy lại bao nhiêu lần cũng được.
+
+Bộ skill của Matt cài qua `npx skills` cho Codex, Antigravity nằm ở `~/.agents/skills`; script không đụng tới. Khi `npx skills add` hay `update`, bỏ chọn Claude Code để không sinh lại symlink trùng.
 
 **3. Mở phiên mới ở repo này và gõ:**
 
@@ -77,7 +79,7 @@ Khi repo đã lên GitHub, dòng đầu có thể là `/plugin marketplace add <
 
 Ở repo trung tâm, `/feature-workflow:feature-setup`:
 
-- cài ba plugin còn lại, cảnh báo bản trùng;
+- kiểm bốn plugin và bản trùng, chỉ lại `scripts/setup-machine.sh` khi thiếu;
 - tìm các repo git cùng thư mục cha, hỏi đưa repo nào vào workspace;
 - kiểm phiên có Orrery và thấy space `orrery.space` (mặc định `personal`) không;
 - hỏi nơi lưu local dự phòng khi phiên không có Orrery (`featureDocs`):
@@ -91,9 +93,9 @@ Khi repo đã lên GitHub, dòng đầu có thể là `/plugin marketplace add <
 
 Chạy lại bao nhiêu lần cũng được: nó chỉ làm phần còn thiếu. Thêm repo mới vào workspace thì chạy lại.
 
-**Cho cả team**: khi được hỏi phạm vi cài, chọn `team`. `feature-setup` ghi `enabledPlugins` (và `extraKnownMarketplaces` nếu repo này có remote GitHub) vào `.claude/settings.json`. Commit file đó; đồng đội clone về, tin cậy thư mục, sẽ được nhắc cài plugin. Đồng đội cũng cần clone các repo dự án vào cùng thư mục cha.
+**Cho cả team**: mỗi đồng đội clone repo này và các repo dự án vào cùng thư mục cha, rồi chạy `./scripts/setup-machine.sh`. Plugin upstream cập nhật theo từng máy, nên hai máy có thể đang ở hai bản khác nhau trong một lúc.
 
-**Cài tay**: cài thêm `finolabs-vibecode@feature-workflow`, `pstack@feature-workflow`, `mattpocock-skills@feature-workflow`; với mỗi repo dự án chạy `scripts/init-project.sh ../<repo>` từ repo này; rồi gõ `/mattpocock-skills:setup-matt-pocock-skills` và `/finolabs-vibecode:setup` trong từng repo.
+**Cài tay**: với mỗi repo dự án chạy `scripts/init-project.sh ../<repo>` từ repo này; rồi gõ `/mattpocock-skills:setup-matt-pocock-skills` và `/finolabs-vibecode:setup` trong từng repo.
 
 **Một repo đơn lẻ, không workspace**: mở phiên trong repo đó và gõ `/feature-workflow:feature-setup`; nó nhận ra không có workspace và setup riêng repo đó.
 
@@ -118,13 +120,9 @@ Mỗi tính năng có một thư mục tính năng trong Orrery, ở `<space>:<r
 
 Xem [`docs/cheat-sheet.md`](docs/cheat-sheet.md). Không biết dùng skill nào thì gõ `/feature-workflow:feature-help <câu hỏi>`.
 
-## Cập nhật bản ghim
+## Cập nhật
 
-```bash
-./scripts/update-vendor.sh pstack <commit>
-```
-
-Rồi làm theo các bước trong [`UPSTREAM.md`](UPSTREAM.md). Không sửa trực tiếp trong `vendor/`.
+Ba bộ upstream tự cập nhật khi upstream phát hành bản mới (tăng `version`). Sau một lần cập nhật, chạy lại `./scripts/setup-machine.sh` để kiểm skill luồng cần vẫn còn. Chi tiết trong [`UPSTREAM.md`](UPSTREAM.md).
 
 ## Còn treo
 
@@ -135,4 +133,4 @@ Rồi làm theo các bước trong [`UPSTREAM.md`](UPSTREAM.md). Không sửa tr
 ## Đã kiểm
 
 - `restore-point` chụp cả thay đổi chưa commit: nó lưu snapshot của working tree lên một ref local, không đụng index, nhánh hay HEAD.
-- Mọi skill luồng này gọi tới đều có trong bản ghim, và cả bốn plugin cài được từ marketplace này (`claude plugin validate`, cài thử trên máy trống).
+- Mọi skill luồng này gọi tới đều có trong bản upstream: `scripts/setup-machine.sh` kiểm ở bước 5 mỗi lần chạy.

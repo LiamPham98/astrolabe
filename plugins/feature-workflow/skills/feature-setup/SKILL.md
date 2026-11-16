@@ -1,6 +1,6 @@
 ---
 name: feature-setup
-description: "Kiểm tra và cài đặt luồng feature-workflow: workspace trung tâm với các repo đồng cấp, plugin cho máy hoặc cho team, luật duyệt chung và riêng, nơi lưu tài liệu tính năng, setup của finolabs và Matt. Chạy lại được, chỉ làm phần còn thiếu. Dùng khi gõ /feature-workflow:feature-setup."
+description: "Kiểm tra và cài đặt luồng feature-workflow: workspace trung tâm với các repo đồng cấp, kiểm plugin của máy, luật duyệt chung và riêng, nơi lưu tài liệu tính năng, setup của finolabs và Matt. Chạy lại được, chỉ làm phần còn thiếu. Dùng khi gõ /feature-workflow:feature-setup."
 disable-model-invocation: true
 ---
 
@@ -39,9 +39,12 @@ claude plugin marketplace list
 claude plugin list --json
 ```
 
-- Marketplace `feature-workflow` đã có chưa, nguồn ở đâu.
-- Bốn plugin từ marketplace `feature-workflow`: `feature-workflow`, `finolabs-vibecode`, `pstack`, `mattpocock-skills`. Ghi phạm vi cài (user hay project).
-- **Bản trùng**: cùng bộ skill cài từ marketplace khác. Hai bản cùng chạy thì skill bị gọi lẫn.
+- Bốn plugin, đúng marketplace: `feature-workflow@feature-workflow`, `finolabs-vibecode@finolabs-vibecode`, `pstack@cursor-plugins`, `mattpocock-skills@mattpocock`. Ghi phạm vi cài (user hay project).
+- `~/.claude/settings.json`: ba marketplace upstream trong `extraKnownMarketplaces` có `"autoUpdate": true` không.
+- **Bản trùng**:
+  - cùng bộ skill cài từ marketplace khác, kể cả bản ghim cũ `<bộ>@feature-workflow` (đến bản 0.3.0);
+  - skill rời trong `~/.claude/skills` trùng tên với skill của bốn plugin (skill rời không có tiền tố nên bị gọi lẫn).
+- Thiếu plugin, thiếu `autoUpdate` hoặc có bản trùng: việc cần làm là người dùng chạy `./scripts/setup-machine.sh` trong repo trung tâm (`feature-workflow`). Script ghi settings, cài plugin, gỡ bản ghim cũ, chuyển skill rời trùng sang `~/.claude/skills-backup-<ngày>/` và kiểm skill luồng cần.
 - Công cụ cho statechart: `command -v mise`.
 - **Orrery** (nơi lưu tài liệu tính năng): phiên có công cụ MCP của Orrery không (`whoami`); `space_list` có thấy space trong `orrery.space` (mặc định `personal`) không, và vai trò có từ `editor` trở lên không. Không có Orrery thì ghi `thiếu`: luồng vẫn chạy nhưng ghi local và đồng bộ sau.
 
@@ -83,37 +86,22 @@ Gửi trong một lần hỏi, chỉ những câu đang cần:
   - `central`: mọi tính năng lưu ở `features/` của trung tâm.
   - `project`: mọi tính năng lưu trong repo dự án; tính năng nhiều repo lưu ở repo chính của tính năng.
 - **Repo đồng cấp đưa vào workspace** (chế độ trung tâm, chọn nhiều): các repo git tìm thấy cùng thư mục cha mà chưa có trong `projects`.
-- **Phạm vi cài plugin**:
-  - `user` (Đề xuất cho máy cá nhân): cài cho máy, mọi project dùng được.
-  - `team`: ghi `enabledPlugins` (và `extraKnownMarketplaces` nếu có remote GitHub) vào `.claude/settings.json` của repo trung tâm và commit, để đồng đội mở repo được nhắc cài.
 - **Việc agent sẽ làm** (chọn nhiều): liệt kê đúng những việc ở bước 4 đang cần.
 
-Mỗi bản trùng hỏi riêng: gỡ bản nào, giữ bản nào. Đề xuất giữ bản từ `feature-workflow`.
+Plugin cài theo máy bằng `scripts/setup-machine.sh`, không qua câu hỏi ở đây.
 
 ## 4. Làm phần đã duyệt
 
 Lệnh nào lỗi thì dừng mục đó, ghi lỗi nguyên văn, làm tiếp các mục khác.
 
-**Plugin**:
-
-- Marketplace chưa có ở máy: `claude plugin marketplace add <đường dẫn tuyệt đối của repo trung tâm>` (phạm vi user; chỉ ghi vào settings của máy này).
-- Cài: `claude plugin install <tên>@feature-workflow --scope user`.
-- Gỡ bản trùng đã duyệt: `claude plugin uninstall <tên>@<marketplace khác>`.
+**Plugin**: agent không cài hay gỡ plugin. In lệnh `./scripts/setup-machine.sh` (chạy trong repo trung tâm) cho người dùng.
 
 **Workspace** (chế độ trung tâm):
 
 1. Ghi `workspace.json`: `featureDocs` đã chọn (chỉ dùng khi phiên không có Orrery); `"orrery": { "space": "personal" }` nếu chưa có; thêm mỗi repo đã chọn vào `projects` với `name` (tên thư mục), `path` (`../<tên>`), `remote` (kết quả `git -C ../<tên> remote get-url origin`, rỗng nếu không có). URL có phần `user:token@` thì bỏ phần đó trước khi ghi, ví dụ `https://user:token@gitlab.com/x.git` thành `https://gitlab.com/x.git`; không in token ra. Giữ nguyên repo đã có.
 2. Ghi `.claude/settings.json` của repo trung tâm, **giữ mọi key khác đang có**:
    - `permissions.additionalDirectories`: đúng danh sách `path` trong `projects`.
-   - Khi chọn phạm vi `team`: `enabledPlugins` với bốn khóa `<tên>@feature-workflow: true`. Remote của repo trung tâm là GitHub thì thêm:
-
-     ```json
-     "extraKnownMarketplaces": {
-       "feature-workflow": { "source": { "source": "github", "repo": "<owner>/<repo>" } }
-     }
-     ```
-
-     Không có remote GitHub thì không ghi `extraKnownMarketplaces`, và nói rõ: đồng đội phải tự `claude plugin marketplace add` trước. Không bao giờ ghi nguồn `directory` vào file commit chung, vì nó là đường dẫn tuyệt đối của một máy.
+   - Không ghi `enabledPlugins` hay `extraKnownMarketplaces` vào file commit chung: plugin cài theo máy bằng `scripts/setup-machine.sh`, và nguồn `directory` là đường dẫn tuyệt đối của một máy.
 3. Tạo `features/.gitkeep` nếu chưa có.
 
 **Từng repo** (repo đang mở, hoặc mọi repo trong `projects` ở chế độ trung tâm):

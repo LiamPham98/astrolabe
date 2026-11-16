@@ -1,30 +1,28 @@
 # Upstream
 
-Repo này gom bản chép nguyên của ba bộ skill vào `vendor/`, cộng bộ skill của team trong `plugins/feature-workflow/`. Ba bộ đều theo giấy phép MIT; file LICENSE gốc của từng bộ giữ nguyên trong thư mục của bộ đó.
+Repo này chỉ chứa bộ skill của team (`plugins/feature-workflow/`). Ba bộ còn lại cài thẳng từ marketplace của upstream, bật `autoUpdate`. Repo không chép code của upstream.
 
-**Chỉ cập nhật bản ghim có chủ đích**:
+Quyết định ngày 16/11/2026: bỏ bản ghim trong `vendor/` (đến bản 0.3.0), lấy bản mới nhất của upstream. Đổi lại, luồng có thể hỏng khi upstream đổi tên, bỏ hoặc đổi hành vi một skill mà luồng gọi tới.
 
-1. Chạy `scripts/update-vendor.sh <bộ> <commit>`.
-2. Đọc `git diff`.
-3. Chạy thử luồng trên một tính năng thật.
-4. Sửa bảng dưới.
-5. Commit tất cả trong cùng một MR.
+## Nguồn
 
-## Bản ghim
+| Plugin | Marketplace | Repo | Giấy phép |
+|---|---|---|---|
+| `finolabs-vibecode@finolabs-vibecode` | `finolabs-vibecode` | https://github.com/finolabs/finolabs-vibecode | MIT, Fioenix |
+| `pstack@cursor-plugins` | `cursor-plugins` | https://github.com/cursor/plugins (bản dựng cho Claude Code, thư mục `harness/pstack/claude-code/`) | MIT, Lauren Tan |
+| `mattpocock-skills@mattpocock` | `mattpocock` | https://github.com/mattpocock/skills | MIT, Matt Pocock |
 
-| Thư mục | Nguồn | Commit | Phiên bản | Giấy phép |
-|---|---|---|---|---|
-| `vendor/finolabs-vibecode` | https://github.com/finolabs/finolabs-vibecode | `9b7c83c18a14182db35afb8bbea05349b1a3ab8d` | 0.2.6-dev | MIT, Fioenix |
-| `vendor/pstack` | https://github.com/cursor/plugins (bản dựng cho Claude Code, thư mục `harness/pstack/claude-code/`) | `6e359ce0aba9e927914d8a940510aa2ef66a8f23` | 0.15.36 | MIT, Lauren Tan |
-| `vendor/mattpocock-skills` | https://github.com/mattpocock/skills | `5863806dd4e15c63174bee4e7515a4256792ecfa` | 1.3.2 | MIT, Matt Pocock |
+`scripts/setup-machine.sh` ghi ba marketplace này vào `extraKnownMarketplaces` của `~/.claude/settings.json` với `"autoUpdate": true`, rồi cài plugin.
 
-Lấy ngày 13/11/2026.
+## Cập nhật chạy thế nào
 
-## Thay đổi so với upstream
+- Mỗi phiên Claude Code, sau tin nhắn đầu, Claude Code làm mới marketplace và cập nhật plugin. Bản mới có hiệu lực ở phiên sau, hoặc sau `/reload-plugins`.
+- Bản "mới hơn" tính theo `version` trong `plugin.json` của upstream, không theo commit. Upstream đẩy commit mà không tăng `version` thì máy không nhận.
+- Cập nhật tay: `claude plugin marketplace update <marketplace>`, rồi `claude plugin update <plugin>@<marketplace>`.
+- `DISABLE_AUTOUPDATER=1` hoặc `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1` tắt lượt cập nhật plugin; `FORCE_AUTOUPDATE_PLUGINS=1` bật lại.
+- Chạy lại `scripts/setup-machine.sh` sau một lần cập nhật để kiểm các skill ở bảng dưới vẫn còn. Script báo `THIẾU` khi upstream đổi tên hoặc bỏ skill. Script không phát hiện skill đổi hành vi.
 
-Không có. `vendor/` giữ nguyên từng byte so với upstream.
-
-pstack lấy bản dựng cho Claude Code mà chính upstream phát hành (marketplace `cursor-plugins` trỏ tới `harness/pstack/claude-code`), không lấy thư mục `pstack/` gốc. Bản dựng này thêm vào mỗi skill một dòng bảo agent đọc `docs/harness/claude-code.md`, file ánh xạ tên công cụ, subagent và model của Cursor sang Claude Code. Thiếu file đó thì skill pstack gọi công cụ của Cursor (`Task`, `AskQuestion`) và không chạy đúng. Muốn sửa một skill của upstream thì không sửa trong `vendor/`: viết skill riêng trong `plugins/feature-workflow/`, hoặc gửi thay đổi lên upstream.
+pstack dùng bản dựng cho Claude Code mà chính upstream phát hành, không dùng thư mục `pstack/` gốc. Bản dựng này bảo agent đọc `docs/harness/claude-code.md`, file ánh xạ công cụ, subagent và model của Cursor sang Claude Code. Muốn sửa một skill của upstream: viết skill riêng trong `plugins/feature-workflow/`, hoặc gửi thay đổi lên upstream.
 
 ## Skill luồng này dùng
 
@@ -36,7 +34,7 @@ pstack lấy bản dựng cho Claude Code mà chính upstream phát hành (marke
 
 Không dùng: `/mattpocock-skills:implement` của Matt, `none.md implement` của finolabs. `deslop` không có trong ba bộ này; nó nằm trong plugin `cursor-team-kit` của Cursor, chưa gom vào.
 
-Trùng tên skill giữa các bộ: pstack và Matt đều có `tdd`, `teach`; Matt và finolabs đều có `handoff`. Mọi skill của plugin đều gọi bằng `/<plugin>:<skill>` (ví dụ `/pstack:tdd`, `/mattpocock-skills:tdd`), nên trùng tên không đè nhau. Skill "có nên làm không" của team đặt tên `feature-why` để không trùng với `why` của pstack.
+Trùng tên skill giữa các bộ: pstack và Matt đều có `tdd`, `teach`; Matt và finolabs đều có `handoff`. Mọi skill của plugin đều gọi bằng `/<plugin>:<skill>` (ví dụ `/pstack:tdd`, `/mattpocock-skills:tdd`), nên trùng tên không đè nhau. Skill rời trong `~/.claude/skills` thì không có tiền tố, nên trùng tên với skill của plugin là gọi lẫn; `scripts/setup-machine.sh` chuyển các skill rời đó sang `~/.claude/skills-backup-<ngày>/`. Skill "có nên làm không" của team đặt tên `feature-why` để không trùng với `why` của pstack.
 
 ## Phần tham khảo từ vibebiz
 

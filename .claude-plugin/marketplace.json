@@ -3,27 +3,12 @@
   "owner": {
     "name": "feature-workflow"
   },
-  "description": "Luồng làm tính năng của team, gom chung bộ skill của team với bản ghim của finolabs-vibecode, pstack và skill của Matt Pocock.",
+  "description": "Luồng làm tính năng của team. Ba bộ skill finolabs-vibecode, pstack và skill của Matt Pocock cài thẳng từ marketplace upstream, xem UPSTREAM.md.",
   "plugins": [
     {
       "name": "feature-workflow",
       "source": "./plugins/feature-workflow",
       "description": "feature-setup, feature-flow, feature-why, spec-check, feature-help và các mẫu file của luồng."
-    },
-    {
-      "name": "finolabs-vibecode",
-      "source": "./vendor/finolabs-vibecode",
-      "description": "Bản ghim của finolabs/finolabs-vibecode (MIT): coding-router, restore-point, checks, review-gate, security-review-gate, merge_check.py."
-    },
-    {
-      "name": "pstack",
-      "source": "./vendor/pstack",
-      "description": "Bản ghim của cursor/plugins/pstack (MIT): architect, interrogate, statechart, poteto-mode, blast-radius, how."
-    },
-    {
-      "name": "mattpocock-skills",
-      "source": "./vendor/mattpocock-skills",
-      "description": "Bản ghim của mattpocock/skills (MIT): grill-with-docs, grilling, domain-modeling, to-spec, to-tickets, setup-matt-pocock-skills."
     }
   ]
 }
