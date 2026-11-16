@@ -6,6 +6,8 @@ Bản gắn tag đầu tiên là `v0.5.0`; các bản trước chưa gắn tag.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-11-16
+
 ### Thay đổi phá vỡ
 
 - astrolabe thành plugin thuần: bỏ repo trung tâm (`workspace.json`, `rules/common.md`), bỏ file trong repo dự án (`.claude/astrolabe.json`, `docs/flow-rules.md`, `docs/features/`), bỏ `setup-machine.sh`, `init-project.sh` và `upstream.json`. Việc cần làm: đặt `workspace_root`, `docs_backend`, `orrery_space` trong `/config` của plugin, chạy `/astrolabe:setup` để tạo luật duyệt và dọn file cũ trong các repo.
