@@ -1,3 +1,8 @@
+---
+type: why
+repo: <repo>
+feature: <slug>
+---
 # Why: <tên tính năng>
 
 <!--

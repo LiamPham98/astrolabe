@@ -1,5 +1,8 @@
 {
   "version": 1,
   "featureDocs": "auto",
+  "orrery": {
+    "space": "personal"
+  },
   "projects": []
 }

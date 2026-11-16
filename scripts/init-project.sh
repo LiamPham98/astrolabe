@@ -45,7 +45,16 @@ fi
 
 python3 -I - "$HUB" "$TARGET" <<'PY'
 import json, os, subprocess, sys
+from urllib.parse import urlsplit, urlunsplit
+sys.stdout.reconfigure(encoding="utf-8")  # console Windows mặc định cp1252, in tiếng Việt sẽ lỗi
 hub, target = sys.argv[1], sys.argv[2]
+
+def strip_userinfo(url):
+    # https://user:token@host/x -> https://host/x, để token không vào file commit chung
+    parts = urlsplit(url)
+    if parts.scheme and "@" in parts.netloc:
+        return urlunsplit(parts._replace(netloc=parts.netloc.rsplit("@", 1)[1]))
+    return url
 name = os.path.basename(target)
 rel_from_hub = "../" + name
 rel_to_hub = "../" + os.path.basename(hub)
@@ -53,6 +62,7 @@ rel_to_hub = "../" + os.path.basename(hub)
 ws_path = os.path.join(hub, "workspace.json")
 ws = json.load(open(ws_path, encoding="utf-8"))
 ws.setdefault("featureDocs", "auto")
+ws.setdefault("orrery", {"space": "personal"})
 projects = ws.setdefault("projects", [])
 if not any(p.get("name") == name for p in projects):
     try:
@@ -60,7 +70,7 @@ if not any(p.get("name") == name for p in projects):
                                 capture_output=True, text=True).stdout.strip()
     except OSError:
         remote = ""
-    projects.append({"name": name, "path": rel_from_hub, "remote": remote})
+    projects.append({"name": name, "path": rel_from_hub, "remote": strip_userinfo(remote)})
     print(f"Đã thêm {name} vào workspace.json")
 json.dump(ws, open(ws_path, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
 open(ws_path, "a", encoding="utf-8").write("\n")

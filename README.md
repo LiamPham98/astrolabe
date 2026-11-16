@@ -8,9 +8,9 @@ Luồng làm tính năng của team, chạy trên Claude Code. Repo này làm ha
 ```
 ~/code/
 ├─ feature-workflow/          repo này (trung tâm)
-│  ├─ workspace.json           repo đồng cấp + nơi lưu tài liệu tính năng
+│  ├─ workspace.json           repo đồng cấp + space Orrery + nơi lưu local dự phòng
 │  ├─ rules/common.md          luật duyệt chung
-│  ├─ features/<slug>/         tài liệu tính năng lưu ở trung tâm
+│  ├─ features/<slug>/         tài liệu tính năng local, chỉ khi chưa đồng bộ Orrery
 │  ├─ .claude/settings.json    khai báo repo đồng cấp, plugin cho team
 │  ├─ CLAUDE.md                ngữ cảnh khi mở phiên ở đây
 │  ├─ plugins/ vendor/         plugin của marketplace
@@ -18,13 +18,13 @@ Luồng làm tính năng của team, chạy trên Claude Code. Repo này làm ha
 ├─ my-api/             repo đồng cấp
 │  ├─ .claude/feature-workflow.json   { "workspace": "../feature-workflow" }
 │  ├─ docs/flow-rules.md       luật riêng, bổ sung cho luật chung
-│  └─ docs/features/<slug>/    tài liệu tính năng lưu trong repo
+│  └─ docs/features/<slug>/    tài liệu tính năng local, chỉ khi chưa đồng bộ Orrery
 └─ my-web/                 repo đồng cấp
 ```
 
 | Plugin | Ở đâu | Nội dung |
 |---|---|---|
-| `feature-workflow` | `plugins/feature-workflow/` | Skill của team: `feature-setup`, `feature-flow`, `feature-why`, `spec-check`, kèm mẫu file |
+| `feature-workflow` | `plugins/feature-workflow/` | Skill của team: `feature-setup`, `feature-flow`, `feature-why`, `spec-check`, `feature-help`, kèm mẫu file |
 | `finolabs-vibecode` | `vendor/finolabs-vibecode/` | Bản ghim của finolabs: điều phối, điểm khôi phục, kiểm, review, cửa merge |
 | `pstack` | `vendor/pstack/` | Bản ghim của pstack (bản dựng cho Claude Code): thiết kế, phản biện thiết kế, statechart, code, blast-radius |
 | `mattpocock-skills` | `vendor/mattpocock-skills/` | Bản ghim skill của Matt Pocock: grill, spec, ticket |
@@ -79,7 +79,8 @@ Khi repo đã lên GitHub, dòng đầu có thể là `/plugin marketplace add <
 
 - cài ba plugin còn lại, cảnh báo bản trùng;
 - tìm các repo git cùng thư mục cha, hỏi đưa repo nào vào workspace;
-- hỏi nơi lưu tài liệu tính năng (`featureDocs`):
+- kiểm phiên có Orrery và thấy space `orrery.space` (mặc định `personal`) không;
+- hỏi nơi lưu local dự phòng khi phiên không có Orrery (`featureDocs`):
   - `auto`: tính năng một repo lưu trong repo đó, nhiều repo lưu ở trung tâm;
   - `central`: lưu hết ở trung tâm;
   - `project`: lưu hết trong repo dự án;
@@ -107,14 +108,15 @@ Skill của plugin luôn gọi kèm tên plugin: `/<plugin>:<skill>`. Gõ `/feat
 /feature-workflow:feature-flow large mở lại kỳ đã khóa
 ```
 
-Mỗi tính năng có một thư mục tính năng (vị trí theo `featureDocs`) chứa:
+Mỗi tính năng có một thư mục tính năng trong Orrery, ở `<space>:<repo>/features/<slug>/` (space theo `orrery.space`, mặc định `personal`). Phiên không có Orrery thì ghi local theo `featureDocs`, rồi đồng bộ lên Orrery ở phiên sau. Spec và ticket cũng nằm trong thư mục này. `GLOSSARY.md` và ADR nằm ở `<repo>/GLOSSARY.md` và `<repo>/adr/`, dùng chung cho mọi tính năng của repo, và đổi qua changeset của Orrery. Chỉ luật duyệt nằm trong git. Thư mục tính năng chứa:
 
 - `flow.md`: biên lai quy trình;
 - `why.md`: kết quả bước Why;
 - `spec-check.md`: kết quả soát spec;
-- `decisions.md`: sổ quyết định.
+- `decisions.md`: sổ quyết định;
+- `spec.md` và `issues/`: spec và ticket do `to-spec`, `to-tickets` ghi.
 
-Xem [`docs/cheat-sheet.md`](docs/cheat-sheet.md).
+Xem [`docs/cheat-sheet.md`](docs/cheat-sheet.md). Không biết dùng skill nào thì gõ `/feature-workflow:feature-help <câu hỏi>`.
 
 ## Cập nhật bản ghim
 

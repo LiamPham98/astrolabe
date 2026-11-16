@@ -1,7 +1,7 @@
 {
   "name": "feature-workflow",
-  "version": "0.2.0",
-  "description": "Luồng làm tính năng của team: feature-setup cài đặt, feature-flow dẫn luồng, feature-why chốt có nên làm, spec-check soát spec trước khi thiết kế.",
+  "version": "0.3.0",
+  "description": "Luồng làm tính năng của team: feature-setup cài đặt, feature-flow dẫn luồng, feature-why chốt có nên làm, spec-check soát spec trước khi thiết kế, feature-help trả lời nên dùng skill nào.",
   "author": {
     "name": "feature-workflow"
   }

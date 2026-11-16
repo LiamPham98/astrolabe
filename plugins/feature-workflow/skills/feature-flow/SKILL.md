@@ -35,9 +35,49 @@ Tìm workspace khi bắt đầu:
 
 Ở kiểu workspace, đọc `workspace.json` để biết `featureDocs` và danh sách repo.
 
-## Thư mục của một tính năng
+## Tài liệu trong Orrery
 
-`<slug>` là tên tính năng viết thường, không dấu, nối bằng gạch ngang. Thư mục tính năng nằm ở:
+`<slug>` là tên tính năng viết thường, không dấu, nối bằng gạch ngang. Mọi tài liệu của luồng, trừ luật duyệt, nằm trong Orrery và được đọc, ghi qua công cụ MCP của Orrery. Luật duyệt (`rules/common.md`, `docs/flow-rules.md`) vẫn nằm trong git để sửa qua MR.
+
+**Space**: `orrery.space` trong `workspace.json` (kiểu workspace) hoặc trong `.claude/feature-workflow.json` (kiểu đơn lẻ). Thiếu thì dùng `personal`.
+
+**Bố cục**: folder theo repo trước, theo tính năng sau. `<repo>` là tên repo của tính năng một repo, hoặc tên repo trung tâm của tính năng nhiều repo.
+
+```
+<repo>/
+├─ GLOSSARY.md                     thuật ngữ của repo (repo nhiều context: GLOSSARY-MAP.md + contexts/<context>/GLOSSARY.md)
+├─ adr/0001-<slug>.md              ADR, đánh số tăng dần
+└─ features/<slug>/                thư mục tính năng
+   ├─ flow.md  why.md  spec.md  spec-check.md  decisions.md
+   └─ issues/01-<slug>.md
+```
+
+| Note | Ai ghi | Nội dung |
+|---|---|---|
+| `flow.md` | feature-flow | Biên lai: preset, công tắc, lý do, các cửa đã qua, revision đã đọc |
+| `why.md` | skill `feature-why` | Kết quả bước Why |
+| `spec.md`, `issues/` | `/mattpocock-skills:to-spec`, `/mattpocock-skills:to-tickets` | Spec và ticket, ghi thẳng vào Orrery theo `docs/agents/issue-tracker.md` của repo |
+| `spec-check.md` | skill `spec-check` | Kết quả soát spec |
+| `decisions.md` | mọi bước | Sổ quyết định, chỉ ghi thêm |
+| `GLOSSARY.md`, `adr/` | `/mattpocock-skills:grill-with-docs`, cửa chốt thiết kế | Thuật ngữ và ADR của repo, dùng chung cho mọi tính năng |
+
+**Cách ghi**:
+
+- Mỗi note có frontmatter `type` (`flow`, `why`, `spec`, `ticket`, `spec-check`, `decisions`, `adr`, `glossary`), `repo`, `feature` (trừ `GLOSSARY.md` và ADR) và `status` khi có. Server tự gán `id`.
+- Tạo note từ mẫu bằng `note_create`. Ghi thêm vào `decisions.md` bằng `note_edit` với `op: append`. Sửa note bằng `note_edit` hoặc `note_update`, luôn với `base_revision` vừa đọc; gặp `conflict` thì đọc lại, gộp, rồi ghi lại.
+- Note trỏ nhau bằng wikilink, ví dụ mục `design` trong `decisions.md` trỏ `[[<repo>/adr/0003-<slug>]]`.
+- `GLOSSARY.md` và ADR là note dùng chung cho cả repo: đổi chúng bằng `changeset_submit` (`op: note.create` hoặc `note.update`), để một người khác tác giả duyệt trong client của họ. Agent không bao giờ tự duyệt changeset. Ghi id changeset vào `flow.md`; trước khi changeset được duyệt, note chưa có trong Orrery, nên bước sau đọc nội dung từ changeset (`changeset_read`). Người làm nói space không có người duyệt thứ hai thì ghi thẳng và ghi `review-risk` vào `decisions.md`.
+- Ghi vào `flow.md` revision của từng note lúc đọc để làm bằng chứng cho cửa duyệt. Mô tả mỗi MR dán link note `spec.md` kèm revision, vì reviewer trong CI không đọc được Orrery.
+
+**Chép từ repo lên Orrery**: skill của Matt (`domain-modeling`, qua `grill-with-docs`) luôn ghi `GLOSSARY.md` và `docs/adr/` vào repo. Sau mỗi lần chạy grill, so các file đó với note trong `<repo>/`: file mới hoặc đã đổi thì đưa lên Orrery như trên, rồi hỏi người làm có xoá bản trong repo không.
+
+**Khi phiên không kết nối Orrery** (không có công cụ `note_create`, hoặc `whoami` lỗi): nói một câu, rồi ghi local vào thư mục ở bảng dưới, và ghi `orrery: chưa đồng bộ` ở đầu `flow.md`. Spec và ticket khi đó ghi cạnh `flow.md`. Lần sau phiên có Orrery:
+
+1. Với mỗi file local, đọc note cùng tên trong Orrery.
+2. Note chưa có: tạo từ file local. Note đã có và khác file local: không ghi đè; trình hai bản và hỏi người làm giữ bản nào. Với `decisions.md`, chỉ append các mục `D-###` mà Orrery chưa có.
+3. Xong thì xoá dòng `orrery: chưa đồng bộ` trong note `flow.md`, và hỏi người làm có xoá các file local không.
+
+Thư mục local khi không có Orrery:
 
 | Kiểu | `featureDocs` | Tính năng một repo | Tính năng nhiều repo (`repo` bật) |
 |---|---|---|---|
@@ -45,17 +85,6 @@ Tìm workspace khi bắt đầu:
 | Workspace | `auto` | `docs/features/<slug>/` của repo đó | `features/<slug>/` của repo trung tâm |
 | Workspace | `central` | `features/<slug>/` của repo trung tâm | `features/<slug>/` của repo trung tâm |
 | Workspace | `project` | `docs/features/<slug>/` của repo đó | `docs/features/<slug>/` của repo chính của tính năng (hỏi repo nào) |
-
-Mọi file do luồng này tạo nằm trong thư mục tính năng:
-
-| File | Ai ghi | Nội dung |
-|---|---|---|
-| `flow.md` | feature-flow | Biên lai: preset, công tắc, lý do, các cửa đã qua |
-| `why.md` | skill `feature-why` | Kết quả bước Why |
-| `spec-check.md` | skill `spec-check` | Kết quả soát spec |
-| `decisions.md` | mọi bước | Sổ quyết định, chỉ ghi thêm |
-
-Spec nằm ở nơi `/mattpocock-skills:to-spec` lưu (mặc định markdown local theo cấu hình `setup-matt-pocock-skills`). Ghi đường dẫn spec vào `flow.md`.
 
 Mẫu của `flow.md` và `decisions.md` nằm trong thư mục `templates/` cạnh file SKILL.md này. Mẫu `why.md` nằm cạnh skill `feature-why`.
 
@@ -81,7 +110,15 @@ Mẫu của `flow.md` và `decisions.md` nằm trong thư mục `templates/` c�
    | `repo` | chạm nhiều repo | restore-point mỗi repo, thứ tự merge | | | ✓ |
 
    Hỏi những công tắc chưa rõ từ mô tả, tối đa 4 câu trong một lần hỏi. Đọc code liên quan nếu cần để trả lời thay vì hỏi.
-4. **Khóa theo file luật**: nếu tính năng chạm một việc trong file luật, cửa duyệt mà việc đó yêu cầu không được tắt, và bật `sec` nếu việc đó đánh dấu cần security review. Ghi rõ việc nào trong file luật bị chạm.
+4. **Khóa theo file luật**: nếu tính năng chạm một việc trong file luật, cửa duyệt mà việc đó yêu cầu không được tắt, và bật `sec` nếu việc đó đánh dấu cần security review. Cửa chỉ chạy khi giai đoạn chứa nó chạy, nên bật công tắc của cửa đó, kể cả khi preset tắt:
+
+   | Cửa bắt buộc | Bật công tắc |
+   |---|---|
+   | chốt có làm | `why` |
+   | duyệt spec | `multi` |
+   | chốt thiết kế | `cross` |
+
+   Ghi rõ việc nào trong file luật bị chạm và công tắc nào bị khóa bật.
 5. **Thư mục tính năng và biên lai**: chọn thư mục tính năng theo bảng ở trên, rồi ghi `flow.md` từ mẫu: preset, từng công tắc bật hay tắt kèm một dòng lý do, các repo liên quan, việc bị khóa theo file luật (ghi rõ việc đó đến từ luật chung hay luật riêng của repo nào), đường dẫn thư mục tính năng.
 6. **Kế hoạch**: trình chuỗi lệnh sẽ gõ theo các công tắc đã bật. Chờ người làm đồng ý (xác nhận nhanh, không phải cửa).
 
@@ -99,8 +136,8 @@ Preset small bỏ giai đoạn 1, 2, 3: đi thẳng tới restore-point rồi gi
 1. Khi bật `unclear`: in lệnh `/mattpocock-skills:grill-with-docs` cho người làm gõ. Nếu có `why.md`, nhắc rằng grill chỉ hỏi phần `why.md` chưa chốt và đưa đường dẫn `why.md`.
 2. Khi bật `multi`: in lệnh `/mattpocock-skills:to-spec`. Ghi đường dẫn spec vào `flow.md`. Thêm `/mattpocock-skills:to-tickets` nếu người làm muốn tách ticket.
 3. Khi bật `unclear` mà không bật `multi`: sau grill, ghi các quyết định đã chốt vào `decisions.md` thay cho spec.
-4. Khi bật `why` hoặc `multi`: load skill `spec-check` trên spec vừa ghi. Kết quả có phát hiện mức nghiêm trọng hoặc cao thì quay lại grill hoặc to-spec với đúng các câu hỏi `spec-check` nêu.
-5. **Cửa: duyệt spec.** Trình spec cùng kết quả `spec-check`.
+4. Khi bật `multi` (đã có spec): load skill `spec-check` trên spec vừa ghi. Kết quả có phát hiện mức nghiêm trọng hoặc cao thì quay lại grill hoặc to-spec với đúng các câu hỏi `spec-check` nêu.
+5. **Cửa: duyệt spec.** Có spec thì trình spec cùng kết quả `spec-check`. Không có spec (chỉ bật `unclear`) thì trình các quyết định vừa ghi vào `decisions.md`.
 
 ## Giai đoạn 3: Thiết kế (khi bật `cross`, `contest` hoặc `state`)
 
@@ -112,6 +149,7 @@ Không chạy `/pstack:how` riêng: Phase A (Ground) của `architect` đã ch�
 2. Khi bật `contest`: in lệnh `/pstack:interrogate` trên thiết kế vừa ra. Chỉ giữ finding chạy lại được.
 3. Khi bật `state`: in lệnh `/pstack:statechart` trên thiết kế, **trước khi viết code**. Đường lỗi TLC tìm ra thì sửa thiết kế ngay ở giai đoạn này.
 4. **Cửa: chốt thiết kế.** Gộp checkpoint của architect, finding của interrogate và kết quả statechart thành một lần duyệt. Ghi quyết định thiết kế vào `decisions.md`.
+5. **ADR**: với mỗi quyết định thiết kế khó đảo ngược, sẽ gây thắc mắc nếu không có lý do ghi lại, và là kết quả của một lựa chọn thật giữa các phương án, ghi một ADR theo `ADR-FORMAT.md` của skill `domain-modeling` (plugin `mattpocock-skills`) vào `<repo>/adr/` trong Orrery, bằng `changeset_submit`. Lấy số tiếp theo sau số lớn nhất đã có trong folder đó. Tính năng nhiều repo ghi ADR vào repo cung cấp hợp đồng. Mục `design` trong `decisions.md` trỏ tới ADR bằng wikilink.
 
 ## Trước khi code
 

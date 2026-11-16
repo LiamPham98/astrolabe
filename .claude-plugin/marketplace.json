@@ -8,7 +8,7 @@
     {
       "name": "feature-workflow",
       "source": "./plugins/feature-workflow",
-      "description": "feature-setup, feature-flow, feature-why, spec-check và các mẫu file của luồng."
+      "description": "feature-setup, feature-flow, feature-why, spec-check, feature-help và các mẫu file của luồng."
     },
     {
       "name": "finolabs-vibecode",

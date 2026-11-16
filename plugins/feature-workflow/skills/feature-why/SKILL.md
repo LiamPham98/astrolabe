@@ -23,7 +23,7 @@ Cấu trúc bước này tham khảo phần phân tích của vibebiz (finolabs/
 Người làm quyết định; agent tìm dữ kiện. Trước mỗi câu hỏi, tìm câu trả lời theo thứ tự:
 
 1. Mô tả tính năng, thư mục tính năng (đường dẫn trong `flow.md`), luật duyệt áp cho tính năng (`rules/common.md` của repo trung tâm nếu có workspace, cùng `docs/flow-rules.md` của từng repo).
-2. Các tính năng khác (trong `docs/features/` của các repo và `features/` của repo trung tâm), `GLOSSARY.md`, ADR.
+2. Các tính năng khác: tìm bằng `note_search` của Orrery trong folder `<repo>/features/` của space tính năng (xem "Tài liệu trong Orrery" trong skill `feature-flow`), và trong các thư mục local chưa đồng bộ; `<repo>/GLOSSARY.md` và ADR trong `<repo>/adr/` của Orrery, cùng `GLOSSARY.md` và `docs/adr/` trong repo nếu còn bản chưa đồng bộ.
 3. Code liên quan: đọc trực tiếp để biết hệ thống đang làm gì. Cần hiểu sâu một subsystem thì đề nghị người làm gõ `/pstack:how`.
 
 Tìm được thì ghi dữ kiện kèm nguồn, và chỉ hỏi phần quyết định còn lại. Không hỏi lại điều file hoặc code đã trả lời.
@@ -72,7 +72,7 @@ Chỉ số ở O là chỉ số của **chính tính năng** (tính năng thay �
 - Mỗi câu tự đứng được: nêu tên tính năng, không viết "như trên", không dùng mã mục.
 - 2 đến 4 phương án loại trừ nhau. Phương án đề xuất đứng đầu, gắn "(Đề xuất)", mô tả bắt đầu bằng lý do đề xuất. Không có bằng chứng nghiêng về bên nào thì đề xuất phương án dễ quay lại nhất.
 - Không thêm phương án "Khác" hay "Không": người làm luôn có ô tự nhập và nút bỏ qua.
-- Hỏi xong vòng nào, ghi ngay vào `why.md` và `decisions.md` vòng đó. Chưa có `decisions.md` thì tạo từ mẫu trong `templates/` của skill `feature-flow`.
+- Hỏi xong vòng nào, ghi ngay vào `why.md` và `decisions.md` vòng đó, trong thư mục tính năng (Orrery, hoặc local khi phiên không có Orrery; cách đọc ghi theo "Tài liệu trong Orrery" trong skill `feature-flow`). Chưa có `decisions.md` thì tạo từ mẫu trong `templates/` của skill `feature-flow`.
 - Mặc định 3 vòng mỗi phiên. Hết 3 vòng mà chưa xong thì hỏi: hỏi tiếp, tạm dừng, hay ghi bản nháp với các mục chưa rõ đánh dấu "chưa làm rõ".
 
 ## Kỹ thuật

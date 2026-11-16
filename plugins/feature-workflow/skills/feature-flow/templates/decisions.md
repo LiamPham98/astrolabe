@@ -1,3 +1,8 @@
+---
+type: decisions
+repo: <repo>
+feature: <slug>
+---
 # Sổ quyết định: <tên tính năng>
 
 <!--

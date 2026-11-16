@@ -25,6 +25,8 @@ Mở phiên ở đâu:
 
 Agent chọn công tắc, đọc `docs/flow-rules.md`, ghi biên lai, rồi trình chuỗi lệnh. Đồng ý thì đi tiếp.
 
+Biên lai, `why.md`, spec, ticket, `spec-check.md` và sổ quyết định nằm trong Orrery ở `<repo>/features/<slug>/` (space `personal`). `GLOSSARY.md` và ADR ở `<repo>/`. Chỉ luật duyệt nằm trong git. Phiên không có Orrery thì ghi local, phiên sau đồng bộ lên.
+
 ## 2. Chọn quy mô
 
 | Tính năng | Preset |
@@ -67,6 +69,8 @@ Agent chọn công tắc, đọc `docs/flow-rules.md`, ghi biên lai, rồi trì
 ```
 
 ## 6. Khi kẹt
+
+- **Không biết dùng skill nào**: `/feature-workflow:feature-help <câu hỏi>`. Nó trả lời theo luồng này và trỏ sang trợ giúp của từng bộ khi cần.
 
 - **review-gate hết 2 vòng mà vẫn REWORK**: quay lại thiết kế, hoặc chấp nhận rủi ro và ghi `review-risk` vào `decisions.md`.
 - **Muốn đổi quyết định cũ**: thêm mục `supersede` vào `decisions.md`, không sửa mục cũ.

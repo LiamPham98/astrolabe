@@ -1,6 +1,6 @@
 ---
 name: feature-setup
-description: Kiểm tra và cài đặt luồng feature-workflow: workspace trung tâm với các repo đồng cấp, plugin cho máy hoặc cho team, luật duyệt chung và riêng, nơi lưu tài liệu tính năng, setup của finolabs và Matt. Chạy lại được, chỉ làm phần còn thiếu. Dùng khi gõ /feature-workflow:feature-setup.
+description: "Kiểm tra và cài đặt luồng feature-workflow: workspace trung tâm với các repo đồng cấp, plugin cho máy hoặc cho team, luật duyệt chung và riêng, nơi lưu tài liệu tính năng, setup của finolabs và Matt. Chạy lại được, chỉ làm phần còn thiếu. Dùng khi gõ /feature-workflow:feature-setup."
 disable-model-invocation: true
 ---
 
@@ -43,6 +43,7 @@ claude plugin list --json
 - Bốn plugin từ marketplace `feature-workflow`: `feature-workflow`, `finolabs-vibecode`, `pstack`, `mattpocock-skills`. Ghi phạm vi cài (user hay project).
 - **Bản trùng**: cùng bộ skill cài từ marketplace khác. Hai bản cùng chạy thì skill bị gọi lẫn.
 - Công cụ cho statechart: `command -v mise`.
+- **Orrery** (nơi lưu tài liệu tính năng): phiên có công cụ MCP của Orrery không (`whoami`); `space_list` có thấy space trong `orrery.space` (mặc định `personal`) không, và vai trò có từ `editor` trở lên không. Không có Orrery thì ghi `thiếu`: luồng vẫn chạy nhưng ghi local và đồng bộ sau.
 
 **Workspace** (chế độ trung tâm):
 
@@ -57,7 +58,8 @@ claude plugin list --json
 - `.claude/feature-workflow.json` có trỏ đúng repo trung tâm không (không áp dụng với đơn lẻ).
 - `docs/flow-rules.md` có chưa; đã sửa hay còn mẫu.
 - `docs/features/` có chưa (chỉ cần khi `featureDocs` là `auto` hoặc `project`, hoặc ở chế độ đơn lẻ).
-- Cấu hình của Matt: đọc SKILL.md của `setup-matt-pocock-skills` trong plugin `mattpocock-skills` để biết nó ghi file gì, rồi kiểm file đó.
+- Cấu hình của Matt: đọc SKILL.md của `setup-matt-pocock-skills` trong plugin `mattpocock-skills` để biết nó ghi file gì, rồi kiểm file đó. `docs/agents/issue-tracker.md` và `docs/agents/domain.md` phải trỏ về Orrery (nội dung như mẫu `templates/issue-tracker-orrery.md` và `templates/domain-orrery.md` cạnh file SKILL.md này); còn là bản của Matt thì ghi `thiếu`.
+- `GLOSSARY.md`, `GLOSSARY-MAP.md` và `docs/adr/` trong repo: có thì ghi `thiếu` cho mục "chép lên Orrery".
 - Cửa của finolabs: ghi "cần chạy `/finolabs-vibecode:setup check` trong repo này".
 - Remote: không phải GitHub thì ghi rõ `merge_check.py` và `post_review.py` của finolabs gọi `gh`, nên cửa merge và việc đăng review không chạy được ở repo này.
 
@@ -100,7 +102,7 @@ Lệnh nào lỗi thì dừng mục đó, ghi lỗi nguyên văn, làm tiếp c�
 
 **Workspace** (chế độ trung tâm):
 
-1. Ghi `workspace.json`: `featureDocs` đã chọn; thêm mỗi repo đã chọn vào `projects` với `name` (tên thư mục), `path` (`../<tên>`), `remote` (kết quả `git -C ../<tên> remote get-url origin`, rỗng nếu không có). Giữ nguyên repo đã có.
+1. Ghi `workspace.json`: `featureDocs` đã chọn (chỉ dùng khi phiên không có Orrery); `"orrery": { "space": "personal" }` nếu chưa có; thêm mỗi repo đã chọn vào `projects` với `name` (tên thư mục), `path` (`../<tên>`), `remote` (kết quả `git -C ../<tên> remote get-url origin`, rỗng nếu không có). URL có phần `user:token@` thì bỏ phần đó trước khi ghi, ví dụ `https://user:token@gitlab.com/x.git` thành `https://gitlab.com/x.git`; không in token ra. Giữ nguyên repo đã có.
 2. Ghi `.claude/settings.json` của repo trung tâm, **giữ mọi key khác đang có**:
    - `permissions.additionalDirectories`: đúng danh sách `path` trong `projects`.
    - Khi chọn phạm vi `team`: `enabledPlugins` với bốn khóa `<tên>@feature-workflow: true`. Remote của repo trung tâm là GitHub thì thêm:
@@ -122,8 +124,12 @@ Lệnh nào lỗi thì dừng mục đó, ghi lỗi nguyên văn, làm tiếp c�
    { "workspace": "../<tên repo trung tâm>" }
    ```
 
+   Chế độ đơn lẻ: ghi `.claude/feature-workflow.json` với `{ "orrery": { "space": "personal" } }` nếu chưa có.
+
 2. Tạo `docs/flow-rules.md` từ `../feature-flow/templates/flow-rules.md` cạnh file SKILL.md này, nếu chưa có. Có rồi thì không ghi đè.
 3. Tạo `docs/features/.gitkeep` nếu `featureDocs` là `auto` hoặc `project`, hoặc ở chế độ đơn lẻ.
+4. Sau khi người dùng chạy `/mattpocock-skills:setup-matt-pocock-skills`: ghi đè `docs/agents/issue-tracker.md` và `docs/agents/domain.md` bằng hai mẫu `templates/issue-tracker-orrery.md` và `templates/domain-orrery.md`, thay `{{space}}` bằng `orrery.space` và `{{repo}}` bằng tên repo. Trình nội dung cũ trước khi ghi đè.
+5. Chép lên Orrery (cần phiên có Orrery): `GLOSSARY.md`, `GLOSSARY-MAP.md` và các file trong `docs/adr/` của repo lên `<repo>/` trong space, theo bố cục ở "Tài liệu trong Orrery" của skill `feature-flow`, bằng `changeset_submit`. Note đã có và khác file thì không ghi đè; trình hai bản và hỏi. Chép xong thì hỏi có xoá bản trong repo không.
 
 Nhắc người dùng commit các file vừa tạo trong từng repo; file luật và `.claude/feature-workflow.json` là file chung của team.
 
@@ -145,7 +151,7 @@ Chế độ trung tâm soạn `rules/common.md` trước, rồi phần riêng c�
 Với mỗi repo còn thiếu, in theo thứ tự (ghi rõ repo nào):
 
 1. `/cd ../<repo>` nếu phiên đang ở repo khác.
-2. `/mattpocock-skills:setup-matt-pocock-skills`: chọn lưu spec dạng markdown local (tracker là tuỳ chọn).
+2. `/mattpocock-skills:setup-matt-pocock-skills`: ở câu hỏi issue tracker chọn "Local markdown" (bước 4 của mục "Từng repo" sẽ thay bằng cấu hình Orrery). Xong thì quay lại `/feature-workflow:feature-setup` để ghi cấu hình Orrery.
 3. `/finolabs-vibecode:setup`: chọn phạm vi **project** để bật cửa kiểm và cửa merge cho repo này. Xong thì `/finolabs-vibecode:setup check`.
 
 Một lần cho máy:

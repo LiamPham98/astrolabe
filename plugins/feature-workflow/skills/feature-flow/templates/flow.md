@@ -1,3 +1,8 @@
+---
+type: flow
+repo: <repo>
+feature: <slug>
+---
 # Biên lai quy trình: <tên tính năng>
 
 <!-- Do feature-flow ghi và cập nhật. Dán phần "Tóm tắt" vào mô tả mỗi MR. -->
@@ -6,9 +11,10 @@
 
 - Preset: small | medium | large
 - Công tắc bật: <danh sách>
-- Spec: <đường dẫn hoặc link issue, hoặc "không có">
+- Spec: <note spec.md kèm revision, hoặc "không có">
 - Repo: <danh sách>
-- Thư mục tính năng: <đường dẫn>
+- Thư mục tính năng: <space>:<repo>/features/<slug>/ trong Orrery, hoặc đường dẫn local khi chưa đồng bộ
+- Revision đã đọc: <note: revision, ghi khi qua mỗi cửa>
 - Luật duyệt đã đọc: <rules/common.md của workspace, docs/flow-rules.md của từng repo>
 
 ## Công tắc
