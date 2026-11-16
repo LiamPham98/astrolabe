@@ -1,10 +1,22 @@
 # Changelog
 
-Mọi thay đổi đáng chú ý của plugin `feature-workflow` ghi ở đây. Định dạng theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/), version theo [SemVer](https://semver.org/) giai đoạn 0 (`0.y.z`: MINOR khi phá vỡ, PATCH khi tương thích). Ngày ghi `YYYY-MM-DD` theo Keep a Changelog. Bản ghim trong `vendor/` có version riêng, xem `UPSTREAM.md`.
+Mọi thay đổi đáng chú ý của plugin `feature-workflow` ghi ở đây. Định dạng theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/), version theo [SemVer](https://semver.org/) giai đoạn 0 (`0.y.z`: MINOR khi phá vỡ, PATCH khi tương thích). Ngày ghi `YYYY-MM-DD` theo Keep a Changelog. Ba bộ upstream có version riêng, xem `UPSTREAM.md`.
 
 Chưa có bản nào gắn tag.
 
 ## [Unreleased]
+
+## [0.4.0] - 2026-11-16
+
+### Thay đổi phá vỡ
+
+- Bỏ bản ghim trong `vendor/` và `scripts/update-vendor.sh`. `finolabs-vibecode`, `pstack`, `mattpocock-skills` cài thẳng từ marketplace upstream (`finolabs-vibecode`, `cursor-plugins`, `mattpocock`) với `autoUpdate`. Việc cần làm: chạy `./scripts/setup-machine.sh` trên mỗi máy; script gỡ bản `<bộ>@feature-workflow` cũ.
+- `feature-setup` không còn cài plugin hay ghi `enabledPlugins` cho team; nó chỉ lại `scripts/setup-machine.sh`.
+
+### Thêm
+
+- `scripts/setup-machine.sh`: cài cho máy một lần, chạy lại an toàn. Ghi `~/.claude/settings.json`, cài plugin, chuyển skill rời trùng tên trong `~/.claude/skills` sang thư mục sao lưu, kiểm skill luồng cần.
+- `feature-setup` dò skill rời trong `~/.claude/skills` trùng tên với skill của plugin.
 
 ## [0.3.0] - 2026-11-16
 
