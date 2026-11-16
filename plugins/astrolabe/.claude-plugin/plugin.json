@@ -1,12 +1,42 @@
 {
   "name": "astrolabe",
   "version": "0.5.2-dev",
-  "description": "Luồng làm tính năng của team: setup cài đặt, flow dẫn luồng, why chốt có nên làm, spec-check soát spec trước khi thiết kế, help trả lời nên dùng skill nào.",
+  "description": "Luồng làm tính năng chạy được ngay sau khi cài, không cần repo trung tâm hay file cấu hình trong repo: flow dẫn luồng, why chốt có nên làm, spec-check soát spec, setup kiểm Orrery và luật duyệt, help trả lời nên dùng gì. finolabs-vibecode, pstack và skill của Matt Pocock là đồng hành tuỳ chọn.",
   "author": {
     "name": "LiamPham98",
     "url": "https://github.com/LiamPham98"
   },
   "homepage": "https://github.com/LiamPham98/astrolabe",
   "repository": "https://github.com/LiamPham98/astrolabe",
-  "license": "MIT"
+  "license": "MIT",
+  "keywords": [
+    "workflow",
+    "feature",
+    "spec",
+    "review",
+    "orrery"
+  ],
+  "userConfig": {
+    "workspace_root": {
+      "type": "directory",
+      "title": "Thư mục workspace",
+      "description": "Thư mục chứa các repo làm việc chung, ví dụ ~/code. Mọi repo git trong đó thuộc một workspace. Để trống thì lấy thư mục cha của repo đang mở."
+    },
+    "docs_backend": {
+      "type": "string",
+      "title": "Nơi lưu tài liệu",
+      "description": "orrery: tài liệu tính năng và luật duyệt là note trong Orrery (cần MCP của Orrery). local: file trong thư mục dữ liệu của plugin trên máy này.",
+      "options": [
+        "local",
+        "orrery"
+      ],
+      "default": "local"
+    },
+    "orrery_space": {
+      "type": "string",
+      "title": "Space Orrery",
+      "description": "Space Orrery dùng khi nơi lưu là orrery.",
+      "default": "personal"
+    }
+  }
 }

@@ -13,9 +13,10 @@ feature: <slug>
 - Công tắc bật: <danh sách>
 - Spec: <note spec.md kèm revision, hoặc "không có">
 - Repo: <danh sách>
-- Thư mục tính năng: <đường dẫn local; hoặc <space>:<repo>/features/<slug>/ khi docsBackend là orrery>
+- Nơi lưu: <orrery, space <space> | local, thư mục dữ liệu của plugin>; thư mục tính năng: <repo>/features/<slug>/
+- Bộ đồng hành có mặt: <finolabs-vibecode, pstack, mattpocock-skills, hoặc "không">
 - Revision đã đọc: <chỉ với orrery; note: revision, ghi khi qua mỗi cửa>
-- Luật duyệt đã đọc: <rules/common.md của workspace, docs/flow-rules.md của từng repo>
+- Luật duyệt đã đọc: <_workspace/rules.md, <repo>/rules.md của từng repo; ghi "mẫu" nếu chưa có>
 
 ## Công tắc
 

@@ -1,10 +1,10 @@
-# Luật duyệt chung của workspace
-
-Áp cho mọi repo trong `workspace.json`. Mỗi repo có thể thêm việc riêng hoặc siết cửa chặt hơn trong `docs/flow-rules.md` của repo đó, nhưng không bỏ được việc nào ở đây.
+# Luật duyệt của repo
 
 Những việc dưới đây **luôn cần người duyệt**. Khi tính năng chạm một việc trong danh sách, `astrolabe:flow` không được tắt cửa duyệt tương ứng, kể cả khi preset hay công tắc nói tắt.
 
-Sửa file này bằng MR như mọi file khác. Mỗi việc ghi: việc gì, vì sao cần người duyệt, cửa nào bắt buộc, có bắt buộc security review không.
+Note `<repo>/rules.md` ở nơi lưu của astrolabe. Nó **bổ sung** cho luật chung `_workspace/rules.md`: thêm việc riêng của repo, hoặc siết cửa chặt hơn. Không bỏ được việc nào của luật chung.
+
+Sửa có người duyệt: changeset của Orrery, hoặc ghi `rules-change` vào `decisions.md` của tính năng đang làm. Mỗi việc ghi: việc gì, vì sao cần người duyệt, cửa nào bắt buộc, có bắt buộc security review không.
 
 <!--
 Cửa có thể chọn: "chốt có làm", "duyệt spec", "chốt thiết kế", "duyệt và merge".

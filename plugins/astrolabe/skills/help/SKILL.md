@@ -1,6 +1,6 @@
 ---
 name: help
-description: "Trả lời câu hỏi về luồng astrolabe: đang ở giai đoạn nào, gõ lệnh gì tiếp, skill nào hợp, lệnh nào không dùng, tài liệu nằm đâu (file local hoặc Orrery). Khi câu hỏi chỉ thuộc một bộ (finolabs, pstack, Matt), trỏ sang skill trợ giúp của bộ đó. Chỉ đọc. Dùng khi gõ /astrolabe:help hoặc khi người làm hỏi nên dùng skill nào."
+description: "Trả lời câu hỏi về luồng astrolabe: đang ở giai đoạn nào, gõ lệnh gì tiếp, skill nào hợp, lệnh nào không dùng, tài liệu và luật duyệt nằm đâu (Orrery hoặc thư mục dữ liệu của plugin). Khi câu hỏi chỉ thuộc một bộ (finolabs, pstack, Matt), trỏ sang skill trợ giúp của bộ đó. Chỉ đọc. Dùng khi gõ /astrolabe:help hoặc khi người làm hỏi nên dùng skill nào."
 ---
 
 # astrolabe:help: hỏi về luồng
@@ -14,14 +14,14 @@ Nói với người làm bằng ngôn ngữ họ đang dùng. Giữ nguyên tên
 Trả lời từ các file này, không từ trí nhớ. Hai nguồn nói khác nhau thì nói ra cả hai.
 
 1. `skills/flow/SKILL.md` của plugin này: giai đoạn, cửa, preset, công tắc, nơi lưu tài liệu.
-2. `README.md` và `docs/cheat-sheet.md` của repo trung tâm, nếu phiên thấy được.
-3. Luật duyệt áp cho repo đang mở: `rules/common.md` của repo trung tâm và `docs/flow-rules.md` của repo.
+2. Luật duyệt áp cho repo đang mở: `_workspace/rules.md` và `<repo>/rules.md` ở nơi lưu (mục "Luật duyệt" của `astrolabe:flow`).
+3. README của plugin: https://github.com/LiamPham98/astrolabe.
 
 ## 1. Xác định người làm đang ở đâu
 
 Chỉ làm khi câu hỏi gắn với một tính năng cụ thể ("tôi làm tiếp gì", "tính năng X tới đâu rồi").
 
-- Tìm `flow.md` của tính năng theo `docsBackend` (mục "Nơi lưu tài liệu" của `astrolabe:flow`): `local` thì tìm trong thư mục local; `orrery` thì `note_search` trong folder `<repo>/features/` của space, và tìm cả thư mục local khi phiên không có Orrery.
+- Tìm `flow.md` của tính năng theo `docs_backend` (mục "Cấu hình" và "Nơi lưu tài liệu" của `astrolabe:flow`): `orrery` thì `note_search` trong folder `<repo>/features/` và `_workspace/features/` của space; `local`, hoặc phiên không có Orrery, thì tìm trong `${CLAUDE_PLUGIN_DATA}`.
 - Đọc preset, công tắc đã bật, các cửa đã qua, MR đã merge, và id changeset còn chờ duyệt.
 - Suy ra giai đoạn hiện tại và bước tiếp theo. Ghi revision của `flow.md` đã đọc trong câu trả lời.
 
@@ -32,17 +32,18 @@ Không tìm thấy `flow.md` thì nói tính năng chưa bắt đầu và đưa 
 | Người làm muốn | Trả lời bằng lệnh |
 |---|---|
 | Bắt đầu một tính năng | `/astrolabe:flow <small\|medium\|large> <mô tả>` |
-| Cài máy, thêm repo, sửa workspace, chọn nơi lưu tài liệu | `/astrolabe:setup` |
+| Kiểm cấu hình, Orrery, tạo luật duyệt, xem bộ đồng hành nào có mặt | `/astrolabe:setup` |
+| Đổi thư mục workspace, nơi lưu tài liệu, space Orrery | `/config`, mục của plugin `astrolabe` |
 | Biết tính năng có đáng làm không | `/astrolabe:why`, hoặc bật `why` trong `astrolabe:flow` |
 | Soát một spec đã có | `/astrolabe:spec-check` |
-| Chọn preset | bảng "Chọn quy mô" trong `docs/cheat-sheet.md` |
+| Chọn preset | bảng công tắc ở giai đoạn 0 của `astrolabe:flow` |
 | Làm tiếp tính năng đang dở | lệnh của bước tiếp theo theo mục 1 |
 
-Câu hỏi về một bước cụ thể trong luồng thì trả lời theo `astrolabe:flow` trước, kể cả khi bước đó dùng skill của bộ khác. Ví dụ: "khi nào chạy `/pstack:statechart`" trả lời theo công tắc `state`.
+Câu hỏi về một bước cụ thể trong luồng thì trả lời theo `astrolabe:flow` trước, kể cả khi bước đó dùng skill của bộ khác. Ví dụ: "khi nào chạy `/pstack:statechart`" trả lời theo công tắc `state`. Bộ đồng hành chưa cài thì trả lời theo cột "Mặc định" của bảng "Bước và công cụ".
 
 ## 3. Trỏ sang trợ giúp của từng bộ
 
-Chỉ trỏ khi câu hỏi nằm trong một bộ và không đổi luồng (cách skill đó chạy, tham số, lỗi của nó):
+Chỉ trỏ khi bộ đó đã cài, và câu hỏi nằm trong bộ đó mà không đổi luồng (cách skill đó chạy, tham số, lỗi của nó):
 
 | Câu hỏi về | Lệnh |
 |---|---|
@@ -56,7 +57,7 @@ Khi trỏ, nhắc một câu: trợ giúp của bộ đó không biết luồng 
 
 Luồng này không dùng các lệnh dưới. Người làm hỏi tới thì nói lý do và đưa lệnh thay thế.
 
-- `/mattpocock-skills:implement` và `none.md implement` của finolabs: phần code đi qua `/pstack:poteto-mode` ở giai đoạn 4.
+- `/mattpocock-skills:implement` và `none.md implement` của finolabs: phần code đi qua bước code ở giai đoạn 4.
 - `/pstack:how` chạy riêng trước `architect`: Phase A của `/pstack:architect` đã chạy `how`.
 - Agent merge thay người làm, hoặc agent tự duyệt changeset của Orrery: người làm tự merge, người khác tác giả duyệt changeset.
 - Tắt cửa duyệt mà luật duyệt bắt buộc.
@@ -64,5 +65,5 @@ Luồng này không dùng các lệnh dưới. Người làm hỏi tới thì n�
 ## Đầu ra
 
 - Một đến ba câu trả lời đúng câu hỏi, có nguồn (file hoặc note kèm revision).
-- Một khối lệnh để gõ tiếp, đủ tiền tố plugin. Lệnh chạy ở repo khác thì thêm `/cd ../<repo>` trước.
+- Một khối lệnh để gõ tiếp, đủ tiền tố plugin. Lệnh chạy ở repo khác thì thêm `/cd <đường dẫn repo>` trước.
 - Câu hỏi có nhiều cách hiểu thì hỏi lại một câu, phương án đề xuất đứng đầu, thay vì đoán.
