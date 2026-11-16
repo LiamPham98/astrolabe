@@ -84,13 +84,18 @@ Mẫu `flow.md`, `decisions.md` và hai mẫu luật nằm trong `templates/` c�
 
 Luật áp cho tính năng là hợp của `_workspace/rules.md` và `<repo>/rules.md` của **mỗi repo tính năng chạm tới**. Luật riêng chỉ thêm việc hoặc siết cửa, không bỏ được việc của luật chung; hai nơi ghi khác nhau về cùng một việc thì lấy cửa chặt hơn.
 
-Note hay file luật chưa có: dùng nội dung mẫu `templates/rules-common.md` (chung) và `templates/rules-repo.md` (riêng), nói một câu rằng đang dùng luật mẫu và gợi ý `/astrolabe:setup` để tạo luật thật. Không tự sửa luật; người làm yêu cầu sửa thì sửa và ghi `rules-change` vào `decisions.md`.
+Note hay file luật chưa có: dùng nội dung mẫu `templates/rules-common.md` (chung) và `templates/rules-repo.md` (riêng), nói một câu rằng đang dùng luật mẫu và gợi ý `/astrolabe:setup` để tạo luật thật.
+
+**Tạo và sửa luật** (`astrolabe:setup` theo đúng quy tắc này):
+
+- **Tạo lần đầu**: chỉ qua `/astrolabe:setup`, sau khi người dùng duyệt danh sách. Orrery: `note_create` từ mẫu, frontmatter `type: rules`, `repo: _workspace` hoặc tên repo. Local: ghi file từ mẫu. Note hay file đã có thì không ghi đè.
+- **Sửa luật đã có**: agent chỉ sửa khi người làm yêu cầu. Orrery: `changeset_submit` (`op: note.update`) để người khác tác giả duyệt, như `GLOSSARY.md` và ADR ở mục dưới; người làm nói space không có người duyệt thứ hai thì `note_update` kèm `base_revision` vừa đọc. Local: sửa file. Sửa trong một tính năng thì ghi `rules-change` vào `decisions.md` của tính năng đó (thêm `review-risk` khi ghi thẳng không qua người duyệt); sửa qua `/astrolabe:setup` thì nêu trong báo cáo cuối.
 
 ### Ghi vào Orrery
 
 - Tạo note từ mẫu bằng `note_create`. Ghi thêm vào `decisions.md` bằng `note_edit` với `op: append`. Sửa note bằng `note_edit` hoặc `note_update`, luôn với `base_revision` vừa đọc; gặp `conflict` thì đọc lại, gộp, rồi ghi lại.
 - Note trỏ nhau bằng wikilink, ví dụ mục `design` trong `decisions.md` trỏ `[[<repo>/adr/0003-<slug>]]`.
-- `GLOSSARY.md`, ADR và luật là note dùng chung: đổi bằng `changeset_submit` (`op: note.create` hoặc `note.update`) để người khác tác giả duyệt. Agent không bao giờ tự duyệt changeset. Ghi id changeset vào `flow.md`; trước khi được duyệt, đọc nội dung từ `changeset_read`. Người làm nói space không có người duyệt thứ hai thì ghi thẳng và ghi `review-risk` vào `decisions.md`.
+- `GLOSSARY.md` và ADR là note dùng chung: đổi bằng `changeset_submit` (`op: note.create` hoặc `note.update`) để người khác tác giả duyệt. Luật theo mục "Tạo và sửa luật" ở trên. Agent không bao giờ tự duyệt changeset. Ghi id changeset vào `flow.md`; trước khi được duyệt, đọc nội dung từ `changeset_read`. Người làm nói space không có người duyệt thứ hai thì ghi thẳng và ghi `review-risk` vào `decisions.md`.
 - Ghi vào `flow.md` revision của từng note lúc đọc làm bằng chứng cho cửa duyệt. Mô tả mỗi MR dán link note `spec.md` kèm revision.
 
 **Khi phiên không kết nối Orrery** (không có công cụ `note_create`, hoặc `whoami` lỗi): nói một câu, ghi theo cùng bố cục vào `${CLAUDE_PLUGIN_DATA}`, và ghi `orrery: chưa đồng bộ` ở đầu `flow.md`. Lần sau phiên có Orrery:
