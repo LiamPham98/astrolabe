@@ -12,7 +12,7 @@ Quyết định ngày 16/11/2026: bỏ bản ghim trong `vendor/` (đến bản 
 | `pstack@cursor-plugins` | `cursor-plugins` | https://github.com/cursor/plugins (bản dựng cho Claude Code, thư mục `harness/pstack/claude-code/`) | MIT, Lauren Tan |
 | `mattpocock-skills@mattpocock` | `mattpocock` | https://github.com/mattpocock/skills | MIT, Matt Pocock |
 
-`scripts/setup-machine.sh` ghi ba marketplace này vào `extraKnownMarketplaces` của `~/.claude/settings.json` với `"autoUpdate": true`, rồi cài plugin.
+Danh sách này khai trong `upstream.json` ở gốc repo: mỗi mục có `marketplace`, `repo` (GitHub), `plugin` và `skills` (skill luồng gọi tới, để kiểm còn tồn tại); `retired` liệt kê plugin cũ cần gỡ. `scripts/setup-machine.sh` đọc file đó, ghi các marketplace vào `extraKnownMarketplaces` của `~/.claude/settings.json` với `"autoUpdate": true`, rồi cài plugin. Thêm hay thay một bộ: sửa `upstream.json` và bảng dưới, không cần sửa script.
 
 ## Cập nhật chạy thế nào
 
@@ -20,7 +20,7 @@ Quyết định ngày 16/11/2026: bỏ bản ghim trong `vendor/` (đến bản 
 - Bản "mới hơn" tính theo `version` trong `plugin.json` của upstream, không theo commit. Upstream đẩy commit mà không tăng `version` thì máy không nhận.
 - Cập nhật tay: `claude plugin marketplace update <marketplace>`, rồi `claude plugin update <plugin>@<marketplace>`.
 - `DISABLE_AUTOUPDATER=1` hoặc `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1` tắt lượt cập nhật plugin; `FORCE_AUTOUPDATE_PLUGINS=1` bật lại.
-- Chạy lại `scripts/setup-machine.sh` sau một lần cập nhật để kiểm các skill ở bảng dưới vẫn còn. Script báo `THIẾU` khi upstream đổi tên hoặc bỏ skill. Script không phát hiện skill đổi hành vi.
+- Chạy lại `scripts/setup-machine.sh` sau một lần cập nhật để kiểm các skill trong `upstream.json` vẫn còn. Script báo `THIẾU` khi upstream đổi tên hoặc bỏ skill. Script không phát hiện skill đổi hành vi.
 
 pstack dùng bản dựng cho Claude Code mà chính upstream phát hành, không dùng thư mục `pstack/` gốc. Bản dựng này bảo agent đọc `docs/harness/claude-code.md`, file ánh xạ công cụ, subagent và model của Cursor sang Claude Code. Muốn sửa một skill của upstream: viết skill riêng trong `plugins/feature-workflow/`, hoặc gửi thay đổi lên upstream.
 
