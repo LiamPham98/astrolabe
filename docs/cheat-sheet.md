@@ -10,7 +10,7 @@ Mọi lệnh dưới đây có tiền tố tên plugin (`/pstack:…`, `/mattpoc
 
 Kiểm tra, hỏi duyệt, rồi cài phần còn thiếu. Chạy lại được.
 
-Workspace: chạy ở repo trung tâm `astrolabe` để setup mọi repo đồng cấp một lần. Thêm repo mới thì chạy lại.
+Workspace: chạy ở repo trung tâm (repo này) để setup mọi repo đồng cấp một lần. Thêm repo mới thì chạy lại.
 
 ## 1. Bắt đầu
 
@@ -25,7 +25,12 @@ Mở phiên ở đâu:
 
 Agent chọn công tắc, đọc `docs/flow-rules.md`, ghi biên lai, rồi trình chuỗi lệnh. Đồng ý thì đi tiếp.
 
-Biên lai, `why.md`, spec, ticket, `spec-check.md` và sổ quyết định nằm trong Orrery ở `<repo>/features/<slug>/` (space `personal`). `GLOSSARY.md` và ADR ở `<repo>/`. Chỉ luật duyệt nằm trong git. Phiên không có Orrery thì ghi local, phiên sau đồng bộ lên.
+Biên lai, `why.md`, spec, ticket, `spec-check.md` và sổ quyết định nằm ở thư mục tính năng, theo `docsBackend` trong `workspace.json`:
+
+- `local` (mặc định): file markdown trong git, ở `docs/features/<slug>/` của repo hoặc `features/<slug>/` của repo trung tâm (theo `featureDocs`). `GLOSSARY.md` và ADR (`docs/adr/`) cũng trong repo.
+- `orrery`: note trong Orrery ở `<repo>/features/<slug>/` (space theo `orrery.space`). `GLOSSARY.md` và ADR ở `<repo>/`. Phiên không có Orrery thì ghi local, phiên sau đồng bộ lên.
+
+Luật duyệt luôn nằm trong git.
 
 ## 2. Chọn quy mô
 

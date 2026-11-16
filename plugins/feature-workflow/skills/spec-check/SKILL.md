@@ -11,9 +11,9 @@ Cấu trúc tham khảo bước soát và checklist sẵn sàng của vibebiz (f
 
 ## Đầu vào
 
-- `flow.md` trong thư mục tính năng, và spec theo đường dẫn ghi trong đó. Thư mục tính năng nằm trong Orrery, hoặc local khi phiên không có Orrery; cách đọc ghi theo "Tài liệu trong Orrery" trong skill `feature-flow`.
+- `flow.md` trong thư mục tính năng, và spec theo đường dẫn ghi trong đó. Thư mục tính năng nằm theo `docsBackend`; cách đọc ghi theo mục "Nơi lưu tài liệu" trong skill `feature-flow`.
 - `why.md`, `decisions.md` của tính năng, nếu có.
-- Thuật ngữ: `<repo>/GLOSSARY.md` trong Orrery (hoặc `GLOSSARY-MAP.md` trỏ tới từng context), cùng `GLOSSARY.md` trong repo nếu còn bản chưa đồng bộ. Gọi chung là `GLOSSARY.md` ở dưới.
+- Thuật ngữ: `GLOSSARY.md` (hoặc `GLOSSARY-MAP.md` trỏ tới từng context) trong repo; với `docsBackend: orrery`, đọc thêm `<repo>/GLOSSARY.md` trong Orrery. Gọi chung là `GLOSSARY.md` ở dưới.
 - Luật duyệt áp cho tính năng: `rules/common.md` của repo trung tâm (nếu có workspace) cùng `docs/flow-rules.md` của mỗi repo tính năng chạm tới.
 
 ## 1. Lập danh mục trước

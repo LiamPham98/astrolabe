@@ -39,30 +39,32 @@ claude plugin marketplace list
 claude plugin list --json
 ```
 
-- Bốn plugin, đúng marketplace: `feature-workflow@feature-workflow`, `finolabs-vibecode@finolabs-vibecode`, `pstack@cursor-plugins`, `mattpocock-skills@mattpocock`. Ghi phạm vi cài (user hay project).
-- `~/.claude/settings.json`: ba marketplace upstream trong `extraKnownMarketplaces` có `"autoUpdate": true` không.
+- Plugin cần có: plugin trong `.claude-plugin/marketplace.json` của repo trung tâm (dạng `<plugin>@<tên marketplace>`, hiện là `feature-workflow@feature-workflow`) và mỗi mục trong `upstream` của `upstream.json` (dạng `<plugin>@<marketplace>`). Đọc hai file đó, không dùng danh sách nhớ sẵn. Ghi phạm vi cài (user hay project).
+- `~/.claude/settings.json`: mỗi marketplace upstream trong `extraKnownMarketplaces` có `"autoUpdate": true` không.
 - **Bản trùng**:
-  - cùng bộ skill cài từ marketplace khác, kể cả bản ghim cũ `<bộ>@feature-workflow` (đến bản 0.3.0);
-  - skill rời trong `~/.claude/skills` trùng tên với skill của bốn plugin (skill rời không có tiền tố nên bị gọi lẫn).
-- Thiếu plugin, thiếu `autoUpdate` hoặc có bản trùng: việc cần làm là người dùng chạy `./scripts/setup-machine.sh` trong repo trung tâm (`feature-workflow`). Script ghi settings, cài plugin, gỡ bản ghim cũ, chuyển skill rời trùng sang `~/.claude/skills-backup-<ngày>/` và kiểm skill luồng cần.
+  - cùng bộ skill cài từ marketplace khác, kể cả plugin cũ liệt kê trong `retired` của `upstream.json`;
+  - skill rời trong `~/.claude/skills` trùng tên với skill của các plugin trên (skill rời không có tiền tố nên bị gọi lẫn).
+- Thiếu plugin, thiếu `autoUpdate` hoặc có bản trùng: việc cần làm là người dùng chạy `./scripts/setup-machine.sh` trong repo trung tâm. Script ghi settings, cài plugin, gỡ plugin cũ, chuyển skill rời trùng sang `~/.claude/skills-backup-<ngày>/` và kiểm skill luồng cần.
 - Công cụ cho statechart: `command -v mise`.
-- **Orrery** (nơi lưu tài liệu tính năng): phiên có công cụ MCP của Orrery không (`whoami`); `space_list` có thấy space trong `orrery.space` (mặc định `personal`) không, và vai trò có từ `editor` trở lên không. Không có Orrery thì ghi `thiếu`: luồng vẫn chạy nhưng ghi local và đồng bộ sau.
+- **Orrery** (chỉ khi `docsBackend` là `orrery`): phiên có công cụ MCP của Orrery không (`whoami`); `space_list` có thấy space trong `orrery.space` (mặc định `personal`) không, và vai trò có từ `editor` trở lên không. Không có Orrery thì ghi `thiếu`: luồng vẫn chạy nhưng ghi local và đồng bộ sau.
 
 **Workspace** (chế độ trung tâm):
 
-- `workspace.json`: `featureDocs` đã chọn chưa, `projects` gồm những repo nào, đường dẫn còn đúng không.
+- `workspace.json`: `docsBackend` và `featureDocs` đã chọn chưa, `projects` gồm những repo nào, đường dẫn còn đúng không.
 - Các repo git nằm cùng thư mục cha (`ls ..`, mỗi thư mục có `.git`) mà chưa có trong `projects`.
-- `.claude/settings.json` của repo trung tâm: `permissions.additionalDirectories` có khớp `projects` không; có `enabledPlugins` cho bốn plugin không; có `extraKnownMarketplaces` không.
+- `.claude/settings.json` của repo trung tâm: `permissions.additionalDirectories` có khớp `projects` không; không có `enabledPlugins` hay `extraKnownMarketplaces` (hai khoá này thuộc `~/.claude/settings.json` của từng máy).
 - `rules/common.md` còn là bản mẫu nguyên hay đã sửa.
 - Remote của repo trung tâm: `git remote get-url origin`.
 
 **Từng repo** (repo đang mở ở chế độ đồng cấp và đơn lẻ; mọi repo trong `projects` ở chế độ trung tâm):
 
-- `.claude/feature-workflow.json` có trỏ đúng repo trung tâm không (không áp dụng với đơn lẻ).
+- `.claude/feature-workflow.json` có trỏ đúng repo trung tâm không (không áp dụng với đơn lẻ). Ở chế độ đơn lẻ, file này giữ `docsBackend` của repo.
 - `docs/flow-rules.md` có chưa; đã sửa hay còn mẫu.
-- `docs/features/` có chưa (chỉ cần khi `featureDocs` là `auto` hoặc `project`, hoặc ở chế độ đơn lẻ).
-- Cấu hình của Matt: đọc SKILL.md của `setup-matt-pocock-skills` trong plugin `mattpocock-skills` để biết nó ghi file gì, rồi kiểm file đó. `docs/agents/issue-tracker.md` và `docs/agents/domain.md` phải trỏ về Orrery (nội dung như mẫu `templates/issue-tracker-orrery.md` và `templates/domain-orrery.md` cạnh file SKILL.md này); còn là bản của Matt thì ghi `thiếu`.
-- `GLOSSARY.md`, `GLOSSARY-MAP.md` và `docs/adr/` trong repo: có thì ghi `thiếu` cho mục "chép lên Orrery".
+- `docs/features/` có chưa (cần khi `featureDocs` là `auto` hoặc `project`, hoặc ở chế độ đơn lẻ).
+- Cấu hình của Matt: đọc SKILL.md của `setup-matt-pocock-skills` trong plugin `mattpocock-skills` để biết nó ghi file gì, rồi kiểm file đó có chưa.
+  - `docsBackend: local`: bản "Local markdown" của Matt là đúng.
+  - `docsBackend: orrery`: `docs/agents/issue-tracker.md` và `docs/agents/domain.md` phải trỏ về Orrery (nội dung như mẫu `templates/issue-tracker-orrery.md` và `templates/domain-orrery.md` cạnh file SKILL.md này); còn là bản của Matt thì ghi `thiếu`.
+- Chỉ khi `docsBackend: orrery`: `GLOSSARY.md`, `GLOSSARY-MAP.md` và `docs/adr/` trong repo có thì ghi `thiếu` cho mục "chép lên Orrery".
 - Cửa của finolabs: ghi "cần chạy `/finolabs-vibecode:setup check` trong repo này".
 - Remote: không phải GitHub thì ghi rõ `merge_check.py` và `post_review.py` của finolabs gọi `gh`, nên cửa merge và việc đăng review không chạy được ở repo này.
 
@@ -81,7 +83,10 @@ Mọi mục đều `đã có` thì nói là đã sẵn sàng, gợi ý `/feature
 
 Gửi trong một lần hỏi, chỉ những câu đang cần:
 
-- **Nơi lưu tài liệu tính năng** (chế độ trung tâm, khi `featureDocs` chưa chọn hoặc người dùng muốn đổi):
+- **Nơi lưu tài liệu** (`docsBackend`; mọi chế độ, khi chưa chọn hoặc người dùng muốn đổi):
+  - `local` (Đề xuất): tài liệu tính năng là file markdown trong git, không cần dịch vụ ngoài.
+  - `orrery`: tài liệu nằm trong Orrery, cần phiên có công cụ MCP của Orrery; hỏi thêm tên space (mặc định `personal`).
+- **Thư mục local** (`featureDocs`; chế độ trung tâm, khi chưa chọn hoặc người dùng muốn đổi; với `orrery` đây là nơi dự phòng khi phiên không có Orrery):
   - `auto` (Đề xuất): tính năng một repo lưu ở `docs/features/` của repo đó; tính năng nhiều repo lưu ở `features/` của trung tâm.
   - `central`: mọi tính năng lưu ở `features/` của trung tâm.
   - `project`: mọi tính năng lưu trong repo dự án; tính năng nhiều repo lưu ở repo chính của tính năng.
@@ -98,10 +103,11 @@ Lệnh nào lỗi thì dừng mục đó, ghi lỗi nguyên văn, làm tiếp c�
 
 **Workspace** (chế độ trung tâm):
 
-1. Ghi `workspace.json`: `featureDocs` đã chọn (chỉ dùng khi phiên không có Orrery); `"orrery": { "space": "personal" }` nếu chưa có; thêm mỗi repo đã chọn vào `projects` với `name` (tên thư mục), `path` (`../<tên>`), `remote` (kết quả `git -C ../<tên> remote get-url origin`, rỗng nếu không có). URL có phần `user:token@` thì bỏ phần đó trước khi ghi, ví dụ `https://user:token@gitlab.com/x.git` thành `https://gitlab.com/x.git`; không in token ra. Giữ nguyên repo đã có.
+1. Ghi `workspace.json`: `docsBackend` và `featureDocs` đã chọn; `"orrery": { "space": "<space>" }` chỉ khi `docsBackend` là `orrery`; thêm mỗi repo đã chọn vào `projects` với `name` (tên thư mục), `path` (đường dẫn tương đối từ repo trung tâm, thường là `../<tên>`), `remote` (kết quả `git -C ../<tên> remote get-url origin`, rỗng nếu không có). URL có phần `user:token@` thì bỏ phần đó trước khi ghi, ví dụ `https://user:token@gitlab.com/x.git` thành `https://gitlab.com/x.git`; không in token ra. Giữ nguyên repo đã có.
 2. Ghi `.claude/settings.json` của repo trung tâm, **giữ mọi key khác đang có**:
    - `permissions.additionalDirectories`: đúng danh sách `path` trong `projects`.
-   - Không ghi `enabledPlugins` hay `extraKnownMarketplaces` vào file commit chung: plugin cài theo máy bằng `scripts/setup-machine.sh`, và nguồn `directory` là đường dẫn tuyệt đối của một máy.
+   - Không ghi `enabledPlugins` hay `extraKnownMarketplaces` vào file này: plugin cài theo máy bằng `scripts/setup-machine.sh`, và nguồn `directory` là đường dẫn tuyệt đối của một máy.
+   - File này nằm trong `.gitignore` của bản public. Repo có dòng đó thì nói rằng file không được commit; team muốn chia sẻ danh sách repo thì bỏ dòng đó.
 3. Tạo `features/.gitkeep` nếu chưa có.
 
 **Từng repo** (repo đang mở, hoặc mọi repo trong `projects` ở chế độ trung tâm):
@@ -112,12 +118,14 @@ Lệnh nào lỗi thì dừng mục đó, ghi lỗi nguyên văn, làm tiếp c�
    { "workspace": "../<tên repo trung tâm>" }
    ```
 
-   Chế độ đơn lẻ: ghi `.claude/feature-workflow.json` với `{ "orrery": { "space": "personal" } }` nếu chưa có.
+   `workspace` là đường dẫn tương đối từ repo này tới repo trung tâm.
+
+   Chế độ đơn lẻ: ghi `.claude/feature-workflow.json` với `{ "docsBackend": "<đã chọn>" }`, thêm `"orrery": { "space": "<space>" }` khi chọn `orrery`. Giữ các khoá đã có.
 
 2. Tạo `docs/flow-rules.md` từ `../feature-flow/templates/flow-rules.md` cạnh file SKILL.md này, nếu chưa có. Có rồi thì không ghi đè.
 3. Tạo `docs/features/.gitkeep` nếu `featureDocs` là `auto` hoặc `project`, hoặc ở chế độ đơn lẻ.
-4. Sau khi người dùng chạy `/mattpocock-skills:setup-matt-pocock-skills`: ghi đè `docs/agents/issue-tracker.md` và `docs/agents/domain.md` bằng hai mẫu `templates/issue-tracker-orrery.md` và `templates/domain-orrery.md`, thay `{{space}}` bằng `orrery.space` và `{{repo}}` bằng tên repo. Trình nội dung cũ trước khi ghi đè.
-5. Chép lên Orrery (cần phiên có Orrery): `GLOSSARY.md`, `GLOSSARY-MAP.md` và các file trong `docs/adr/` của repo lên `<repo>/` trong space, theo bố cục ở "Tài liệu trong Orrery" của skill `feature-flow`, bằng `changeset_submit`. Note đã có và khác file thì không ghi đè; trình hai bản và hỏi. Chép xong thì hỏi có xoá bản trong repo không.
+4. Chỉ khi `docsBackend: orrery`, sau khi người dùng chạy `/mattpocock-skills:setup-matt-pocock-skills`: ghi đè `docs/agents/issue-tracker.md` và `docs/agents/domain.md` bằng hai mẫu `templates/issue-tracker-orrery.md` và `templates/domain-orrery.md`, thay `{{space}}` bằng `orrery.space` và `{{repo}}` bằng tên repo. Trình nội dung cũ trước khi ghi đè.
+5. Chỉ khi `docsBackend: orrery`, chép lên Orrery (cần phiên có Orrery): `GLOSSARY.md`, `GLOSSARY-MAP.md` và các file trong `docs/adr/` của repo lên `<repo>/` trong space, theo mục "Orrery" trong "Nơi lưu tài liệu" của skill `feature-flow`, bằng `changeset_submit`. Note đã có và khác file thì không ghi đè; trình hai bản và hỏi. Chép xong thì hỏi có xoá bản trong repo không.
 
 Nhắc người dùng commit các file vừa tạo trong từng repo; file luật và `.claude/feature-workflow.json` là file chung của team.
 
@@ -139,7 +147,7 @@ Chế độ trung tâm soạn `rules/common.md` trước, rồi phần riêng c�
 Với mỗi repo còn thiếu, in theo thứ tự (ghi rõ repo nào):
 
 1. `/cd ../<repo>` nếu phiên đang ở repo khác.
-2. `/mattpocock-skills:setup-matt-pocock-skills`: ở câu hỏi issue tracker chọn "Local markdown" (bước 4 của mục "Từng repo" sẽ thay bằng cấu hình Orrery). Xong thì quay lại `/feature-workflow:feature-setup` để ghi cấu hình Orrery.
+2. `/mattpocock-skills:setup-matt-pocock-skills`: ở câu hỏi issue tracker chọn "Local markdown". Khi `docsBackend` là `orrery`: bước 4 của mục "Từng repo" sẽ thay bằng cấu hình Orrery, nên xong thì quay lại `/feature-workflow:feature-setup`.
 3. `/finolabs-vibecode:setup`: chọn phạm vi **project** để bật cửa kiểm và cửa merge cho repo này. Xong thì `/finolabs-vibecode:setup check`.
 
 Một lần cho máy:

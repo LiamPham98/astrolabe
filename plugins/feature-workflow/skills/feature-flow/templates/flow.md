@@ -13,8 +13,8 @@ feature: <slug>
 - Công tắc bật: <danh sách>
 - Spec: <note spec.md kèm revision, hoặc "không có">
 - Repo: <danh sách>
-- Thư mục tính năng: <space>:<repo>/features/<slug>/ trong Orrery, hoặc đường dẫn local khi chưa đồng bộ
-- Revision đã đọc: <note: revision, ghi khi qua mỗi cửa>
+- Thư mục tính năng: <đường dẫn local; hoặc <space>:<repo>/features/<slug>/ khi docsBackend là orrery>
+- Revision đã đọc: <chỉ với orrery; note: revision, ghi khi qua mỗi cửa>
 - Luật duyệt đã đọc: <rules/common.md của workspace, docs/flow-rules.md của từng repo>
 
 ## Công tắc
