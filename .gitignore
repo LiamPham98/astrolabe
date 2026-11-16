@@ -1,3 +1,6 @@
 .DS_Store
 *.swp
 .claude/settings.local.json
+# Khai báo repo đồng cấp của từng người (init-project.sh và feature-setup sinh ra).
+# Fork của một team muốn chia sẻ danh sách này thì bỏ dòng dưới.
+.claude/settings.json
