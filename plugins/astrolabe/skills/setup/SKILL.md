@@ -68,11 +68,11 @@ Cấu hình sai hoặc thiếu: không hỏi ở đây; hướng dẫn người 
 
 Lệnh nào lỗi thì dừng mục đó, ghi lỗi nguyên văn, làm tiếp các mục khác.
 
-1. **Tạo luật**: ghi note (Orrery: `note_create`, frontmatter `type: rules`, `repo: _workspace` hoặc tên repo) hoặc file trong `${CLAUDE_PLUGIN_DATA}` theo bố cục. Đã có thì không ghi đè.
+1. **Tạo luật**: theo "Tạo lần đầu" trong mục "Tạo và sửa luật" của `astrolabe:flow`. Đã có thì không ghi đè.
 2. **Soạn luật từ code** (khi được duyệt):
    1. Đọc code để tìm chỗ thuộc các loại việc trong mẫu: sửa hoặc xoá dữ liệu đã chốt, công thức ảnh hưởng tiền, phân quyền, AI ra quyết định, xuất dữ liệu cá nhân, gửi thông báo hàng loạt. Ghi chỗ tìm được (repo, file, module).
    2. Hỏi một vòng, tối đa 4 câu: loại việc nào áp cho mọi repo; việc nào chỉ một repo có; việc nhạy cảm khác không có trong mẫu; cửa bắt buộc và security review cho các việc đã chọn. Mỗi câu có phương án đề xuất theo code tìm được.
-   3. Ghi bảng vào `_workspace/rules.md` và `<repo>/rules.md`. Bỏ dòng không áp dụng, thêm dòng mới, giữ phần chú thích đầu. Luật riêng không lặp lại việc đã có trong luật chung. Với Orrery, sửa note đã có bằng `note_update` kèm `base_revision`.
+   3. Ghi bảng vào `_workspace/rules.md` và `<repo>/rules.md`. Bỏ dòng không áp dụng, thêm dòng mới, giữ phần chú thích đầu. Luật riêng không lặp lại việc đã có trong luật chung. Note hay file chưa có thì tạo như mục 1; đã có thì sửa theo "Sửa luật đã có" trong mục "Tạo và sửa luật" của `astrolabe:flow` (Orrery: qua changeset).
 3. **Đồng bộ lên Orrery**: theo mục "Khi phiên không kết nối Orrery" của `astrolabe:flow`.
 4. **Dọn dấu vết bản cũ**: xoá đúng các file đã duyệt; thư mục rỗng sau khi xoá thì xoá luôn. Luật trong `docs/flow-rules.md` đã sửa khác mẫu thì chép nội dung sang `<repo>/rules.md` ở nơi lưu trước khi xoá.
 
