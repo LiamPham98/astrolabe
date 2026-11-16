@@ -6,6 +6,8 @@ Bản gắn tag đầu tiên là `v0.5.0`; các bản trước chưa gắn tag.
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-11-16
+
 ### Sửa
 
 - Quy tắc tạo và sửa luật duyệt thống nhất giữa `astrolabe:flow` và `astrolabe:setup`: tạo lần đầu từ mẫu chỉ qua `/astrolabe:setup` sau khi người dùng duyệt; sửa luật đã có trong Orrery qua changeset, ghi thẳng chỉ khi space không có người duyệt thứ hai.
