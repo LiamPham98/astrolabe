@@ -6,6 +6,8 @@ Bản gắn tag đầu tiên là `v0.5.0`; các bản trước chưa gắn tag.
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-11-16
+
 ### Sửa
 
 - `setup-machine.sh` chạy từ bản clone mà marketplace `astrolabe` đang dùng nguồn khác (ví dụ đã cài từ GitHub) thì giữ nguồn đó và báo cách chuyển, không ghi nguồn thư mục đè vào `settings.json`.
