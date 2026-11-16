@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Cài luồng feature-workflow cho máy này. Chạy một lần mỗi máy; chạy lại vẫn an toàn.
+# Cài luồng astrolabe cho máy này. Chạy một lần mỗi máy; chạy lại vẫn an toàn.
 #
 #   ./scripts/setup-machine.sh
 #
@@ -12,8 +12,9 @@
 #    - extraKnownMarketplaces: các marketplace upstream với "autoUpdate": true,
 #      và marketplace của repo này (nguồn directory);
 #    - enabledPlugins: plugin của repo này và plugin upstream.
-# 2. Thêm marketplace còn thiếu, cài plugin còn thiếu.
-# 3. Gỡ plugin cũ khai trong "retired" của upstream.json nếu còn.
+# 2. Gỡ plugin cũ ("retired") và marketplace cũ ("retiredMarketplaces") khai trong upstream.json,
+#    ví dụ bản feature-workflow trước khi đổi tên thành astrolabe.
+# 3. Thêm marketplace còn thiếu, cài plugin còn thiếu.
 # 4. Chuyển skill rời trong ~/.claude/skills trùng tên với skill của plugin sang
 #    ~/.claude/skills-backup-<ngày>/ (không xoá; ~/.agents/skills giữ nguyên cho Codex, Antigravity).
 # 5. Kiểm các skill mà luồng gọi tới vẫn còn trong plugin upstream.
@@ -41,6 +42,7 @@ command -v cygpath >/dev/null && HUB_NATIVE="$(cygpath -w "$HUB")"
 #   marketplaces     "<marketplace> <repo GitHub>" của từng bộ upstream
 #   wanted           mọi plugin cần bật, dạng <plugin>@<marketplace>
 #   retired          plugin cũ cần gỡ
+#   retired-mk       marketplace cũ cần gỡ
 manifest() {
   "$PY" -I -X utf8 - "$HUB_NATIVE" "$1" <<'PY' | tr -d '\r'
 import json, os, sys
@@ -56,6 +58,8 @@ elif key == "wanted":
     rows += [f'{u["plugin"]}@{u["marketplace"]}' for u in up["upstream"]]
 elif key == "retired":
     rows = up.get("retired", [])
+elif key == "retired-mk":
+    rows = up.get("retiredMarketplaces", [])
 else:
     sys.exit(f"khoá lạ: {key}")
 print("\n".join(rows))
@@ -76,6 +80,9 @@ st = json.load(open(path, encoding="utf-8")) if os.path.exists(path) else {}
 before = json.dumps(st, sort_keys=True)
 
 mk = st.setdefault("extraKnownMarketplaces", {})
+for name in up.get("retiredMarketplaces", []):
+    if name != hub_mk["name"]:
+        mk.pop(name, None)
 for u in up["upstream"]:
     mk[u["marketplace"]] = {"source": {"source": "github", "repo": u["repo"]}, "autoUpdate": True}
 mk[hub_mk["name"]] = {"source": {"source": "directory", "path": hub}}
@@ -102,7 +109,18 @@ else:
     print("Đã ghi.")
 PY
 
-echo "== 2. Marketplace và plugin"
+echo "== 2. Gỡ plugin và marketplace cũ"
+installed="$(claude plugin list --json)"
+has_plugin() { grep -q "\"id\": \"$1\"" <<<"$installed"; }
+for pid in $(manifest retired); do
+  if has_plugin "$pid"; then claude plugin uninstall "$pid"; else echo "Không còn $pid"; fi
+done
+known="$(claude plugin marketplace list 2>/dev/null || true)"
+for name in $(manifest retired-mk); do
+  if grep -qw -- "$name" <<<"$known"; then claude plugin marketplace remove "$name"; else echo "Không còn marketplace $name"; fi
+done
+
+echo "== 3. Marketplace và plugin"
 known="$(claude plugin marketplace list 2>/dev/null || true)"
 add_mk() {  # <tên> <nguồn>
   if grep -qw -- "$1" <<<"$known"; then echo "Đã có marketplace $1"; else claude plugin marketplace add "$2"; fi
@@ -118,14 +136,8 @@ done 3< <(manifest marketplaces)
 claude plugin marketplace update "$HUB_MK"
 
 installed="$(claude plugin list --json)"
-has_plugin() { grep -q "\"id\": \"$1\"" <<<"$installed"; }
 for pid in $WANTED; do
   if has_plugin "$pid"; then echo "Đã cài $pid"; else claude plugin install "$pid" --scope user; fi
-done
-
-echo "== 3. Gỡ plugin cũ"
-for pid in $(manifest retired); do
-  if has_plugin "$pid"; then claude plugin uninstall "$pid"; else echo "Không còn $pid"; fi
 done
 
 echo "== 4. Skill rời trùng tên"
@@ -204,5 +216,5 @@ cat <<'EOF'
 Xong. Việc tiếp theo:
   1. Mở phiên Claude Code mới (hoặc gõ /reload-plugins) để nạp plugin mới.
   2. Chưa có ~/.claude/rules/pstack-models.md thì gõ /pstack:setup-pstack.
-  3. Ở repo trung tâm gõ /feature-workflow:feature-setup để setup workspace và từng repo.
+  3. Ở repo trung tâm gõ /astrolabe:setup để setup workspace và từng repo.
 EOF

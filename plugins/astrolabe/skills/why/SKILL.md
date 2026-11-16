@@ -1,9 +1,9 @@
 ---
-name: feature-why
-description: Chốt "có nên làm không, làm để đạt gì, lấy gì để biết là đúng" cho một tính năng trước khi grill hoặc spec. Dùng khi feature-flow bật công tắc why, hoặc khi gõ /feature-workflow:feature-why.
+name: why
+description: Chốt "có nên làm không, làm để đạt gì, lấy gì để biết là đúng" cho một tính năng trước khi grill hoặc spec. Dùng khi astrolabe:flow bật công tắc why, hoặc khi gõ /astrolabe:why.
 ---
 
-# feature-why: có nên làm không
+# astrolabe:why: có nên làm không
 
 Bước này trả lời câu hỏi mà `/mattpocock-skills:grill-with-docs` mặc định coi như đã có: tính năng này có đáng làm không. Nó phỏng vấn người làm theo từng vòng ngắn, phản biện thẳng, và ghi kết quả vào `why.md` trong thư mục tính năng.
 
@@ -23,7 +23,7 @@ Cấu trúc bước này tham khảo phần phân tích của vibebiz (finolabs/
 Người làm quyết định; agent tìm dữ kiện. Trước mỗi câu hỏi, tìm câu trả lời theo thứ tự:
 
 1. Mô tả tính năng, thư mục tính năng (đường dẫn trong `flow.md`), luật duyệt áp cho tính năng (`rules/common.md` của repo trung tâm nếu có workspace, cùng `docs/flow-rules.md` của từng repo).
-2. Các tính năng khác, `GLOSSARY.md` và ADR, tìm theo `docsBackend` (mục "Nơi lưu tài liệu" trong skill `feature-flow`): luôn đọc thư mục local, `GLOSSARY.md` và `docs/adr/` trong repo; với `orrery`, đọc thêm folder `<repo>/features/` (bằng `note_search`), `<repo>/GLOSSARY.md` và `<repo>/adr/` trong space.
+2. Các tính năng khác, `GLOSSARY.md` và ADR, tìm theo `docsBackend` (mục "Nơi lưu tài liệu" trong skill `astrolabe:flow`): luôn đọc thư mục local, `GLOSSARY.md` và `docs/adr/` trong repo; với `orrery`, đọc thêm folder `<repo>/features/` (bằng `note_search`), `<repo>/GLOSSARY.md` và `<repo>/adr/` trong space.
 3. Code liên quan: đọc trực tiếp để biết hệ thống đang làm gì. Cần hiểu sâu một subsystem thì đề nghị người làm gõ `/pstack:how`.
 
 Tìm được thì ghi dữ kiện kèm nguồn, và chỉ hỏi phần quyết định còn lại. Không hỏi lại điều file hoặc code đã trả lời.
@@ -72,7 +72,7 @@ Chỉ số ở O là chỉ số của **chính tính năng** (tính năng thay �
 - Mỗi câu tự đứng được: nêu tên tính năng, không viết "như trên", không dùng mã mục.
 - 2 đến 4 phương án loại trừ nhau. Phương án đề xuất đứng đầu, gắn "(Đề xuất)", mô tả bắt đầu bằng lý do đề xuất. Không có bằng chứng nghiêng về bên nào thì đề xuất phương án dễ quay lại nhất.
 - Không thêm phương án "Khác" hay "Không": người làm luôn có ô tự nhập và nút bỏ qua.
-- Hỏi xong vòng nào, ghi ngay vào `why.md` và `decisions.md` vòng đó, trong thư mục tính năng (cách đọc ghi theo mục "Nơi lưu tài liệu" trong skill `feature-flow`). Chưa có `decisions.md` thì tạo từ mẫu trong `templates/` của skill `feature-flow`.
+- Hỏi xong vòng nào, ghi ngay vào `why.md` và `decisions.md` vòng đó, trong thư mục tính năng (cách đọc ghi theo mục "Nơi lưu tài liệu" trong skill `astrolabe:flow`). Chưa có `decisions.md` thì tạo từ mẫu trong `templates/` của skill `astrolabe:flow`.
 - Mặc định 3 vòng mỗi phiên. Hết 3 vòng mà chưa xong thì hỏi: hỏi tiếp, tạm dừng, hay ghi bản nháp với các mục chưa rõ đánh dấu "chưa làm rõ".
 
 ## Kỹ thuật
@@ -92,11 +92,11 @@ Không ghi câu trả lời mới ngay. Vòng sau hỏi đầu tiên: giữ quy�
 - P, O, G, A đã rõ. AI đã rõ nếu tính năng có AI. Z có ít nhất một quy mô.
 - Các mục còn lại rõ, hoặc hoãn có lý do.
 
-Khi xong, ghi `why.md` từ mẫu `templates/why.md` cạnh file SKILL.md này, gồm cả phần gợi ý công tắc cho feature-flow, mỗi gợi ý một dòng lý do:
+Khi xong, ghi `why.md` từ mẫu `templates/why.md` cạnh file SKILL.md này, gồm cả phần gợi ý công tắc cho astrolabe:flow, mỗi gợi ý một dòng lý do:
 
 - `state` khi tính năng chạm vòng đời hoặc trạng thái;
 - `contest` khi khó đảo ngược;
 - `sec` khi chạm dữ liệu nhạy cảm, tiền, quyền;
 - `multi` khi Z cần nhiều MR hoặc nhiều phiên.
 
-Rồi trả lại cho feature-flow để trình cửa "chốt có làm". Phương án được chọn là không làm gì hoặc sửa quy trình thì nói rõ là luồng nên dừng ở đây.
+Rồi trả lại cho astrolabe:flow để trình cửa "chốt có làm". Phương án được chọn là không làm gì hoặc sửa quy trình thì nói rõ là luồng nên dừng ở đây.

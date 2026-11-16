@@ -1,6 +1,6 @@
 # Changelog
 
-Mọi thay đổi đáng chú ý của plugin `feature-workflow` ghi ở đây. Định dạng theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/), version theo [SemVer](https://semver.org/) giai đoạn 0 (`0.y.z`: MINOR khi phá vỡ, PATCH khi tương thích). Ngày ghi `YYYY-MM-DD` theo Keep a Changelog. Ba bộ upstream có version riêng, xem `UPSTREAM.md`.
+Mọi thay đổi đáng chú ý của plugin `astrolabe` ghi ở đây. Định dạng theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/), version theo [SemVer](https://semver.org/) giai đoạn 0 (`0.y.z`: MINOR khi phá vỡ, PATCH khi tương thích). Ngày ghi `YYYY-MM-DD` theo Keep a Changelog. Ba bộ upstream có version riêng, xem `UPSTREAM.md`.
 
 Chưa có bản nào gắn tag.
 
@@ -8,12 +8,13 @@ Chưa có bản nào gắn tag.
 
 ### Thay đổi phá vỡ
 
-- Nơi lưu tài liệu chọn bằng `docsBackend` trong `workspace.json` (hoặc `.claude/feature-workflow.json` ở repo đơn lẻ): `local` (mặc định) hoặc `orrery`. Thiếu khoá thì là `local`, nên workspace đang dùng Orrery sẽ chuyển sang ghi file local. Việc cần làm: muốn giữ Orrery thì thêm `"docsBackend": "orrery"` vào `workspace.json`.
+- Đổi tên theo repo: plugin và marketplace `feature-workflow` thành `astrolabe`; skill `feature-setup`, `feature-flow`, `feature-why`, `feature-help` thành `setup`, `flow`, `why`, `help` (`spec-check` giữ tên). Lệnh giờ gõ `/astrolabe:flow`, `/astrolabe:setup`. File trỏ workspace trong repo dự án đổi từ `.claude/feature-workflow.json` thành `.claude/astrolabe.json`. Việc cần làm: chạy lại `./scripts/setup-machine.sh` (script gỡ `feature-workflow@feature-workflow` và marketplace cũ), rồi `/astrolabe:setup` trong từng repo để đổi tên file trỏ.
+- Nơi lưu tài liệu chọn bằng `docsBackend` trong `workspace.json` (hoặc `.claude/astrolabe.json` ở repo đơn lẻ): `local` (mặc định) hoặc `orrery`. Thiếu khoá thì là `local`, nên workspace đang dùng Orrery sẽ chuyển sang ghi file local. Việc cần làm: muốn giữ Orrery thì thêm `"docsBackend": "orrery"` vào `workspace.json`.
 - `.claude/settings.json` của repo trung tâm vào `.gitignore`. Việc cần làm: team muốn commit danh sách repo đồng cấp thì bỏ dòng đó trong fork của mình.
 
 ### Thêm
 
-- `upstream.json`: khai các bộ skill upstream (marketplace, repo, plugin, skill luồng cần) và plugin cũ cần gỡ. `scripts/setup-machine.sh` và `feature-setup` đọc file này thay cho danh sách viết cứng.
+- `upstream.json`: khai các bộ skill upstream (marketplace, repo, plugin, skill luồng cần) và plugin cũ cần gỡ. `scripts/setup-machine.sh` và `astrolabe:setup` đọc file này thay cho danh sách viết cứng.
 - `LICENSE` (MIT); `plugin.json` và `marketplace.json` có tác giả, `homepage`, `repository`, `license`.
 - README có mục "Tuỳ biến".
 

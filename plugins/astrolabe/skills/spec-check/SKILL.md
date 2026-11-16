@@ -1,17 +1,17 @@
 ---
 name: spec-check
-description: Soát spec của một tính năng trước khi thiết kế (trùng, mâu thuẫn, không đo được, số lệch, thiếu nghiệm thu, lỗ hổng, thuật ngữ lệch) và chấm checklist sẵn sàng. Chỉ đọc, không sửa spec. Dùng khi feature-flow tới cuối giai đoạn 2, hoặc khi gõ /feature-workflow:spec-check.
+description: Soát spec của một tính năng trước khi thiết kế (trùng, mâu thuẫn, không đo được, số lệch, thiếu nghiệm thu, lỗ hổng, thuật ngữ lệch) và chấm checklist sẵn sàng. Chỉ đọc, không sửa spec. Dùng khi astrolabe:flow tới cuối giai đoạn 2, hoặc khi gõ /astrolabe:spec-check.
 ---
 
 # spec-check: soát spec trước khi thiết kế
 
-Đọc spec cùng các file đi kèm, tìm lỗi khiến thiết kế hoặc code phải làm lại, rồi chấm checklist sẵn sàng. Bước này **chỉ đọc**: không sửa spec, không sửa quyết định. Mọi phát hiện trả về cho feature-flow để đưa lại vào grill hoặc to-spec.
+Đọc spec cùng các file đi kèm, tìm lỗi khiến thiết kế hoặc code phải làm lại, rồi chấm checklist sẵn sàng. Bước này **chỉ đọc**: không sửa spec, không sửa quyết định. Mọi phát hiện trả về cho astrolabe:flow để đưa lại vào grill hoặc to-spec.
 
 Cấu trúc tham khảo bước soát và checklist sẵn sàng của vibebiz (finolabs/vibebiz), viết lại cho team kỹ thuật.
 
 ## Đầu vào
 
-- `flow.md` trong thư mục tính năng, và spec theo đường dẫn ghi trong đó. Thư mục tính năng nằm theo `docsBackend`; cách đọc ghi theo mục "Nơi lưu tài liệu" trong skill `feature-flow`.
+- `flow.md` trong thư mục tính năng, và spec theo đường dẫn ghi trong đó. Thư mục tính năng nằm theo `docsBackend`; cách đọc ghi theo mục "Nơi lưu tài liệu" trong skill `astrolabe:flow`.
 - `why.md`, `decisions.md` của tính năng, nếu có.
 - Thuật ngữ: `GLOSSARY.md` (hoặc `GLOSSARY-MAP.md` trỏ tới từng context) trong repo; với `docsBackend: orrery`, đọc thêm `<repo>/GLOSSARY.md` trong Orrery. Gọi chung là `GLOSSARY.md` ở dưới.
 - Luật duyệt áp cho tính năng: `rules/common.md` của repo trung tâm (nếu có workspace) cùng `docs/flow-rules.md` của mỗi repo tính năng chạm tới.
@@ -67,4 +67,4 @@ Ghi `spec-check.md` vào thư mục tính năng (đường dẫn trong `flow.md`
 - **Phát hiện**: mỗi phát hiện một dòng gồm mã (ví dụ `X-02`), mức, chỗ (file và mục), điều sai, và câu cần hỏi để sửa, viết sẵn để đưa vào grill hoặc to-spec.
 - **Checklist**: 12 mục, đạt hay không, kèm ghi chú.
 
-Trả kết quả cho feature-flow. Không tự sửa spec, kể cả lỗi câu chữ.
+Trả kết quả cho astrolabe:flow. Không tự sửa spec, kể cả lỗi câu chữ.

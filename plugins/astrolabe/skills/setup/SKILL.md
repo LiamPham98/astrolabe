@@ -1,12 +1,12 @@
 ---
-name: feature-setup
-description: "Kiểm tra và cài đặt luồng feature-workflow: workspace trung tâm với các repo đồng cấp, kiểm plugin của máy, luật duyệt chung và riêng, nơi lưu tài liệu tính năng, setup của finolabs và Matt. Chạy lại được, chỉ làm phần còn thiếu. Dùng khi gõ /feature-workflow:feature-setup."
+name: setup
+description: "Kiểm tra và cài đặt luồng astrolabe: workspace trung tâm với các repo đồng cấp, kiểm plugin của máy, luật duyệt chung và riêng, nơi lưu tài liệu tính năng, setup của finolabs và Matt. Chạy lại được, chỉ làm phần còn thiếu. Dùng khi gõ /astrolabe:setup."
 disable-model-invocation: true
 ---
 
-# feature-setup
+# setup
 
-Đưa máy, workspace và các repo về trạng thái dùng được `/feature-workflow:feature-flow`. Kiểm tra trước, báo cáo, hỏi duyệt, rồi mới làm. Chạy lại bao nhiêu lần cũng được: chỉ làm phần còn thiếu, không ghi đè thứ đã có.
+Đưa máy, workspace và các repo về trạng thái dùng được `/astrolabe:flow`. Kiểm tra trước, báo cáo, hỏi duyệt, rồi mới làm. Chạy lại bao nhiêu lần cũng được: chỉ làm phần còn thiếu, không ghi đè thứ đã có.
 
 Nói với người dùng bằng ngôn ngữ họ đang dùng. Giữ nguyên tên lệnh, tên plugin, đường dẫn.
 
@@ -24,11 +24,11 @@ Tìm gốc repo đang mở: `git rev-parse --show-toplevel`.
 
 | Dấu hiệu | Chế độ |
 |---|---|
-| Gốc repo có `.claude-plugin/marketplace.json` liệt kê plugin `feature-workflow`, và có `workspace.json` | **Trung tâm**: setup workspace và các repo đồng cấp |
-| Gốc repo có `.claude/feature-workflow.json`, hoặc thư mục cha có một repo trung tâm như trên | **Repo đồng cấp**: gắn repo này vào workspace |
+| Gốc repo có `.claude-plugin/marketplace.json` liệt kê plugin `astrolabe`, và có `workspace.json` | **Trung tâm**: setup workspace và các repo đồng cấp |
+| Gốc repo có `.claude/astrolabe.json`, hoặc thư mục cha có một repo trung tâm như trên | **Repo đồng cấp**: gắn repo này vào workspace |
 | Không có gì ở trên | **Đơn lẻ**: setup riêng repo này, không workspace |
 
-Ở chế độ repo đồng cấp mà chưa có `.claude/feature-workflow.json`: hỏi có gắn repo này vào workspace ở `../<tên repo trung tâm>` không. Không gắn thì chuyển sang đơn lẻ.
+Ở chế độ repo đồng cấp mà chưa có `.claude/astrolabe.json`: hỏi có gắn repo này vào workspace ở `../<tên repo trung tâm>` không. Không gắn thì chuyển sang đơn lẻ.
 
 ## 1. Kiểm tra (chỉ đọc)
 
@@ -39,10 +39,10 @@ claude plugin marketplace list
 claude plugin list --json
 ```
 
-- Plugin cần có: plugin trong `.claude-plugin/marketplace.json` của repo trung tâm (dạng `<plugin>@<tên marketplace>`, hiện là `feature-workflow@feature-workflow`) và mỗi mục trong `upstream` của `upstream.json` (dạng `<plugin>@<marketplace>`). Đọc hai file đó, không dùng danh sách nhớ sẵn. Ghi phạm vi cài (user hay project).
+- Plugin cần có: plugin trong `.claude-plugin/marketplace.json` của repo trung tâm (dạng `<plugin>@<tên marketplace>`, hiện là `astrolabe@astrolabe`) và mỗi mục trong `upstream` của `upstream.json` (dạng `<plugin>@<marketplace>`). Đọc hai file đó, không dùng danh sách nhớ sẵn. Ghi phạm vi cài (user hay project).
 - `~/.claude/settings.json`: mỗi marketplace upstream trong `extraKnownMarketplaces` có `"autoUpdate": true` không.
 - **Bản trùng**:
-  - cùng bộ skill cài từ marketplace khác, kể cả plugin cũ liệt kê trong `retired` của `upstream.json`;
+  - cùng bộ skill cài từ marketplace khác, kể cả plugin cũ trong `retired` và marketplace cũ trong `retiredMarketplaces` của `upstream.json`;
   - skill rời trong `~/.claude/skills` trùng tên với skill của các plugin trên (skill rời không có tiền tố nên bị gọi lẫn).
 - Thiếu plugin, thiếu `autoUpdate` hoặc có bản trùng: việc cần làm là người dùng chạy `./scripts/setup-machine.sh` trong repo trung tâm. Script ghi settings, cài plugin, gỡ plugin cũ, chuyển skill rời trùng sang `~/.claude/skills-backup-<ngày>/` và kiểm skill luồng cần.
 - Công cụ cho statechart: `command -v mise`.
@@ -58,7 +58,7 @@ claude plugin list --json
 
 **Từng repo** (repo đang mở ở chế độ đồng cấp và đơn lẻ; mọi repo trong `projects` ở chế độ trung tâm):
 
-- `.claude/feature-workflow.json` có trỏ đúng repo trung tâm không (không áp dụng với đơn lẻ). Ở chế độ đơn lẻ, file này giữ `docsBackend` của repo.
+- `.claude/astrolabe.json` có trỏ đúng repo trung tâm không (không áp dụng với đơn lẻ). Còn `.claude/feature-workflow.json` (tên cũ) thì ghi `thiếu`: việc cần làm là đổi tên file thành `.claude/astrolabe.json`, giữ nguyên nội dung. Ở chế độ đơn lẻ, file này giữ `docsBackend` của repo.
 - `docs/flow-rules.md` có chưa; đã sửa hay còn mẫu.
 - `docs/features/` có chưa (cần khi `featureDocs` là `auto` hoặc `project`, hoặc ở chế độ đơn lẻ).
 - Cấu hình của Matt: đọc SKILL.md của `setup-matt-pocock-skills` trong plugin `mattpocock-skills` để biết nó ghi file gì, rồi kiểm file đó có chưa.
@@ -77,7 +77,7 @@ Một bảng cho máy và workspace, một bảng cho mỗi repo:
 
 Trạng thái chỉ dùng: `đã có`, `thiếu`, `trùng`, `chưa rõ`. Việc cần làm ghi rõ ai làm: agent (sau khi được duyệt) hay người dùng (gõ lệnh, kèm repo phải `/cd` tới).
 
-Mọi mục đều `đã có` thì nói là đã sẵn sàng, gợi ý `/feature-workflow:feature-flow`, và dừng.
+Mọi mục đều `đã có` thì nói là đã sẵn sàng, gợi ý `/astrolabe:flow`, và dừng.
 
 ## 3. Hỏi duyệt và chọn
 
@@ -112,7 +112,7 @@ Lệnh nào lỗi thì dừng mục đó, ghi lỗi nguyên văn, làm tiếp c�
 
 **Từng repo** (repo đang mở, hoặc mọi repo trong `projects` ở chế độ trung tâm):
 
-1. Chế độ trung tâm hoặc đồng cấp: ghi `.claude/feature-workflow.json`:
+1. Chế độ trung tâm hoặc đồng cấp: ghi `.claude/astrolabe.json`:
 
    ```json
    { "workspace": "../<tên repo trung tâm>" }
@@ -120,14 +120,14 @@ Lệnh nào lỗi thì dừng mục đó, ghi lỗi nguyên văn, làm tiếp c�
 
    `workspace` là đường dẫn tương đối từ repo này tới repo trung tâm.
 
-   Chế độ đơn lẻ: ghi `.claude/feature-workflow.json` với `{ "docsBackend": "<đã chọn>" }`, thêm `"orrery": { "space": "<space>" }` khi chọn `orrery`. Giữ các khoá đã có.
+   Chế độ đơn lẻ: ghi `.claude/astrolabe.json` với `{ "docsBackend": "<đã chọn>" }`, thêm `"orrery": { "space": "<space>" }` khi chọn `orrery`. Giữ các khoá đã có.
 
-2. Tạo `docs/flow-rules.md` từ `../feature-flow/templates/flow-rules.md` cạnh file SKILL.md này, nếu chưa có. Có rồi thì không ghi đè.
+2. Tạo `docs/flow-rules.md` từ `../flow/templates/flow-rules.md` cạnh file SKILL.md này, nếu chưa có. Có rồi thì không ghi đè.
 3. Tạo `docs/features/.gitkeep` nếu `featureDocs` là `auto` hoặc `project`, hoặc ở chế độ đơn lẻ.
 4. Chỉ khi `docsBackend: orrery`, sau khi người dùng chạy `/mattpocock-skills:setup-matt-pocock-skills`: ghi đè `docs/agents/issue-tracker.md` và `docs/agents/domain.md` bằng hai mẫu `templates/issue-tracker-orrery.md` và `templates/domain-orrery.md`, thay `{{space}}` bằng `orrery.space` và `{{repo}}` bằng tên repo. Trình nội dung cũ trước khi ghi đè.
-5. Chỉ khi `docsBackend: orrery`, chép lên Orrery (cần phiên có Orrery): `GLOSSARY.md`, `GLOSSARY-MAP.md` và các file trong `docs/adr/` của repo lên `<repo>/` trong space, theo mục "Orrery" trong "Nơi lưu tài liệu" của skill `feature-flow`, bằng `changeset_submit`. Note đã có và khác file thì không ghi đè; trình hai bản và hỏi. Chép xong thì hỏi có xoá bản trong repo không.
+5. Chỉ khi `docsBackend: orrery`, chép lên Orrery (cần phiên có Orrery): `GLOSSARY.md`, `GLOSSARY-MAP.md` và các file trong `docs/adr/` của repo lên `<repo>/` trong space, theo mục "Orrery" trong "Nơi lưu tài liệu" của skill `astrolabe:flow`, bằng `changeset_submit`. Note đã có và khác file thì không ghi đè; trình hai bản và hỏi. Chép xong thì hỏi có xoá bản trong repo không.
 
-Nhắc người dùng commit các file vừa tạo trong từng repo; file luật và `.claude/feature-workflow.json` là file chung của team.
+Nhắc người dùng commit các file vừa tạo trong từng repo; file luật và `.claude/astrolabe.json` là file chung của team.
 
 ## 5. Soạn luật duyệt (khi được duyệt)
 
@@ -147,7 +147,7 @@ Chế độ trung tâm soạn `rules/common.md` trước, rồi phần riêng c�
 Với mỗi repo còn thiếu, in theo thứ tự (ghi rõ repo nào):
 
 1. `/cd ../<repo>` nếu phiên đang ở repo khác.
-2. `/mattpocock-skills:setup-matt-pocock-skills`: ở câu hỏi issue tracker chọn "Local markdown". Khi `docsBackend` là `orrery`: bước 4 của mục "Từng repo" sẽ thay bằng cấu hình Orrery, nên xong thì quay lại `/feature-workflow:feature-setup`.
+2. `/mattpocock-skills:setup-matt-pocock-skills`: ở câu hỏi issue tracker chọn "Local markdown". Khi `docsBackend` là `orrery`: bước 4 của mục "Từng repo" sẽ thay bằng cấu hình Orrery, nên xong thì quay lại `/astrolabe:setup`.
 3. `/finolabs-vibecode:setup`: chọn phạm vi **project** để bật cửa kiểm và cửa merge cho repo này. Xong thì `/finolabs-vibecode:setup check`.
 
 Một lần cho máy:
@@ -161,5 +161,5 @@ Nếu vừa cài plugin ở bước 4: nhắc mở phiên Claude Code mới trư
 
 Các bảng như bước 2, cập nhật trạng thái, thêm cột "đã làm gì". Kết thúc bằng một dòng việc tiếp theo:
 
-- chế độ trung tâm, đã sẵn sàng: mở phiên ở repo trung tâm cho tính năng nhiều repo, hoặc ở repo dự án cho tính năng một repo, rồi gõ `/feature-workflow:feature-flow <small|medium|large> <mô tả>`;
+- chế độ trung tâm, đã sẵn sàng: mở phiên ở repo trung tâm cho tính năng nhiều repo, hoặc ở repo dự án cho tính năng một repo, rồi gõ `/astrolabe:flow <small|medium|large> <mô tả>`;
 - còn thiếu: lệnh nào, gõ ở repo nào.

@@ -22,6 +22,8 @@
   "retired": [
     "finolabs-vibecode@feature-workflow",
     "pstack@feature-workflow",
-    "mattpocock-skills@feature-workflow"
-  ]
+    "mattpocock-skills@feature-workflow",
+    "feature-workflow@feature-workflow"
+  ],
+  "retiredMarketplaces": ["feature-workflow"]
 }
