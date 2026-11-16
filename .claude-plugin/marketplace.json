@@ -9,7 +9,7 @@
     {
       "name": "astrolabe",
       "source": "./plugins/astrolabe",
-      "description": "setup, flow, why, spec-check, help và các mẫu file của luồng.",
+      "description": "Luồng làm tính năng của team: setup cài đặt, flow dẫn luồng, why chốt có nên làm, spec-check soát spec trước khi thiết kế, help trả lời nên dùng skill nào.",
       "homepage": "https://github.com/LiamPham98/astrolabe",
       "license": "MIT"
     }
