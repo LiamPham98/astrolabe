@@ -4,12 +4,12 @@
     "name": "LiamPham98",
     "url": "https://github.com/LiamPham98"
   },
-  "description": "Luồng làm tính năng của team. Ba bộ skill finolabs-vibecode, pstack và skill của Matt Pocock cài thẳng từ marketplace upstream, xem UPSTREAM.md.",
+  "description": "Plugin astrolabe: luồng làm tính năng cho Claude Code, cài thẳng từ GitHub.",
   "plugins": [
     {
       "name": "astrolabe",
       "source": "./plugins/astrolabe",
-      "description": "Luồng làm tính năng của team: setup cài đặt, flow dẫn luồng, why chốt có nên làm, spec-check soát spec trước khi thiết kế, help trả lời nên dùng skill nào.",
+      "description": "Luồng làm tính năng chạy được ngay sau khi cài, không cần repo trung tâm hay file cấu hình trong repo: flow dẫn luồng, why chốt có nên làm, spec-check soát spec, setup kiểm Orrery và luật duyệt, help trả lời nên dùng gì. finolabs-vibecode, pstack và skill của Matt Pocock là đồng hành tuỳ chọn.",
       "homepage": "https://github.com/LiamPham98/astrolabe",
       "license": "MIT"
     }

@@ -22,9 +22,9 @@ Cấu trúc bước này tham khảo phần phân tích của vibebiz (finolabs/
 
 Người làm quyết định; agent tìm dữ kiện. Trước mỗi câu hỏi, tìm câu trả lời theo thứ tự:
 
-1. Mô tả tính năng, thư mục tính năng (đường dẫn trong `flow.md`), luật duyệt áp cho tính năng (`rules/common.md` của repo trung tâm nếu có workspace, cùng `docs/flow-rules.md` của từng repo).
-2. Các tính năng khác, `GLOSSARY.md` và ADR, tìm theo `docsBackend` (mục "Nơi lưu tài liệu" trong skill `astrolabe:flow`): luôn đọc thư mục local, `GLOSSARY.md` và `docs/adr/` trong repo; với `orrery`, đọc thêm folder `<repo>/features/` (bằng `note_search`), `<repo>/GLOSSARY.md` và `<repo>/adr/` trong space.
-3. Code liên quan: đọc trực tiếp để biết hệ thống đang làm gì. Cần hiểu sâu một subsystem thì đề nghị người làm gõ `/pstack:how`.
+1. Mô tả tính năng, thư mục tính năng (đường dẫn trong `flow.md`), luật duyệt áp cho tính năng (`_workspace/rules.md` và `<repo>/rules.md` của từng repo, theo mục "Luật duyệt" trong skill `astrolabe:flow`).
+2. Các tính năng khác (`<repo>/features/`, `_workspace/features/`), `<repo>/GLOSSARY.md` và `<repo>/adr/` ở nơi lưu (mục "Nơi lưu tài liệu" trong skill `astrolabe:flow`; với Orrery tìm bằng `note_search`), cùng `GLOSSARY.md` và `docs/adr/` trong repo nếu còn bản chưa đưa về nơi lưu.
+3. Code liên quan: đọc trực tiếp để biết hệ thống đang làm gì. Cần hiểu sâu một subsystem mà đã cài pstack thì đề nghị người làm gõ `/pstack:how`; không thì tự đọc sâu phần đó.
 
 Tìm được thì ghi dữ kiện kèm nguồn, và chỉ hỏi phần quyết định còn lại. Không hỏi lại điều file hoặc code đã trả lời.
 

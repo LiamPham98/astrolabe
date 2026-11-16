@@ -5,135 +5,152 @@ description: Dẫn một tính năng qua luồng đã chốt (điều phối, c�
 
 # flow
 
-Dẫn một tính năng qua luồng làm tính năng của team. Luồng có một xương sống cố định và các giai đoạn tuỳ chọn bật theo đặc điểm tính năng. Phần làm và kiểm lặp lại cho từng MR.
+Dẫn một tính năng qua luồng làm tính năng. Luồng có một xương sống cố định và các giai đoạn tuỳ chọn bật theo đặc điểm tính năng. Phần làm và kiểm lặp lại cho từng MR.
 
 Cách gọi: `/astrolabe:flow <small|medium|large> <mô tả tính năng>`. Thiếu quy mô thì hỏi.
+
+## Cấu hình
+
+Plugin không đọc hay ghi file cấu hình nào trong repo dự án. Mọi cấu hình là `userConfig` của plugin, người dùng đặt khi bật plugin hoặc trong `/config`:
+
+| Khoá | Giá trị trong phiên này | Khi chưa đặt |
+|---|---|---|
+| `workspace_root` | `${user_config.workspace_root}` | thư mục cha của repo đang mở |
+| `docs_backend` | `${user_config.docs_backend}` | `local` |
+| `orrery_space` | `${user_config.orrery_space}` | `personal` |
+
+Thư mục dữ liệu của plugin trên máy này: `${CLAUDE_PLUGIN_DATA}`.
+
+Ô nào trống, hoặc còn nguyên dạng `${...}`, là chưa đặt: dùng cột "Khi chưa đặt". `docs_backend` khác `local` và `orrery` thì nói một câu và dùng `local`.
 
 ## Nguyên tắc
 
 - **Bốn cửa dừng duyệt**: chốt có làm, duyệt spec, chốt thiết kế, duyệt và merge mỗi MR. Ở bốn cửa này, dừng và chờ người làm trả lời. Ngoài bốn cửa, trình kết quả rồi đi tiếp.
-- **Tên lệnh có tiền tố plugin**: skill của plugin được gọi bằng `/<plugin>:<skill>`, ví dụ `/pstack:architect`. Mọi lệnh in ra cho người làm đều phải có tiền tố.
+- **Không ghi gì vào repo dự án ngoài code của tính năng.** Tài liệu tính năng và luật duyệt nằm ở nơi lưu (mục "Nơi lưu tài liệu"), không nằm trong repo.
+- **Bộ đồng hành là tuỳ chọn.** finolabs-vibecode, pstack và skill của Matt Pocock làm một số bước tốt hơn, nhưng luồng chạy đủ khi không có bộ nào. Một bộ có mặt khi danh sách skill của phiên có skill mang tiền tố của nó (`finolabs-vibecode:`, `pstack:`, `mattpocock-skills:`). Mỗi bước dùng bộ đồng hành nếu có, không thì làm theo cách mặc định trong mục "Bước và công cụ".
 - **Ai chạy skill nào**:
-  - Skill chỉ người gõ được (tắt model-invocation): mọi skill pstack luồng này dùng, `grill-with-docs`, `to-spec`, `to-tickets`, `setup-matt-pocock-skills` của Matt, `restore-point` và `setup` của finolabs. Với các skill này, in đúng câu lệnh để người làm gõ, kèm đường dẫn spec hoặc thiết kế cần dùng. Không giả lập skill đó bằng cách tự làm thay.
-  - Skill agent tự chạy được: `coding-router`, `checks`, `review-gate`, `security-review-gate` của finolabs, cùng `astrolabe:why` và `spec-check` của plugin này. Agent tự load và chạy, không bắt người làm gõ.
-- **Không merge thay người làm.** Không tắt cửa duyệt mà file luật bắt buộc.
-- **Mọi lệnh sau giai đoạn 2 đều kèm đường dẫn spec** (file hoặc link issue).
-- Không dùng `/mattpocock-skills:implement` của Matt hay `none.md implement`. "Không adopt path Matt" chỉ có nghĩa là không dùng chuỗi implement của Matt; vẫn dùng `/mattpocock-skills:grill-with-docs` và `/mattpocock-skills:to-spec`.
+  - Skill chỉ người gõ được (tắt model-invocation): mọi skill pstack luồng này dùng, `grill-with-docs`, `to-spec`, `to-tickets` của Matt, `restore-point` của finolabs. In đúng câu lệnh có tiền tố plugin để người làm gõ, kèm đường dẫn spec, thiết kế và nơi ghi kết quả. Không giả lập skill đó bằng cách tự làm thay; bộ không có mặt thì dùng cách mặc định.
+  - Skill agent tự chạy được: `coding-router`, `checks`, `review-gate`, `security-review-gate` của finolabs; `code-review`, `security-review` có sẵn của Claude Code; `astrolabe:why` và `astrolabe:spec-check`.
+- **Không merge thay người làm.** Không tắt cửa duyệt mà luật bắt buộc.
+- **Mọi lệnh sau giai đoạn 2 đều kèm đường dẫn spec.**
+- Không dùng `/mattpocock-skills:implement` hay `none.md implement` của finolabs.
 
 ## Workspace
 
-Luồng chạy được theo hai kiểu:
+Repo đang mở là gốc git của thư mục phiên (`git rev-parse --show-toplevel`). Workspace là thư mục `workspace_root`; mọi thư mục con trực tiếp có `.git` là một repo của workspace. Không có danh sách repo nào phải khai.
 
-- **Đơn lẻ**: một repo, không có workspace.
-- **Workspace**: một repo trung tâm (có `workspace.json` ở gốc; là bản clone astrolabe hoặc repo bất kỳ của team) cùng các repo đồng cấp nằm chung thư mục cha.
+Tính năng có thể chạm nhiều repo. Ở giai đoạn 0, hỏi tính năng chạm repo nào trong số repo tìm thấy (chọn nhiều, đề xuất repo đang mở). Phiên mở ở chính thư mục workspace (không phải một repo) thì luôn hỏi.
 
-Tìm workspace khi bắt đầu:
-
-1. Gốc repo đang mở có `workspace.json`: phiên đang ở **repo trung tâm**. Các repo đồng cấp là danh sách `projects`, đường dẫn tính từ repo trung tâm.
-2. Gốc repo đang mở có `.claude/astrolabe.json`: phiên đang ở **repo đồng cấp**. Repo trung tâm là `workspace` trong file đó, tính từ repo đang mở. Repo chỉ có `.claude/feature-workflow.json` (tên cũ trước bản đổi tên) thì đọc file đó và đề nghị chạy `/astrolabe:setup` để đổi tên.
-3. Không có cả hai: đơn lẻ.
-
-Ở kiểu workspace, đọc `workspace.json` để biết `docsBackend`, `featureDocs` và danh sách repo.
+Đọc, sửa repo khác repo đang mở bằng đường dẫn tuyệt đối. Công cụ bị chặn vì thư mục nằm ngoài phiên thì nhắc người làm gõ `/add-dir <đường dẫn repo>`.
 
 ## Nơi lưu tài liệu
 
-`<slug>` là tên tính năng viết thường, không dấu, nối bằng gạch ngang. Luật duyệt (`rules/common.md`, `docs/flow-rules.md`) luôn nằm trong git để sửa qua MR. Các tài liệu còn lại lưu theo `docsBackend`, đọc trong `workspace.json` (kiểu workspace) hoặc `.claude/astrolabe.json` (kiểu đơn lẻ):
+`<slug>` là tên tính năng viết thường, không dấu, nối bằng gạch ngang. `<repo>` là tên thư mục của repo. Tính năng chạm nhiều repo lưu dưới `_workspace` thay cho `<repo>`.
 
-| `docsBackend` | Tài liệu tính năng | `GLOSSARY.md`, ADR |
-|---|---|---|
-| `local` (mặc định, cả khi thiếu khoá) | file trong git, ở thư mục theo mục "Thư mục local" | `GLOSSARY.md` và `docs/adr/` trong repo, đổi qua MR |
-| `orrery` | note trong Orrery, theo mục "Orrery" | note trong Orrery, đổi qua changeset |
-
-Giá trị khác hai giá trị trên thì nói một câu và dùng `local`.
-
-Thư mục tính năng chứa cùng các file ở mọi backend:
-
-| File | Ai ghi | Nội dung |
-|---|---|---|
-| `flow.md` | astrolabe:flow | Biên lai: preset, công tắc, lý do, các cửa đã qua |
-| `why.md` | skill `astrolabe:why` | Kết quả bước Why |
-| `spec.md`, `issues/` | `/mattpocock-skills:to-spec`, `/mattpocock-skills:to-tickets` | Spec và ticket, ghi theo `docs/agents/issue-tracker.md` của repo |
-| `spec-check.md` | skill `spec-check` | Kết quả soát spec |
-| `decisions.md` | mọi bước | Sổ quyết định, chỉ ghi thêm |
-
-Mỗi file có frontmatter `type` (`flow`, `why`, `spec`, `ticket`, `spec-check`, `decisions`, `adr`, `glossary`), `repo`, `feature` (trừ `GLOSSARY.md` và ADR) và `status` khi có. `GLOSSARY.md` và ADR dùng chung cho mọi tính năng của repo; `/mattpocock-skills:grill-with-docs` và cửa chốt thiết kế ghi chúng.
-
-Mẫu của `flow.md` và `decisions.md` nằm trong thư mục `templates/` cạnh file SKILL.md này. Mẫu `why.md` nằm cạnh skill `astrolabe:why`.
-
-### Thư mục local
-
-Dùng khi `docsBackend` là `local`, và làm nơi dự phòng khi `docsBackend` là `orrery` mà phiên không kết nối Orrery.
-
-| Kiểu | `featureDocs` | Tính năng một repo | Tính năng nhiều repo (`repo` bật) |
-|---|---|---|---|
-| Đơn lẻ | — | `docs/features/<slug>/` | — |
-| Workspace | `auto` (mặc định) | `docs/features/<slug>/` của repo đó | `features/<slug>/` của repo trung tâm |
-| Workspace | `central` | `features/<slug>/` của repo trung tâm | `features/<slug>/` của repo trung tâm |
-| Workspace | `project` | `docs/features/<slug>/` của repo đó | `docs/features/<slug>/` của repo chính của tính năng (hỏi repo nào) |
-
-Với `docsBackend: local`:
-
-- Ghi thêm vào `decisions.md` bằng cách nối vào cuối file; không sửa mục đã có.
-- Spec và ticket nằm ở nơi `docs/agents/issue-tracker.md` của repo quy định (cấu hình "Local markdown" của `/mattpocock-skills:setup-matt-pocock-skills`). Ghi đường dẫn của chúng vào `flow.md`.
-- File tính năng là file trong git: commit cùng MR đầu tiên của tính năng, rồi cập nhật trong các MR sau. Mô tả mỗi MR dán đường dẫn `flow.md` và `spec.md`.
-- ADR ghi vào `docs/adr/` của repo, đánh số tăng dần; `GLOSSARY.md` nằm ở gốc repo.
-
-### Orrery
-
-Chỉ áp khi `docsBackend` là `orrery`. Tài liệu đọc, ghi qua công cụ MCP của Orrery.
-
-**Space**: `orrery.space` cùng file với `docsBackend`. Thiếu thì dùng `personal`.
-
-**Bố cục**: folder theo repo trước, theo tính năng sau. `<repo>` là tên repo của tính năng một repo, hoặc tên repo trung tâm của tính năng nhiều repo.
+Bố cục giống nhau ở mọi nơi lưu:
 
 ```
+_workspace/
+├─ rules.md                       luật duyệt chung
+└─ features/<slug>/               tính năng nhiều repo
 <repo>/
-├─ GLOSSARY.md                     thuật ngữ của repo (repo nhiều context: GLOSSARY-MAP.md + contexts/<context>/GLOSSARY.md)
-├─ adr/0001-<slug>.md              ADR, đánh số tăng dần
-└─ features/<slug>/                thư mục tính năng
+├─ rules.md                       luật duyệt riêng của repo
+├─ GLOSSARY.md                    thuật ngữ (repo nhiều context: GLOSSARY-MAP.md + contexts/<context>/GLOSSARY.md)
+├─ adr/0001-<slug>.md             ADR, đánh số tăng dần
+└─ features/<slug>/               thư mục tính năng
    ├─ flow.md  why.md  spec.md  spec-check.md  decisions.md
    └─ issues/01-<slug>.md
 ```
 
-**Cách ghi**:
+| `docs_backend` | Bố cục trên nằm ở |
+|---|---|
+| `orrery` | note trong Orrery, space `orrery_space`, đọc ghi qua công cụ MCP của Orrery |
+| `local` | thư mục `${CLAUDE_PLUGIN_DATA}` trên máy này |
 
-- Server tự gán `id` cho note.
+| File | Ai ghi | Nội dung |
+|---|---|---|
+| `flow.md` | astrolabe:flow | Biên lai: cấu hình đã dùng, bộ đồng hành có mặt, preset, công tắc, lý do, các cửa đã qua |
+| `why.md` | `astrolabe:why` | Kết quả bước Why |
+| `spec.md`, `issues/` | `to-spec`, `to-tickets` của Matt; không có thì agent | Spec và ticket |
+| `spec-check.md` | `astrolabe:spec-check` | Kết quả soát spec |
+| `decisions.md` | mọi bước | Sổ quyết định, chỉ ghi thêm |
+| `GLOSSARY.md`, `adr/` | bước hỏi làm rõ, cửa chốt thiết kế | Thuật ngữ và ADR của repo, dùng chung cho mọi tính năng |
+
+Mỗi file có frontmatter `type` (`flow`, `why`, `spec`, `ticket`, `spec-check`, `decisions`, `adr`, `glossary`, `rules`), `repo`, `feature` (trừ `GLOSSARY.md`, ADR và luật) và `status` khi có. Ticket có dòng `Status:` gần đầu; nhãn triage: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`.
+
+Mẫu `flow.md`, `decisions.md` và hai mẫu luật nằm trong `templates/` cạnh file SKILL.md này. Mẫu `why.md` nằm cạnh skill `astrolabe:why`.
+
+### Luật duyệt
+
+Luật áp cho tính năng là hợp của `_workspace/rules.md` và `<repo>/rules.md` của **mỗi repo tính năng chạm tới**. Luật riêng chỉ thêm việc hoặc siết cửa, không bỏ được việc của luật chung; hai nơi ghi khác nhau về cùng một việc thì lấy cửa chặt hơn.
+
+Note hay file luật chưa có: dùng nội dung mẫu `templates/rules-common.md` (chung) và `templates/rules-repo.md` (riêng), nói một câu rằng đang dùng luật mẫu và gợi ý `/astrolabe:setup` để tạo luật thật. Không tự sửa luật; người làm yêu cầu sửa thì sửa và ghi `rules-change` vào `decisions.md`.
+
+### Ghi vào Orrery
+
 - Tạo note từ mẫu bằng `note_create`. Ghi thêm vào `decisions.md` bằng `note_edit` với `op: append`. Sửa note bằng `note_edit` hoặc `note_update`, luôn với `base_revision` vừa đọc; gặp `conflict` thì đọc lại, gộp, rồi ghi lại.
 - Note trỏ nhau bằng wikilink, ví dụ mục `design` trong `decisions.md` trỏ `[[<repo>/adr/0003-<slug>]]`.
-- `GLOSSARY.md` và ADR là note dùng chung cho cả repo: đổi chúng bằng `changeset_submit` (`op: note.create` hoặc `note.update`), để một người khác tác giả duyệt trong client của họ. Agent không bao giờ tự duyệt changeset. Ghi id changeset vào `flow.md`; trước khi changeset được duyệt, note chưa có trong Orrery, nên bước sau đọc nội dung từ changeset (`changeset_read`). Người làm nói space không có người duyệt thứ hai thì ghi thẳng và ghi `review-risk` vào `decisions.md`.
-- Ghi vào `flow.md` revision của từng note lúc đọc để làm bằng chứng cho cửa duyệt. Mô tả mỗi MR dán link note `spec.md` kèm revision, vì reviewer trong CI không đọc được Orrery.
+- `GLOSSARY.md`, ADR và luật là note dùng chung: đổi bằng `changeset_submit` (`op: note.create` hoặc `note.update`) để người khác tác giả duyệt. Agent không bao giờ tự duyệt changeset. Ghi id changeset vào `flow.md`; trước khi được duyệt, đọc nội dung từ `changeset_read`. Người làm nói space không có người duyệt thứ hai thì ghi thẳng và ghi `review-risk` vào `decisions.md`.
+- Ghi vào `flow.md` revision của từng note lúc đọc làm bằng chứng cho cửa duyệt. Mô tả mỗi MR dán link note `spec.md` kèm revision.
 
-**Chép từ repo lên Orrery**: skill của Matt (`domain-modeling`, qua `grill-with-docs`) luôn ghi `GLOSSARY.md` và `docs/adr/` vào repo. Sau mỗi lần chạy grill, so các file đó với note trong `<repo>/`: file mới hoặc đã đổi thì đưa lên Orrery như trên, rồi hỏi người làm có xoá bản trong repo không.
+**Khi phiên không kết nối Orrery** (không có công cụ `note_create`, hoặc `whoami` lỗi): nói một câu, ghi theo cùng bố cục vào `${CLAUDE_PLUGIN_DATA}`, và ghi `orrery: chưa đồng bộ` ở đầu `flow.md`. Lần sau phiên có Orrery:
 
-**Khi phiên không kết nối Orrery** (không có công cụ `note_create`, hoặc `whoami` lỗi): nói một câu, rồi ghi vào thư mục local ở mục trên, và ghi `orrery: chưa đồng bộ` ở đầu `flow.md`. Spec và ticket khi đó ghi cạnh `flow.md`. Lần sau phiên có Orrery:
-
-1. Với mỗi file local, đọc note cùng tên trong Orrery.
-2. Note chưa có: tạo từ file local. Note đã có và khác file local: không ghi đè; trình hai bản và hỏi người làm giữ bản nào. Với `decisions.md`, chỉ append các mục `D-###` mà Orrery chưa có.
+1. Với mỗi file trong `${CLAUDE_PLUGIN_DATA}` có dòng đó ở `flow.md` của thư mục tính năng, đọc note cùng tên trong Orrery.
+2. Note chưa có: tạo từ file. Note đã có và khác file: không ghi đè; trình hai bản và hỏi người làm giữ bản nào. Với `decisions.md`, chỉ append các mục `D-###` mà Orrery chưa có.
 3. Xong thì xoá dòng `orrery: chưa đồng bộ` trong note `flow.md`, và hỏi người làm có xoá các file local không.
+
+### Ghi local
+
+- Ghi thêm vào `decisions.md` bằng cách nối vào cuối file; không sửa mục đã có.
+- File nằm trên máy, reviewer của MR không đọc được: mô tả mỗi MR dán tóm tắt biên lai và phần spec liên quan.
+
+### Từ repo về nơi lưu
+
+`domain-modeling` của Matt (qua `grill-with-docs`) ghi `GLOSSARY.md` và `docs/adr/` vào repo. Sau mỗi lần chạy, so các file đó với `<repo>/GLOSSARY.md` và `<repo>/adr/` ở nơi lưu: file mới hoặc đã đổi thì đưa về nơi lưu (Orrery: qua changeset như trên), rồi hỏi người làm có xoá bản trong repo không.
+
+## Bước và công cụ
+
+| Bước | Mặc định (luôn có) | Có bộ đồng hành thì dùng |
+|---|---|---|
+| Chọn path và độ sâu | agent tự chọn theo preset | `coding-router` của finolabs (agent load) |
+| Hỏi làm rõ (`unclear`) | agent phỏng vấn theo vòng bằng công cụ hỏi của phiên, mỗi câu có phương án đề xuất; chốt thuật ngữ vào `GLOSSARY.md` | `/mattpocock-skills:grill-with-docs` |
+| Spec (`multi`) | agent viết `spec.md` (mục tiêu, phạm vi, ngoài phạm vi, luật nghiệp vụ, tiêu chí nghiệm thu đo được) và `issues/` nếu người làm muốn tách ticket | `/mattpocock-skills:to-spec`, `/mattpocock-skills:to-tickets` |
+| Thiết kế (`cross`) | agent đọc code liên quan, viết thiết kế (module chạm tới, hợp đồng, dữ liệu, phương án đã loại) rồi dừng ở cửa; gợi ý người làm bật plan mode (Shift+Tab) nếu muốn duyệt kế hoạch trước khi agent đọc sâu | `/pstack:architect` |
+| Phản biện (`contest`) | agent tự phản biện thiết kế: liệt kê cách nó hỏng, mỗi cách một cách kiểm chạy lại được | `/pstack:interrogate` |
+| Máy trạng thái (`state`) | agent lập bảng trạng thái × sự kiện, liệt kê chuyển trạng thái thiếu và đường lỗi | `/pstack:statechart` (cần `mise`) |
+| Điểm khôi phục | working tree sạch và một nhánh riêng cho tính năng trong mỗi repo chạm tới | `/finolabs-vibecode:restore-point create` |
+| Code | agent code từng đơn vị kiểm được, mỗi đơn vị một MR | `/pstack:poteto-mode` |
+| Phạm vi ảnh hưởng | agent tìm mọi nơi gọi tới code đã đổi và ghi rủi ro | `/pstack:blast-radius` |
+| Kiểm | chạy test, lint, type check của repo; đọc output thật, gán PASS, FAIL hoặc PENDING có biên lai | `checks` của finolabs (agent load) |
+| Review | skill `code-review` có sẵn của Claude Code; không gọi được thì in `/code-review` cho người làm | `review-gate` của finolabs (agent load) |
+| Security (`sec`) | skill `security-review` có sẵn của Claude Code; không gọi được thì in `/security-review` | `security-review-gate` của finolabs |
+| Cửa merge | người làm tự đối chiếu gói kiểm và review rồi merge | `merge_check.py` của `review-gate` (chỉ pull request GitHub, vì gọi `gh`) |
+
+Lệnh của bộ đồng hành chạy trên repo đang mở của phiên. Với repo khác, in `/cd <đường dẫn repo>` trước lệnh, và nhắc `/cd` về lại sau.
+
+Khi in lệnh `to-spec`, `to-tickets` hay `grill-with-docs`, ghi kèm nơi lưu để skill của Matt không cần cấu hình riêng trong repo, ví dụ: `/mattpocock-skills:to-spec Ghi spec vào <nơi lưu>:<repo>/features/<slug>/spec.md, ticket vào issues/NN-<slug>.md cùng thư mục.`
 
 ## Giai đoạn 0: Điều phối
 
-1. **coding-router**: nếu chưa có biên lai của coding-router cho tính năng này, load `coding-router` để inspect, chọn path và độ sâu. Path luôn là luồng này.
-2. **File luật**: luật áp cho tính năng là hợp của:
-   - ở kiểu workspace: `rules/common.md` của repo trung tâm;
-   - `docs/flow-rules.md` của **mỗi repo tính năng chạm tới**.
+1. **Cấu hình và bộ đồng hành**: đọc bảng "Cấu hình"; ghi bộ đồng hành nào có mặt. Với `orrery`, gọi `whoami` để biết phiên có Orrery không.
+2. **Chọn path**: có finolabs và chưa có biên lai của `coding-router` cho tính năng này thì load `coding-router`. Path luôn là luồng này.
+3. **Repo chạm tới**: theo mục "Workspace". Chạm hơn một repo thì bật `repo`.
+4. **Luật**: đọc theo mục "Luật duyệt".
+5. **Preset và công tắc**: bắt đầu từ preset, rồi chỉnh từng công tắc theo tính năng thật.
 
-   Luật riêng chỉ thêm việc hoặc siết cửa, không bỏ được việc của luật chung; hai file ghi khác nhau về cùng một việc thì lấy cửa chặt hơn. Thiếu file nào thì nói một câu và đề nghị chạy `/astrolabe:setup`; tiếp tục với phần đang có.
-3. **Preset và công tắc**: bắt đầu từ preset, rồi chỉnh từng công tắc theo tính năng thật.
-
-   | Công tắc | Bật khi | Bật giai đoạn hoặc bước | S | M | L |
+   | Công tắc | Bật khi | Bật bước | S | M | L |
    |---|---|---|---|---|---|
    | `why` | tính năng mới tốn công, cần sếp hoặc nghiệp vụ duyệt, có AI, chạm dữ liệu nhạy cảm | giai đoạn 1 và 5 | | | ✓ |
-   | `unclear` | yêu cầu còn mơ hồ, luật nghiệp vụ hoặc thuật ngữ mới | `/mattpocock-skills:grill-with-docs` | | ✓ | ✓ |
-   | `multi` | làm qua nhiều phiên, nhiều người hoặc nhiều MR | `/mattpocock-skills:to-spec`, `spec-check` | | | ✓ |
-   | `cross` | code vượt biên hàm, chạm nhiều module hoặc hợp đồng | `/pstack:architect` | | ✓ | ✓ |
-   | `contest` | thiết kế có tranh cãi hoặc khó đảo ngược (schema, migration) | `/pstack:interrogate` | | | ✓ |
-   | `state` | có máy trạng thái | `/pstack:statechart` | | | ✓ |
-   | `sec` | đụng tiền, quyền, dữ liệu cá nhân | `/finolabs-vibecode:security-review-gate` | | | |
-   | `repo` | chạm nhiều repo | restore-point mỗi repo, thứ tự merge | | | ✓ |
+   | `unclear` | yêu cầu còn mơ hồ, luật nghiệp vụ hoặc thuật ngữ mới | hỏi làm rõ | | ✓ | ✓ |
+   | `multi` | làm qua nhiều phiên, nhiều người hoặc nhiều MR | spec, `spec-check` | | | ✓ |
+   | `cross` | code vượt biên hàm, chạm nhiều module hoặc hợp đồng | thiết kế | | ✓ | ✓ |
+   | `contest` | thiết kế có tranh cãi hoặc khó đảo ngược (schema, migration) | phản biện | | | ✓ |
+   | `state` | có máy trạng thái | máy trạng thái | | | ✓ |
+   | `sec` | đụng tiền, quyền, dữ liệu cá nhân | security | | | |
+   | `repo` | chạm nhiều repo | điểm khôi phục mỗi repo, thứ tự merge | | | ✓ |
 
    Hỏi những công tắc chưa rõ từ mô tả, tối đa 4 câu trong một lần hỏi. Đọc code liên quan nếu cần để trả lời thay vì hỏi.
-4. **Khóa theo file luật**: nếu tính năng chạm một việc trong file luật, cửa duyệt mà việc đó yêu cầu không được tắt, và bật `sec` nếu việc đó đánh dấu cần security review. Cửa chỉ chạy khi giai đoạn chứa nó chạy, nên bật công tắc của cửa đó, kể cả khi preset tắt:
+6. **Khóa theo luật**: tính năng chạm một việc trong luật thì cửa duyệt việc đó yêu cầu không được tắt, và bật `sec` nếu việc đó cần security review. Cửa chỉ chạy khi giai đoạn chứa nó chạy, nên bật công tắc của cửa đó, kể cả khi preset tắt:
 
    | Cửa bắt buộc | Bật công tắc |
    |---|---|
@@ -141,11 +158,11 @@ Chỉ áp khi `docsBackend` là `orrery`. Tài liệu đọc, ghi qua công cụ
    | duyệt spec | `multi` |
    | chốt thiết kế | `cross` |
 
-   Ghi rõ việc nào trong file luật bị chạm và công tắc nào bị khóa bật.
-5. **Thư mục tính năng và biên lai**: chọn thư mục tính năng theo bảng ở trên, rồi ghi `flow.md` từ mẫu: preset, từng công tắc bật hay tắt kèm một dòng lý do, các repo liên quan, việc bị khóa theo file luật (ghi rõ việc đó đến từ luật chung hay luật riêng của repo nào), đường dẫn thư mục tính năng.
-6. **Kế hoạch**: trình chuỗi lệnh sẽ gõ theo các công tắc đã bật. Chờ người làm đồng ý (xác nhận nhanh, không phải cửa).
+   Ghi rõ việc nào bị chạm, đến từ luật chung hay luật riêng của repo nào, và công tắc nào bị khóa bật.
+7. **Thư mục tính năng và biên lai**: ghi `flow.md` từ mẫu vào `<repo>/features/<slug>/` (hoặc `_workspace/features/<slug>/`) ở nơi lưu.
+8. **Kế hoạch**: trình chuỗi bước sẽ chạy theo công tắc đã bật, ghi rõ bước nào dùng bộ đồng hành, bước nào dùng mặc định. Chờ người làm đồng ý (xác nhận nhanh, không phải cửa).
 
-Preset small bỏ giai đoạn 1, 2, 3: đi thẳng tới restore-point rồi giai đoạn 4, để `poteto-mode` chạy playbook đầy đủ. Playbook tự gọi `how` và `architect` khi code vượt biên hàm.
+Preset small bỏ giai đoạn 1, 2, 3: đi thẳng tới điểm khôi phục rồi giai đoạn 4.
 
 ## Giai đoạn 1: Có nên làm không (khi bật `why`)
 
@@ -156,51 +173,37 @@ Preset small bỏ giai đoạn 1, 2, 3: đi thẳng tới restore-point rồi gi
 
 ## Giai đoạn 2: Hiểu yêu cầu (khi bật `unclear` hoặc `multi`)
 
-1. Khi bật `unclear`: in lệnh `/mattpocock-skills:grill-with-docs` cho người làm gõ. Nếu có `why.md`, nhắc rằng grill chỉ hỏi phần `why.md` chưa chốt và đưa đường dẫn `why.md`.
-2. Khi bật `multi`: in lệnh `/mattpocock-skills:to-spec`. Ghi đường dẫn spec vào `flow.md`. Thêm `/mattpocock-skills:to-tickets` nếu người làm muốn tách ticket.
-3. Khi bật `unclear` mà không bật `multi`: sau grill, ghi các quyết định đã chốt vào `decisions.md` thay cho spec.
-4. Khi bật `multi` (đã có spec): load skill `spec-check` trên spec vừa ghi. Kết quả có phát hiện mức nghiêm trọng hoặc cao thì quay lại grill hoặc to-spec với đúng các câu hỏi `spec-check` nêu.
-5. **Cửa: duyệt spec.** Có spec thì trình spec cùng kết quả `spec-check`. Không có spec (chỉ bật `unclear`) thì trình các quyết định vừa ghi vào `decisions.md`.
+1. Khi bật `unclear`: chạy bước hỏi làm rõ. Có `why.md` thì chỉ hỏi phần `why.md` chưa chốt.
+2. Khi bật `multi`: chạy bước spec. Ghi đường dẫn spec vào `flow.md`.
+3. Khi bật `unclear` mà không bật `multi`: ghi các quyết định đã chốt vào `decisions.md` thay cho spec.
+4. Khi đã có spec: load `astrolabe:spec-check`. Có phát hiện mức nghiêm trọng hoặc cao thì quay lại hỏi làm rõ hoặc spec với đúng các câu hỏi `spec-check` nêu.
+5. **Cửa: duyệt spec.** Có spec thì trình spec cùng kết quả `spec-check`. Không có spec thì trình các quyết định vừa ghi.
 
 ## Giai đoạn 3: Thiết kế (khi bật `cross`, `contest` hoặc `state`)
 
-Không chạy `/pstack:how` riêng: Phase A (Ground) của `architect` đã chạy `how`.
-
-1. Khi bật `cross` hoặc `contest`, in lệnh:
-   `/pstack:architect with checkpoint. stop and show me before implementing. Spec: <đường dẫn spec>`
-   Mở đầu checkpoint bằng một đoạn nhắc lại mục tiêu tính năng bằng lời của agent, để người làm sửa nếu hiểu sai.
-2. Khi bật `contest`: in lệnh `/pstack:interrogate` trên thiết kế vừa ra. Chỉ giữ finding chạy lại được.
-3. Khi bật `state`: in lệnh `/pstack:statechart` trên thiết kế, **trước khi viết code**. Đường lỗi TLC tìm ra thì sửa thiết kế ngay ở giai đoạn này.
-4. **Cửa: chốt thiết kế.** Gộp checkpoint của architect, finding của interrogate và kết quả statechart thành một lần duyệt. Ghi quyết định thiết kế vào `decisions.md`.
-5. **ADR**: với mỗi quyết định thiết kế khó đảo ngược, sẽ gây thắc mắc nếu không có lý do ghi lại, và là kết quả của một lựa chọn thật giữa các phương án, ghi một ADR theo `ADR-FORMAT.md` của skill `domain-modeling` (plugin `mattpocock-skills`), ở nơi lưu ADR theo `docsBackend` (mục "Nơi lưu tài liệu"): `docs/adr/` của repo với `local`, `<repo>/adr/` trong Orrery bằng `changeset_submit` với `orrery`. Lấy số tiếp theo sau số lớn nhất đã có. Tính năng nhiều repo ghi ADR vào repo cung cấp hợp đồng. Mục `design` trong `decisions.md` trỏ tới ADR (đường dẫn file với `local`, wikilink với `orrery`).
+1. Khi bật `cross` hoặc `contest`: chạy bước thiết kế. Với pstack, in `/pstack:architect with checkpoint. stop and show me before implementing. Spec: <đường dẫn spec>`. Mở đầu checkpoint bằng một đoạn nhắc lại mục tiêu tính năng bằng lời của agent, để người làm sửa nếu hiểu sai.
+2. Khi bật `contest`: chạy bước phản biện trên thiết kế vừa ra. Chỉ giữ finding kiểm lại được.
+3. Khi bật `state`: chạy bước máy trạng thái **trước khi viết code**. Đường lỗi tìm ra thì sửa thiết kế ngay ở giai đoạn này.
+4. **Cửa: chốt thiết kế.** Gộp thiết kế, phản biện và kết quả máy trạng thái thành một lần duyệt. Ghi quyết định thiết kế vào `decisions.md`.
+5. **ADR**: với mỗi quyết định khó đảo ngược, sẽ gây thắc mắc nếu không ghi lý do, và là lựa chọn thật giữa các phương án, ghi một ADR vào `<repo>/adr/` ở nơi lưu (bối cảnh, quyết định, phương án đã loại, hệ quả; có Matt thì theo `ADR-FORMAT.md` của `domain-modeling`). Lấy số tiếp theo sau số lớn nhất đã có. Tính năng nhiều repo ghi ADR vào repo cung cấp hợp đồng. Mục `design` trong `decisions.md` trỏ tới ADR.
 
 ## Trước khi code
 
-In lệnh `/finolabs-vibecode:restore-point create` cho người làm gõ. Lệnh chạy trên repo đang mở của phiên. Khi bật `repo`, hoặc khi phiên đang ở repo trung tâm mà code nằm ở repo đồng cấp, in theo từng repo:
-
-```
-/cd ../<repo>
-/finolabs-vibecode:restore-point create
-```
-
-Xong thì nhắc `/cd` về lại repo trung tâm nếu luồng đang chạy từ đó.
+Chạy bước điểm khôi phục cho repo đang mở, hoặc cho từng repo khi bật `repo`.
 
 ## Giai đoạn 4: Lặp cho từng MR
 
 Chia việc thành các đơn vị kiểm được; mỗi đơn vị một MR. Với mỗi đơn vị, đi hết các bước dưới rồi mới sang đơn vị tiếp theo.
 
-1. In lệnh poteto-mode:
-   - đã qua giai đoạn 3: `/pstack:poteto-mode <mục tiêu>. Cách kiểm: <…>. Một MR mỗi đơn vị kiểm được. Dùng thiết kế đã chốt, bắt đầu từ throughput checkpoint. Spec: <đường dẫn>`
-   - không qua giai đoạn 3: `/pstack:poteto-mode <mục tiêu>. Cách kiểm: <…>. Một MR mỗi đơn vị kiểm được.`
-2. `/pstack:blast-radius` trên MR. Khi bật `state`: phát lại đường lỗi của statechart trên code thật.
-3. Agent tự chạy skill `checks` của finolabs: đọc output thật, gán PASS, FAIL hoặc PENDING có biên lai.
-4. Agent tự chạy skill `review-gate` của finolabs. Khi bật `sec`: chạy thêm `security-review-gate`.
-   - Tối đa 2 vòng sửa. Hết 2 vòng mà vẫn REWORK: dừng và hỏi người làm chọn quay lại giai đoạn 3, hoặc chấp nhận rủi ro. Chấp nhận thì ghi `review-risk` vào `decisions.md` kèm lý do.
-5. `merge_check.py` do `review-gate` chạy, theo cửa của repo. Script này gọi `gh`, nên **chỉ chạy với pull request trên GitHub**. Repo trên GitLab, hoặc repo chưa adopt cửa, thì nói rõ là MR này không có cửa cứng.
-6. **Cửa: duyệt và merge.** Trình gói: kết quả checks, review-gate, blast-radius và rủi ro đã chấp nhận. Người làm tự merge. Khi bật `repo`, merge repo cung cấp hợp đồng trước, repo dùng hợp đồng sau.
+1. **Code**. Với pstack: đã qua giai đoạn 3 thì `/pstack:poteto-mode <mục tiêu>. Cách kiểm: <…>. Một MR mỗi đơn vị kiểm được. Dùng thiết kế đã chốt, bắt đầu từ throughput checkpoint. Spec: <đường dẫn>`; không qua giai đoạn 3 thì bỏ hai câu cuối.
+2. **Phạm vi ảnh hưởng** trên MR. Khi bật `state`: phát lại đường lỗi của bước máy trạng thái trên code thật.
+3. **Kiểm**.
+4. **Review**; khi bật `sec` thêm **security**. Tối đa 2 vòng sửa. Hết 2 vòng mà vẫn còn lỗi chặn: dừng và hỏi người làm chọn quay lại giai đoạn 3, hoặc chấp nhận rủi ro. Chấp nhận thì ghi `review-risk` vào `decisions.md` kèm lý do.
+5. **Cửa merge**: với finolabs, `merge_check.py` chỉ chạy với pull request trên GitHub. Repo trên GitLab hay forge khác thì nói rõ MR này không có cửa cứng.
+6. **Cửa: duyệt và merge.** Trình gói: kết quả kiểm, review, phạm vi ảnh hưởng và rủi ro đã chấp nhận. Người làm tự merge. Khi bật `repo`, merge repo cung cấp hợp đồng trước, repo dùng hợp đồng sau.
 7. Cập nhật `flow.md` (MR nào đã merge), sang đơn vị tiếp theo.
 
-Trong mô tả mỗi MR, dán tóm tắt biên lai: preset, công tắc đã bật, đường dẫn `flow.md`.
+Trong mô tả mỗi MR, dán tóm tắt biên lai: preset, công tắc đã bật, nơi lưu `flow.md`.
 
 ## Giai đoạn 5: Sau ra mắt (khi bật `why`)
 

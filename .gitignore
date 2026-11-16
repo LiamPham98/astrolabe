@@ -1,6 +1,5 @@
 .DS_Store
 *.swp
 .claude/settings.local.json
-# Khai báo repo đồng cấp của từng người (init-project.sh và /astrolabe:setup sinh ra).
-# Fork của một team muốn chia sẻ danh sách này thì bỏ dòng dưới.
+# Cấu hình Claude Code riêng của từng máy khi mở phiên ở repo này.
 .claude/settings.json

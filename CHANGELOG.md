@@ -6,6 +6,18 @@ Bản gắn tag đầu tiên là `v0.5.0`; các bản trước chưa gắn tag.
 
 ## [Unreleased]
 
+### Thay đổi phá vỡ
+
+- astrolabe thành plugin thuần: bỏ repo trung tâm (`workspace.json`, `rules/common.md`), bỏ file trong repo dự án (`.claude/astrolabe.json`, `docs/flow-rules.md`, `docs/features/`), bỏ `setup-machine.sh`, `init-project.sh` và `upstream.json`. Việc cần làm: đặt `workspace_root`, `docs_backend`, `orrery_space` trong `/config` của plugin, chạy `/astrolabe:setup` để tạo luật duyệt và dọn file cũ trong các repo.
+- Cấu hình nằm trong `userConfig` của plugin. Workspace là mọi repo git trong `workspace_root`, không cần khai danh sách.
+- Luật duyệt và tài liệu tính năng nằm ở nơi lưu: note Orrery (`docs_backend: orrery`) hoặc thư mục dữ liệu của plugin (`local`), theo bố cục `_workspace/rules.md`, `<repo>/rules.md`, `<repo>/features/<slug>/`, `_workspace/features/<slug>/`.
+- finolabs-vibecode, pstack và skill của Matt Pocock thành đồng hành tuỳ chọn. Không có bộ nào thì mỗi bước dùng cách mặc định (agent tự hỏi và viết spec, `code-review`, `security-review`, chạy test của repo). Việc cần làm: không có; bộ nào đã cài vẫn được dùng.
+
+### Đổi
+
+- `astrolabe:setup` chỉ kiểm cấu hình, Orrery, luật duyệt và bộ đồng hành; tạo luật từ mẫu và dọn file của bản cũ khi được duyệt. Không cài plugin, không ghi gì vào repo.
+- Khi in lệnh `to-spec`, `to-tickets`, `grill-with-docs`, `astrolabe:flow` ghi kèm nơi lưu, nên skill của Matt không cần `docs/agents/` trong repo.
+
 ## [0.5.1] - 2026-11-16
 
 ### Sửa
