@@ -20,6 +20,9 @@ Chưa có bản nào gắn tag.
 
 ### Sửa
 
+- `setup-machine.sh` chạy `claude plugin update` cho plugin đã cài, để bước kiểm skill không đọc bản cũ còn sót trên máy.
+- `setup-machine.sh` ghi `~/.claude/settings.json` sau khi thêm marketplace, vì `claude plugin marketplace add` làm mất `"autoUpdate": true`.
+- Hai script đọc được file JSON có BOM UTF-8 (thường gặp khi file được ghi bằng PowerShell hay Notepad).
 - `init-project.sh` nhận repo ở bất kỳ đâu cùng ổ đĩa, ghi đường dẫn tương đối tính bằng `relpath`, thay cho việc bắt buộc cùng thư mục cha.
 - `init-project.sh` dò `python3` hoặc `python` như `setup-machine.sh`, và chuyển đường dẫn sang dạng Windows trước khi gọi Python, để chạy được trên Git Bash.
 - Tên repo nội bộ trong ví dụ đổi thành `my-api`, `my-web`.

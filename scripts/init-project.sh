@@ -81,7 +81,7 @@ rel_from_hub = rel(target, hub)
 rel_to_hub = rel(hub, target)
 
 ws_path = os.path.join(hub, "workspace.json")
-ws = json.load(open(ws_path, encoding="utf-8")) if os.path.exists(ws_path) else {"version": 1}
+ws = json.load(open(ws_path, encoding="utf-8-sig")) if os.path.exists(ws_path) else {"version": 1}
 ws.setdefault("docsBackend", "local")
 ws.setdefault("featureDocs", "auto")
 projects = ws.setdefault("projects", [])
@@ -100,13 +100,13 @@ else:
 write_json(ws_path, ws)
 
 st_path = os.path.join(hub, ".claude", "settings.json")
-st = json.load(open(st_path, encoding="utf-8")) if os.path.exists(st_path) else {}
+st = json.load(open(st_path, encoding="utf-8-sig")) if os.path.exists(st_path) else {}
 st.setdefault("permissions", {})["additionalDirectories"] = [p["path"] for p in projects]
 write_json(st_path, st)
 print("Đã đồng bộ permissions.additionalDirectories")
 
 ptr = os.path.join(target, ".claude", "astrolabe.json")
-cfg = json.load(open(ptr, encoding="utf-8")) if os.path.exists(ptr) else {}
+cfg = json.load(open(ptr, encoding="utf-8-sig")) if os.path.exists(ptr) else {}
 cfg["workspace"] = rel_to_hub
 write_json(ptr, cfg)
 print(f"Đã ghi {ptr}")
