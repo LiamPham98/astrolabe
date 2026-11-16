@@ -17,6 +17,7 @@ Nói với người dùng bằng ngôn ngữ họ đang dùng. Giữ nguyên tê
 - **Skill chỉ người gõ được** (`/finolabs-vibecode:setup`, `/mattpocock-skills:setup-matt-pocock-skills`, `/pstack:setup-pstack`): in đúng câu lệnh cho người dùng gõ, không làm thay. Hai lệnh đầu chạy trên repo đang mở của phiên, nên với repo đồng cấp, người dùng `/cd ../<repo>` trước.
 - Plugin mới cài chỉ có hiệu lực ở **phiên Claude Code mới**.
 - Đường dẫn trong file commit chung luôn là **tương đối** (`../my-api`), không bao giờ là đường dẫn tuyệt đối của một máy.
+- **Thư mục plugin**: hai cấp trên thư mục chứa file SKILL.md này (`<plugin>/skills/setup/` thì là `<plugin>/`). `upstream.json` và `scripts/` nằm ở đó, dù plugin cài từ GitHub hay chạy từ bản clone.
 
 ## 0. Xác định chế độ
 
@@ -24,11 +25,13 @@ Tìm gốc repo đang mở: `git rev-parse --show-toplevel`.
 
 | Dấu hiệu | Chế độ |
 |---|---|
-| Gốc repo có `.claude-plugin/marketplace.json` liệt kê plugin `astrolabe`, và có `workspace.json` | **Trung tâm**: setup workspace và các repo đồng cấp |
+| Gốc repo có `workspace.json` | **Trung tâm**: setup workspace và các repo đồng cấp |
 | Gốc repo có `.claude/astrolabe.json`, hoặc thư mục cha có một repo trung tâm như trên | **Repo đồng cấp**: gắn repo này vào workspace |
 | Không có gì ở trên | **Đơn lẻ**: setup riêng repo này, không workspace |
 
 Ở chế độ repo đồng cấp mà chưa có `.claude/astrolabe.json`: hỏi có gắn repo này vào workspace ở `../<tên repo trung tâm>` không. Không gắn thì chuyển sang đơn lẻ.
+
+Ở chế độ đơn lẻ mà thư mục cha có repo git khác: hỏi thêm có biến repo đang mở thành **repo trung tâm** không. Repo trung tâm là repo bất kỳ có `workspace.json` (ví dụ repo tài liệu hay repo chính của team), không cần là bản clone của astrolabe. Đồng ý thì làm tiếp như chế độ trung tâm, với `workspace.json` và `rules/common.md` tạo ở bước 4.
 
 ## 1. Kiểm tra (chỉ đọc)
 
@@ -39,12 +42,12 @@ claude plugin marketplace list
 claude plugin list --json
 ```
 
-- Plugin cần có: plugin trong `.claude-plugin/marketplace.json` của repo trung tâm (dạng `<plugin>@<tên marketplace>`, hiện là `astrolabe@astrolabe`) và mỗi mục trong `upstream` của `upstream.json` (dạng `<plugin>@<marketplace>`). Đọc hai file đó, không dùng danh sách nhớ sẵn. Ghi phạm vi cài (user hay project).
-- `~/.claude/settings.json`: mỗi marketplace upstream trong `extraKnownMarketplaces` có `"autoUpdate": true` không.
+- Plugin cần có: plugin này (tên trong `.claude-plugin/plugin.json` của thư mục plugin; marketplace xem trong `claude plugin list --json`, thường là `astrolabe@astrolabe`) và mỗi mục trong `upstream` của `upstream.json` trong thư mục plugin (dạng `<plugin>@<marketplace>`). Đọc các file đó, không dùng danh sách nhớ sẵn. Ghi phạm vi cài (user hay project).
+- `~/.claude/settings.json`: mỗi marketplace upstream, và marketplace của plugin này khi nguồn là GitHub, có `"autoUpdate": true` trong `extraKnownMarketplaces` không.
 - **Bản trùng**:
   - cùng bộ skill cài từ marketplace khác, kể cả plugin cũ trong `retired` và marketplace cũ trong `retiredMarketplaces` của `upstream.json`;
   - skill rời trong `~/.claude/skills` trùng tên với skill của các plugin trên (skill rời không có tiền tố nên bị gọi lẫn).
-- Thiếu plugin, thiếu `autoUpdate` hoặc có bản trùng: việc cần làm là người dùng chạy `./scripts/setup-machine.sh` trong repo trung tâm. Script ghi settings, cài plugin, gỡ plugin cũ, chuyển skill rời trùng sang `~/.claude/skills-backup-<ngày>/` và kiểm skill luồng cần.
+- Thiếu plugin, thiếu `autoUpdate` hoặc có bản trùng: việc cần làm là chạy `scripts/setup-machine.sh` trong thư mục plugin (agent chạy, sau khi được duyệt). Script gỡ plugin cũ, thêm marketplace, cài và cập nhật plugin, ghi settings, chuyển skill rời trùng tên sang `~/.claude/skills-backup-<ngày>/` và kiểm skill luồng cần.
 - Công cụ cho statechart: `command -v mise`.
 - **Orrery** (chỉ khi `docsBackend` là `orrery`): phiên có công cụ MCP của Orrery không (`whoami`); `space_list` có thấy space trong `orrery.space` (mặc định `personal`) không, và vai trò có từ `editor` trở lên không. Không có Orrery thì ghi `thiếu`: luồng vẫn chạy nhưng ghi local và đồng bộ sau.
 
@@ -53,7 +56,7 @@ claude plugin list --json
 - `workspace.json`: `docsBackend` và `featureDocs` đã chọn chưa, `projects` gồm những repo nào, đường dẫn còn đúng không.
 - Các repo git nằm cùng thư mục cha (`ls ..`, mỗi thư mục có `.git`) mà chưa có trong `projects`.
 - `.claude/settings.json` của repo trung tâm: `permissions.additionalDirectories` có khớp `projects` không; không có `enabledPlugins` hay `extraKnownMarketplaces` (hai khoá này thuộc `~/.claude/settings.json` của từng máy).
-- `rules/common.md` còn là bản mẫu nguyên hay đã sửa.
+- `rules/common.md` có chưa; còn là bản mẫu nguyên hay đã sửa.
 - Remote của repo trung tâm: `git remote get-url origin`.
 
 **Từng repo** (repo đang mở ở chế độ đồng cấp và đơn lẻ; mọi repo trong `projects` ở chế độ trung tâm):
@@ -93,22 +96,23 @@ Gửi trong một lần hỏi, chỉ những câu đang cần:
 - **Repo đồng cấp đưa vào workspace** (chế độ trung tâm, chọn nhiều): các repo git tìm thấy cùng thư mục cha mà chưa có trong `projects`.
 - **Việc agent sẽ làm** (chọn nhiều): liệt kê đúng những việc ở bước 4 đang cần.
 
-Plugin cài theo máy bằng `scripts/setup-machine.sh`, không qua câu hỏi ở đây.
+Cài máy là một mục trong "Việc agent sẽ làm" khi bước 1 thấy thiếu. Mục đó nói rõ script sẽ chuyển những skill rời nào sang thư mục sao lưu.
 
 ## 4. Làm phần đã duyệt
 
 Lệnh nào lỗi thì dừng mục đó, ghi lỗi nguyên văn, làm tiếp các mục khác.
 
-**Plugin**: agent không cài hay gỡ plugin. In lệnh `./scripts/setup-machine.sh` (chạy trong repo trung tâm) cho người dùng.
+**Máy**: chạy `bash "<thư mục plugin>/scripts/setup-machine.sh"` (thời gian chờ tới 10 phút; script clone marketplace từ GitHub). Đọc output thật: báo `THIẾU` ở bước cuối thì báo nguyên văn cho người dùng. Không gỡ plugin nào ngoài danh sách `retired` của `upstream.json`. Xong thì nhắc mở phiên mới hoặc gõ `/reload-plugins`.
 
 **Workspace** (chế độ trung tâm):
 
-1. Ghi `workspace.json`: `docsBackend` và `featureDocs` đã chọn; `"orrery": { "space": "<space>" }` chỉ khi `docsBackend` là `orrery`; thêm mỗi repo đã chọn vào `projects` với `name` (tên thư mục), `path` (đường dẫn tương đối từ repo trung tâm, thường là `../<tên>`), `remote` (kết quả `git -C ../<tên> remote get-url origin`, rỗng nếu không có). URL có phần `user:token@` thì bỏ phần đó trước khi ghi, ví dụ `https://user:token@gitlab.com/x.git` thành `https://gitlab.com/x.git`; không in token ra. Giữ nguyên repo đã có.
+1. Ghi `workspace.json` (tạo với `"version": 1` nếu chưa có): `docsBackend` và `featureDocs` đã chọn; `"orrery": { "space": "<space>" }` chỉ khi `docsBackend` là `orrery`; thêm mỗi repo đã chọn vào `projects` với `name` (tên thư mục), `path` (đường dẫn tương đối từ repo trung tâm, thường là `../<tên>`), `remote` (kết quả `git -C ../<tên> remote get-url origin`, rỗng nếu không có). URL có phần `user:token@` thì bỏ phần đó trước khi ghi, ví dụ `https://user:token@gitlab.com/x.git` thành `https://gitlab.com/x.git`; không in token ra. Giữ nguyên repo đã có.
 2. Ghi `.claude/settings.json` của repo trung tâm, **giữ mọi key khác đang có**:
    - `permissions.additionalDirectories`: đúng danh sách `path` trong `projects`.
    - Không ghi `enabledPlugins` hay `extraKnownMarketplaces` vào file này: plugin cài theo máy bằng `scripts/setup-machine.sh`, và nguồn `directory` là đường dẫn tuyệt đối của một máy.
    - File này nằm trong `.gitignore` của bản public. Repo có dòng đó thì nói rằng file không được commit; team muốn chia sẻ danh sách repo thì bỏ dòng đó.
 3. Tạo `features/.gitkeep` nếu chưa có.
+4. Tạo `rules/common.md` từ `templates/common-rules.md` cạnh file SKILL.md này nếu chưa có. Có rồi thì không ghi đè.
 
 **Từng repo** (repo đang mở, hoặc mọi repo trong `projects` ở chế độ trung tâm):
 

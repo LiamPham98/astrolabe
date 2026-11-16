@@ -25,7 +25,7 @@ Cách gọi: `/astrolabe:flow <small|medium|large> <mô tả tính năng>`. Thi�
 Luồng chạy được theo hai kiểu:
 
 - **Đơn lẻ**: một repo, không có workspace.
-- **Workspace**: một repo trung tâm (có `workspace.json` và `.claude-plugin/marketplace.json` ở gốc) cùng các repo đồng cấp nằm chung thư mục cha.
+- **Workspace**: một repo trung tâm (có `workspace.json` ở gốc; là bản clone astrolabe hoặc repo bất kỳ của team) cùng các repo đồng cấp nằm chung thư mục cha.
 
 Tìm workspace khi bắt đầu:
 
