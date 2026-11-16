@@ -1,6 +1,6 @@
 {
   "name": "astrolabe",
-  "version": "0.6.0",
+  "version": "0.6.1-dev",
   "description": "Luồng làm tính năng chạy được ngay sau khi cài, không cần repo trung tâm hay file cấu hình trong repo: flow dẫn luồng, why chốt có nên làm, spec-check soát spec, setup kiểm Orrery và luật duyệt, help trả lời nên dùng gì. finolabs-vibecode, pstack và skill của Matt Pocock là đồng hành tuỳ chọn.",
   "author": {
     "name": "LiamPham98",
