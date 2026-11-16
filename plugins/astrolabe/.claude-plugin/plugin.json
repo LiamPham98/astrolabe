@@ -1,0 +1,12 @@
+{
+  "name": "astrolabe",
+  "version": "0.4.0",
+  "description": "Luồng làm tính năng của team: setup cài đặt, flow dẫn luồng, why chốt có nên làm, spec-check soát spec trước khi thiết kế, help trả lời nên dùng skill nào.",
+  "author": {
+    "name": "LiamPham98",
+    "url": "https://github.com/LiamPham98"
+  },
+  "homepage": "https://github.com/LiamPham98/astrolabe",
+  "repository": "https://github.com/LiamPham98/astrolabe",
+  "license": "MIT"
+}

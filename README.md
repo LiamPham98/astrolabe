@@ -1,6 +1,6 @@
 # astrolabe
 
-Luồng làm tính năng của team, chạy trên Claude Code. Repo tên `astrolabe`; plugin và marketplace bên trong vẫn tên `feature-workflow`, nên lệnh vẫn gõ `/feature-workflow:<skill>`. Repo này làm hai việc:
+Luồng làm tính năng của team, chạy trên Claude Code. Repo, plugin và marketplace cùng tên `astrolabe`; lệnh gõ `/astrolabe:<skill>`. Repo này làm hai việc:
 
 1. **Plugin marketplace** của skill team, cộng script cài ba bộ skill upstream (bản mới nhất, tự cập nhật).
 2. **Repo trung tâm của workspace**: các repo dự án nằm cùng thư mục cha dùng chung luồng, luật duyệt và tài liệu tính năng.
@@ -18,7 +18,7 @@ Luồng làm tính năng của team, chạy trên Claude Code. Repo tên `astrol
 │  ├─ scripts/setup-machine.sh  cài cho máy, chạy một lần
 │  └─ .claude-plugin/marketplace.json
 ├─ my-api/                     repo đồng cấp (tên ví dụ)
-│  ├─ .claude/feature-workflow.json   { "workspace": "../astrolabe" }
+│  ├─ .claude/astrolabe.json  { "workspace": "../astrolabe" }
 │  ├─ docs/flow-rules.md        luật riêng, bổ sung cho luật chung
 │  └─ docs/features/<slug>/     tài liệu tính năng một repo (docsBackend: local)
 └─ my-web/                     repo đồng cấp (tên ví dụ)
@@ -26,7 +26,7 @@ Luồng làm tính năng của team, chạy trên Claude Code. Repo tên `astrol
 
 | Plugin | Cài từ | Nội dung |
 |---|---|---|
-| `feature-workflow` | `plugins/feature-workflow/` (repo này) | Skill của team: `feature-setup`, `feature-flow`, `feature-why`, `spec-check`, `feature-help`, kèm mẫu file |
+| `astrolabe` | `plugins/astrolabe/` (repo này) | Skill của team: `setup`, `flow`, `why`, `spec-check`, `help`, kèm mẫu file |
 | `finolabs-vibecode` | Marketplace `finolabs-vibecode` (GitHub, tự cập nhật) | Điều phối, điểm khôi phục, kiểm, review, cửa merge |
 | `pstack` | Marketplace `cursor-plugins` (GitHub, tự cập nhật) | Bản dựng cho Claude Code: thiết kế, phản biện thiết kế, statechart, code, blast-radius |
 | `mattpocock-skills` | Marketplace `mattpocock` (GitHub, tự cập nhật) | Skill của Matt Pocock: grill, spec, ticket |
@@ -36,8 +36,8 @@ Ba bộ upstream khai trong [`upstream.json`](upstream.json); nguồn, giấy ph
 ## Luồng
 
 ```
-0  Điều phối         /feature-workflow:feature-flow          preset + công tắc, đọc file luật, ghi biên lai
-1  Có nên làm không? feature-why             (tuỳ chọn)  ── Dừng: chốt có làm
+0  Điều phối         /astrolabe:flow          preset + công tắc, đọc file luật, ghi biên lai
+1  Có nên làm không? astrolabe:why             (tuỳ chọn)  ── Dừng: chốt có làm
 2  Hiểu yêu cầu      /mattpocock-skills:grill-with-docs → /mattpocock-skills:to-spec → spec-check
                                              (tuỳ chọn)  ── Dừng: duyệt spec
 3  Thiết kế          /pstack:architect (+ /pstack:interrogate, /pstack:statechart)
@@ -56,7 +56,7 @@ Ba bộ upstream khai trong [`upstream.json`](upstream.json); nguồn, giấy ph
 - medium: bật `unclear`, `cross`;
 - large: bật `why`, `unclear`, `multi`, `cross`, `contest`, `state`, `repo`.
 
-Người làm vẫn chỉnh từng công tắc. Chi tiết trong [`plugins/feature-workflow/skills/feature-flow/SKILL.md`](plugins/feature-workflow/skills/feature-flow/SKILL.md).
+Người làm vẫn chỉnh từng công tắc. Chi tiết trong [`plugins/astrolabe/skills/flow/SKILL.md`](plugins/astrolabe/skills/flow/SKILL.md).
 
 ## Cài đặt
 
@@ -75,10 +75,10 @@ Bộ skill của Matt cài qua `npx skills` cho Codex, Antigravity nằm ở `~/
 **3. Mở phiên mới ở repo này và gõ:**
 
 ```text
-/feature-workflow:feature-setup
+/astrolabe:setup
 ```
 
-Ở repo trung tâm, `/feature-workflow:feature-setup`:
+Ở repo trung tâm, `/astrolabe:setup`:
 
 - kiểm plugin theo `upstream.json` và bản trùng, chỉ lại `scripts/setup-machine.sh` khi thiếu;
 - tìm các repo git cùng thư mục cha, hỏi đưa repo nào vào workspace;
@@ -88,7 +88,7 @@ Bộ skill của Matt cài qua `npx skills` cho Codex, Antigravity nằm ở `~/
   - `central`: lưu hết ở trung tâm;
   - `project`: lưu hết trong repo dự án;
 - ghi `workspace.json`, khai báo repo đồng cấp trong `.claude/settings.json`;
-- ghi `.claude/feature-workflow.json` và `docs/flow-rules.md` vào từng repo;
+- ghi `.claude/astrolabe.json` và `docs/flow-rules.md` vào từng repo;
 - đọc code và hỏi để soạn luật chung (`rules/common.md`) và luật riêng từng repo;
 - in sẵn lệnh setup của finolabs và Matt cho từng repo (kèm `/cd ../<repo>`).
 
@@ -98,20 +98,20 @@ Chạy lại bao nhiêu lần cũng được: nó chỉ làm phần còn thiếu
 
 **Cài tay**: với mỗi repo dự án chạy `scripts/init-project.sh <đường-dẫn-repo>` từ repo này (repo nên nằm cùng thư mục cha, nhưng ở đâu cũng được, miễn cùng ổ đĩa); rồi gõ `/mattpocock-skills:setup-matt-pocock-skills` và `/finolabs-vibecode:setup` trong từng repo.
 
-**Một repo đơn lẻ, không workspace**: mở phiên trong repo đó và gõ `/feature-workflow:feature-setup`; nó nhận ra không có workspace và setup riêng repo đó.
+**Một repo đơn lẻ, không workspace**: mở phiên trong repo đó và gõ `/astrolabe:setup`; nó nhận ra không có workspace và setup riêng repo đó.
 
 ## Dùng
 
-Skill của plugin luôn gọi kèm tên plugin: `/<plugin>:<skill>`. Gõ `/feature-workflow:` rồi Tab để Claude Code gợi ý tên.
+Skill của plugin luôn gọi kèm tên plugin: `/<plugin>:<skill>`. Gõ `/astrolabe:` rồi Tab để Claude Code gợi ý tên.
 
 - **Tính năng một repo**: mở phiên trong repo đó.
 - **Tính năng nhiều repo**: mở phiên ở repo trung tâm. Phiên thấy được các repo đồng cấp khai báo trong `.claude/settings.json`. Việc gắn với một repo (restore-point, git, MR, merge) làm trong repo đó; lệnh chỉ người gõ được thì `/cd ../<repo>` trước.
 
 ```
-/feature-workflow:feature-flow large mở lại kỳ đã khóa
+/astrolabe:flow large mở lại kỳ đã khóa
 ```
 
-Mỗi tính năng có một thư mục tính năng. Vị trí theo `docsBackend` trong `workspace.json` (hoặc `.claude/feature-workflow.json` ở repo đơn lẻ):
+Mỗi tính năng có một thư mục tính năng. Vị trí theo `docsBackend` trong `workspace.json` (hoặc `.claude/astrolabe.json` ở repo đơn lẻ):
 
 - `local` (mặc định): file markdown trong git, ở `docs/features/<slug>/` của repo hoặc `features/<slug>/` của repo trung tâm, theo `featureDocs`. `GLOSSARY.md` và ADR (`docs/adr/`) nằm trong repo và đổi qua MR. Không cần dịch vụ ngoài.
 - `orrery`: note trong [Orrery](#tuỳ-biến) ở `<space>:<repo>/features/<slug>/`; `GLOSSARY.md` và ADR ở `<repo>/`, đổi qua changeset. Phiên không có Orrery thì ghi local theo `featureDocs`, rồi đồng bộ lên ở phiên sau.
@@ -124,7 +124,7 @@ Luật duyệt luôn nằm trong git. Thư mục tính năng chứa:
 - `decisions.md`: sổ quyết định;
 - `spec.md` và `issues/`: spec và ticket do `to-spec`, `to-tickets` ghi.
 
-Xem [`docs/cheat-sheet.md`](docs/cheat-sheet.md). Không biết dùng skill nào thì gõ `/feature-workflow:feature-help <câu hỏi>`.
+Xem [`docs/cheat-sheet.md`](docs/cheat-sheet.md). Không biết dùng skill nào thì gõ `/astrolabe:help <câu hỏi>`.
 
 ## Tuỳ biến
 
@@ -132,7 +132,7 @@ Mọi thứ riêng của một team nằm trong file cấu hình, không nằm t
 
 | Muốn đổi | Sửa ở |
 |---|---|
-| Thêm, bỏ hay thay bộ skill upstream; skill luồng cần kiểm | `upstream.json` (`upstream[]`: `marketplace`, `repo`, `plugin`, `skills`; `retired[]`: plugin cũ cần gỡ) |
+| Thêm, bỏ hay thay bộ skill upstream; skill luồng cần kiểm | `upstream.json` (`upstream[]`: `marketplace`, `repo`, `plugin`, `skills`; `retired[]`, `retiredMarketplaces[]`: plugin và marketplace cũ cần gỡ) |
 | Nơi lưu tài liệu tính năng | `docsBackend` (`local` hoặc `orrery`) và `featureDocs` (`auto`, `central`, `project`) trong `workspace.json` |
 | Space Orrery (chỉ khi `docsBackend: orrery`) | `orrery.space` trong `workspace.json` |
 | Repo trong workspace | `projects` trong `workspace.json`, hoặc chạy `scripts/init-project.sh` |

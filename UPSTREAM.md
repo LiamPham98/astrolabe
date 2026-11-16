@@ -1,6 +1,6 @@
 # Upstream
 
-Repo này chỉ chứa bộ skill của team (`plugins/feature-workflow/`). Ba bộ còn lại cài thẳng từ marketplace của upstream, bật `autoUpdate`. Repo không chép code của upstream.
+Repo này chỉ chứa bộ skill của team (`plugins/astrolabe/`). Ba bộ còn lại cài thẳng từ marketplace của upstream, bật `autoUpdate`. Repo không chép code của upstream.
 
 Quyết định ngày 16/11/2026: bỏ bản ghim trong `vendor/` (đến bản 0.3.0), lấy bản mới nhất của upstream. Đổi lại, luồng có thể hỏng khi upstream đổi tên, bỏ hoặc đổi hành vi một skill mà luồng gọi tới.
 
@@ -22,7 +22,7 @@ Danh sách này khai trong `upstream.json` ở gốc repo: mỗi mục có `mark
 - `DISABLE_AUTOUPDATER=1` hoặc `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1` tắt lượt cập nhật plugin; `FORCE_AUTOUPDATE_PLUGINS=1` bật lại.
 - Chạy lại `scripts/setup-machine.sh` sau một lần cập nhật để kiểm các skill trong `upstream.json` vẫn còn. Script báo `THIẾU` khi upstream đổi tên hoặc bỏ skill. Script không phát hiện skill đổi hành vi.
 
-pstack dùng bản dựng cho Claude Code mà chính upstream phát hành, không dùng thư mục `pstack/` gốc. Bản dựng này bảo agent đọc `docs/harness/claude-code.md`, file ánh xạ công cụ, subagent và model của Cursor sang Claude Code. Muốn sửa một skill của upstream: viết skill riêng trong `plugins/feature-workflow/`, hoặc gửi thay đổi lên upstream.
+pstack dùng bản dựng cho Claude Code mà chính upstream phát hành, không dùng thư mục `pstack/` gốc. Bản dựng này bảo agent đọc `docs/harness/claude-code.md`, file ánh xạ công cụ, subagent và model của Cursor sang Claude Code. Muốn sửa một skill của upstream: viết skill riêng trong `plugins/astrolabe/`, hoặc gửi thay đổi lên upstream.
 
 ## Skill luồng này dùng
 
@@ -34,7 +34,7 @@ pstack dùng bản dựng cho Claude Code mà chính upstream phát hành, khôn
 
 Không dùng: `/mattpocock-skills:implement` của Matt, `none.md implement` của finolabs. `deslop` không có trong ba bộ này; nó nằm trong plugin `cursor-team-kit` của Cursor, chưa gom vào.
 
-Trùng tên skill giữa các bộ: pstack và Matt đều có `tdd`, `teach`; Matt và finolabs đều có `handoff`. Mọi skill của plugin đều gọi bằng `/<plugin>:<skill>` (ví dụ `/pstack:tdd`, `/mattpocock-skills:tdd`), nên trùng tên không đè nhau. Skill rời trong `~/.claude/skills` thì không có tiền tố, nên trùng tên với skill của plugin là gọi lẫn; `scripts/setup-machine.sh` chuyển các skill rời đó sang `~/.claude/skills-backup-<ngày>/`. Skill "có nên làm không" của team đặt tên `feature-why` để không trùng với `why` của pstack.
+Trùng tên skill giữa các bộ: pstack và Matt đều có `tdd`, `teach`; Matt và finolabs đều có `handoff`. Mọi skill của plugin đều gọi bằng `/<plugin>:<skill>` (ví dụ `/pstack:tdd`, `/mattpocock-skills:tdd`), nên trùng tên không đè nhau. Skill rời trong `~/.claude/skills` thì không có tiền tố, nên trùng tên với skill của plugin là gọi lẫn; `scripts/setup-machine.sh` chuyển các skill rời đó sang `~/.claude/skills-backup-<ngày>/`. Skill của repo này cũng gọi kèm tiền tố (`/astrolabe:why`, `/astrolabe:setup`), nên trùng tên với `why` của pstack hay `setup` của finolabs không sao.
 
 ## Phần tham khảo từ vibebiz
 
@@ -44,14 +44,14 @@ Hai skill dưới đây viết lại bằng lời riêng theo cấu trúc tham k
 
 | Ở đây | Cấu trúc tham khảo từ vibebiz |
 |---|---|
-| `feature-why`: cây phụ thuộc, xếp hạng tác động × mức chưa rõ, độ sâu theo loại việc | router |
-| `feature-why`: cách hỏi theo vòng, phương án đề xuất đứng đầu | ask protocol |
-| `feature-why`: luật không khen, lý do thất bại cụ thể, rủi ro bỏ qua phải ghi | anti-sycophancy, challenge lens |
-| `feature-why`: từ thứ muốn có sang kết quả, chỉ số không được xấu đi, ngưỡng dừng | outcome lens |
+| `astrolabe:why`: cây phụ thuộc, xếp hạng tác động × mức chưa rõ, độ sâu theo loại việc | router |
+| `astrolabe:why`: cách hỏi theo vòng, phương án đề xuất đứng đầu | ask protocol |
+| `astrolabe:why`: luật không khen, lý do thất bại cụ thể, rủi ro bỏ qua phải ghi | anti-sycophancy, challenge lens |
+| `astrolabe:why`: từ thứ muốn có sang kết quả, chỉ số không được xấu đi, ngưỡng dừng | outcome lens |
 | `spec-check`: các lượt soát và mức nghiêm trọng | analyze |
 | `spec-check`: checklist sẵn sàng | checklist |
-| `feature-flow/templates/flow-rules.md`: việc luôn cần người duyệt | constitution (`mandatory_approvals`) |
-| `feature-flow/templates/decisions.md`: sổ chỉ ghi thêm, loại `dismissed-risk`, `supersede` | decisions |
+| `flow/templates/flow-rules.md`: việc luôn cần người duyệt | constitution (`mandatory_approvals`) |
+| `flow/templates/decisions.md`: sổ chỉ ghi thêm, loại `dismissed-risk`, `supersede` | decisions |
 | File này | `UPSTREAM.md` của vibebiz |
 
 **Còn treo**: làm rõ giấy phép với chủ repo vibebiz trước khi lấy thêm bất kỳ phần nào trực tiếp từ code gốc.

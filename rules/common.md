@@ -2,7 +2,7 @@
 
 Áp cho mọi repo trong `workspace.json`. Mỗi repo có thể thêm việc riêng hoặc siết cửa chặt hơn trong `docs/flow-rules.md` của repo đó, nhưng không bỏ được việc nào ở đây.
 
-Những việc dưới đây **luôn cần người duyệt**. Khi tính năng chạm một việc trong danh sách, `feature-flow` không được tắt cửa duyệt tương ứng, kể cả khi preset hay công tắc nói tắt.
+Những việc dưới đây **luôn cần người duyệt**. Khi tính năng chạm một việc trong danh sách, `astrolabe:flow` không được tắt cửa duyệt tương ứng, kể cả khi preset hay công tắc nói tắt.
 
 Sửa file này bằng MR như mọi file khác. Mỗi việc ghi: việc gì, vì sao cần người duyệt, cửa nào bắt buộc, có bắt buộc security review không.
 

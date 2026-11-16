@@ -1,5 +1,5 @@
 {
-  "name": "feature-workflow",
+  "name": "astrolabe",
   "owner": {
     "name": "LiamPham98",
     "url": "https://github.com/LiamPham98"
@@ -7,9 +7,9 @@
   "description": "Luồng làm tính năng của team. Ba bộ skill finolabs-vibecode, pstack và skill của Matt Pocock cài thẳng từ marketplace upstream, xem UPSTREAM.md.",
   "plugins": [
     {
-      "name": "feature-workflow",
-      "source": "./plugins/feature-workflow",
-      "description": "feature-setup, feature-flow, feature-why, spec-check, feature-help và các mẫu file của luồng.",
+      "name": "astrolabe",
+      "source": "./plugins/astrolabe",
+      "description": "setup, flow, why, spec-check, help và các mẫu file của luồng.",
       "homepage": "https://github.com/LiamPham98/astrolabe",
       "license": "MIT"
     }

@@ -1,11 +1,11 @@
 # Cheat-sheet: làm một tính năng
 
-Mọi lệnh dưới đây có tiền tố tên plugin (`/pstack:…`, `/mattpocock-skills:…`, `/finolabs-vibecode:…`, `/feature-workflow:…`). Theo tài liệu Claude Code, skill của plugin chạy dưới dạng `/<plugin>:<skill>`, nên luôn gõ đủ tiền tố.
+Mọi lệnh dưới đây có tiền tố tên plugin (`/pstack:…`, `/mattpocock-skills:…`, `/finolabs-vibecode:…`, `/astrolabe:…`). Theo tài liệu Claude Code, skill của plugin chạy dưới dạng `/<plugin>:<skill>`, nên luôn gõ đủ tiền tố.
 
 ## 0. Lần đầu trong repo
 
 ```
-/feature-workflow:feature-setup
+/astrolabe:setup
 ```
 
 Kiểm tra, hỏi duyệt, rồi cài phần còn thiếu. Chạy lại được.
@@ -20,7 +20,7 @@ Mở phiên ở đâu:
 - tính năng nhiều repo: ở repo trung tâm.
 
 ```
-/feature-workflow:feature-flow <small|medium|large> <mô tả>
+/astrolabe:flow <small|medium|large> <mô tả>
 ```
 
 Agent chọn công tắc, đọc `docs/flow-rules.md`, ghi biên lai, rồi trình chuỗi lệnh. Đồng ý thì đi tiếp.
@@ -44,7 +44,7 @@ Luật duyệt luôn nằm trong git.
 
 | Bật khi | Công tắc | Thêm bước |
 |---|---|---|
-| Cần chứng minh giá trị | `why` | `feature-why`, đọc chỉ số sau ra mắt |
+| Cần chứng minh giá trị | `why` | `astrolabe:why`, đọc chỉ số sau ra mắt |
 | Yêu cầu mơ hồ | `unclear` | `/mattpocock-skills:grill-with-docs` |
 | Nhiều phiên, người, MR | `multi` | `/mattpocock-skills:to-spec`, `spec-check` |
 | Vượt biên hàm | `cross` | `/pstack:architect` |
@@ -57,7 +57,7 @@ Luật duyệt luôn nằm trong git.
 
 ## 4. Bốn lần dừng
 
-1. **Chốt có làm**: đọc `why.md` (do `feature-why` ghi). Chọn không làm thì dừng.
+1. **Chốt có làm**: đọc `why.md` (do `astrolabe:why` ghi). Chọn không làm thì dừng.
 2. **Duyệt spec**: đọc spec và `spec-check.md`.
 3. **Chốt thiết kế**: checkpoint của architect, finding interrogate, kết quả statechart.
 4. **Duyệt và merge** mỗi MR: checks, review-gate, blast-radius, rủi ro đã chấp nhận. Người làm tự merge.
@@ -75,7 +75,7 @@ Luật duyệt luôn nằm trong git.
 
 ## 6. Khi kẹt
 
-- **Không biết dùng skill nào**: `/feature-workflow:feature-help <câu hỏi>`. Nó trả lời theo luồng này và trỏ sang trợ giúp của từng bộ khi cần.
+- **Không biết dùng skill nào**: `/astrolabe:help <câu hỏi>`. Nó trả lời theo luồng này và trỏ sang trợ giúp của từng bộ khi cần.
 
 - **review-gate hết 2 vòng mà vẫn REWORK**: quay lại thiết kế, hoặc chấp nhận rủi ro và ghi `review-risk` vào `decisions.md`.
 - **Muốn đổi quyết định cũ**: thêm mục `supersede` vào `decisions.md`, không sửa mục cũ.

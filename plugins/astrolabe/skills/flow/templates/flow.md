@@ -5,7 +5,7 @@ feature: <slug>
 ---
 # Biên lai quy trình: <tên tính năng>
 
-<!-- Do feature-flow ghi và cập nhật. Dán phần "Tóm tắt" vào mô tả mỗi MR. -->
+<!-- Do astrolabe:flow ghi và cập nhật. Dán phần "Tóm tắt" vào mô tả mỗi MR. -->
 
 ## Tóm tắt
 

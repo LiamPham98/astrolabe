@@ -24,7 +24,7 @@ Read the note with `note_read` by path and name. The user will normally pass the
 
 ## When the session has no Orrery tools
 
-Write the same files under `.scratch/<feature-slug>/` in this repo, and say that they need to be synced to Orrery in a later session (`/feature-workflow:feature-flow` does the sync).
+Write the same files under `.scratch/<feature-slug>/` in this repo, and say that they need to be synced to Orrery in a later session (`/astrolabe:flow` does the sync).
 
 ## Wayfinding operations
 

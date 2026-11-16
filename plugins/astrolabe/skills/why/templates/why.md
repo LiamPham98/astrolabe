@@ -6,7 +6,7 @@ feature: <slug>
 # Why: <tên tính năng>
 
 <!--
-Do skill `feature-why` ghi. Mục nào chưa rõ thì ghi "chưa làm rõ". Mục hoãn ghi "hoãn: <lý do>".
+Do skill `astrolabe:why` ghi. Mục nào chưa rõ thì ghi "chưa làm rõ". Mục hoãn ghi "hoãn: <lý do>".
 Mọi con số ghi kèm nguồn, kỳ và nhãn (đo thật / giả định).
 -->
 
@@ -64,7 +64,7 @@ Chọn: <phương án> vì <lý do>.
 
 <S, M hoặc L; số MR dự kiến.>
 
-## Gợi ý công tắc cho feature-flow
+## Gợi ý công tắc cho astrolabe:flow
 
 | Công tắc | Gợi ý | Lý do |
 |---|---|---|

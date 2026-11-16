@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Gắn một repo dự án vào workspace (cách làm tay, thay cho /feature-workflow:feature-setup).
+# Gắn một repo dự án vào workspace (cách làm tay, thay cho /astrolabe:setup).
 #
 #   ./scripts/init-project.sh <đường-dẫn-repo-dự-án> [--standalone]
 #
@@ -7,7 +7,7 @@
 # miễn cùng ổ đĩa: mọi đường dẫn ghi vào file đều là đường dẫn tương đối.
 # - Thêm repo vào workspace.json (projects) nếu chưa có
 # - Đồng bộ permissions.additionalDirectories trong .claude/settings.json của repo này
-# - Ghi <repo>/.claude/feature-workflow.json trỏ về repo này
+# - Ghi <repo>/.claude/astrolabe.json trỏ về repo này
 # - Tạo <repo>/docs/flow-rules.md từ mẫu nếu chưa có (không bao giờ ghi đè)
 # - Tạo <repo>/docs/features/ khi featureDocs là auto hoặc project
 #
@@ -23,7 +23,7 @@ MODE="${2:-workspace}"
 HUB="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 TARGET="$(cd "$1" 2>/dev/null && pwd)" || { echo "Không thấy thư mục: $1" >&2; exit 1; }
 [[ "$TARGET" != "$HUB" ]] || { echo "Không gắn repo trung tâm vào chính nó." >&2; exit 1; }
-TEMPLATE="$HUB/plugins/feature-workflow/skills/feature-flow/templates/flow-rules.md"
+TEMPLATE="$HUB/plugins/astrolabe/skills/flow/templates/flow-rules.md"
 
 RULES="$TARGET/docs/flow-rules.md"
 mkdir -p "$TARGET/docs"
@@ -105,7 +105,7 @@ st.setdefault("permissions", {})["additionalDirectories"] = [p["path"] for p in 
 write_json(st_path, st)
 print("Đã đồng bộ permissions.additionalDirectories")
 
-ptr = os.path.join(target, ".claude", "feature-workflow.json")
+ptr = os.path.join(target, ".claude", "astrolabe.json")
 cfg = json.load(open(ptr, encoding="utf-8")) if os.path.exists(ptr) else {}
 cfg["workspace"] = rel_to_hub
 write_json(ptr, cfg)

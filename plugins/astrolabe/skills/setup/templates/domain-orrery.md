@@ -19,7 +19,7 @@ If none of these exist, **proceed silently**. Don't flag their absence; don't su
 
 ## Where new entries go
 
-`/domain-modeling` writes `GLOSSARY.md` and `docs/adr/` in the repo. That is expected: `/feature-workflow:feature-flow` syncs them to `{{repo}}/` in Orrery after each grilling session, through a changeset another person approves.
+`/domain-modeling` writes `GLOSSARY.md` and `docs/adr/` in the repo. That is expected: `/astrolabe:flow` syncs them to `{{repo}}/` in Orrery after each grilling session, through a changeset another person approves.
 
 ## Use the glossary's vocabulary
 
