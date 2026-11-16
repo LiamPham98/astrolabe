@@ -15,18 +15,16 @@ Repo này gom bản chép nguyên của ba bộ skill vào `vendor/`, cộng b�
 | Thư mục | Nguồn | Commit | Phiên bản | Giấy phép |
 |---|---|---|---|---|
 | `vendor/finolabs-vibecode` | https://github.com/finolabs/finolabs-vibecode | `9b7c83c18a14182db35afb8bbea05349b1a3ab8d` | 0.2.6-dev | MIT, Fioenix |
-| `vendor/pstack` | https://github.com/cursor/plugins (thư mục `pstack/`) | `6e359ce0aba9e927914d8a940510aa2ef66a8f23` | 0.15.36 | MIT, Lauren Tan |
+| `vendor/pstack` | https://github.com/cursor/plugins (bản dựng cho Claude Code, thư mục `harness/pstack/claude-code/`) | `6e359ce0aba9e927914d8a940510aa2ef66a8f23` | 0.15.36 | MIT, Lauren Tan |
 | `vendor/mattpocock-skills` | https://github.com/mattpocock/skills | `5863806dd4e15c63174bee4e7515a4256792ecfa` | 1.3.2 | MIT, Matt Pocock |
 
 Lấy ngày 13/11/2026.
 
 ## Thay đổi so với upstream
 
-| Thư mục | Thay đổi | Lý do |
-|---|---|---|
-| `vendor/pstack/.claude-plugin/plugin.json` | Thêm mới | Upstream chỉ có manifest cho Cursor (`.cursor-plugin/`). File này để Claude Code cài được pstack như một plugin. Nội dung lấy từ manifest gốc |
+Không có. `vendor/` giữ nguyên từng byte so với upstream.
 
-Ngoài file trên, `vendor/` giữ nguyên từng byte so với upstream. Muốn sửa một skill của upstream thì không sửa trong `vendor/`: viết skill riêng trong `plugins/feature-workflow/`, hoặc gửi thay đổi lên upstream.
+pstack lấy bản dựng cho Claude Code mà chính upstream phát hành (marketplace `cursor-plugins` trỏ tới `harness/pstack/claude-code`), không lấy thư mục `pstack/` gốc. Bản dựng này thêm vào mỗi skill một dòng bảo agent đọc `docs/harness/claude-code.md`, file ánh xạ tên công cụ, subagent và model của Cursor sang Claude Code. Thiếu file đó thì skill pstack gọi công cụ của Cursor (`Task`, `AskQuestion`) và không chạy đúng. Muốn sửa một skill của upstream thì không sửa trong `vendor/`: viết skill riêng trong `plugins/feature-workflow/`, hoặc gửi thay đổi lên upstream.
 
 ## Skill luồng này dùng
 
@@ -36,9 +34,9 @@ Ngoài file trên, `vendor/` giữ nguyên từng byte so với upstream. Muốn
 | pstack | `architect`, `interrogate`, `statechart`, `poteto-mode`, `blast-radius`, `how` |
 | mattpocock-skills | `grill-with-docs` (gọi `grilling`, `domain-modeling`), `to-spec`, `to-tickets`, `setup-matt-pocock-skills` |
 
-Không dùng: `/implement` của Matt, `none.md implement` của finolabs. `deslop` không có trong ba bộ này; nó nằm trong plugin `cursor-team-kit` của Cursor, chưa gom vào.
+Không dùng: `/mattpocock-skills:implement` của Matt, `none.md implement` của finolabs. `deslop` không có trong ba bộ này; nó nằm trong plugin `cursor-team-kit` của Cursor, chưa gom vào.
 
-Trùng tên skill giữa các bộ: pstack và Matt đều có `tdd`, `teach`; Matt và finolabs đều có `handoff`. Skill của plugin được phân biệt theo tên plugin, nên gõ kèm tên plugin khi cần (ví dụ `/pstack:tdd`). Skill "có nên làm không" của team đặt tên `feature-why` để không trùng với `why` của pstack.
+Trùng tên skill giữa các bộ: pstack và Matt đều có `tdd`, `teach`; Matt và finolabs đều có `handoff`. Mọi skill của plugin đều gọi bằng `/<plugin>:<skill>` (ví dụ `/pstack:tdd`, `/mattpocock-skills:tdd`), nên trùng tên không đè nhau. Skill "có nên làm không" của team đặt tên `feature-why` để không trùng với `why` của pstack.
 
 ## Phần tham khảo từ vibebiz
 

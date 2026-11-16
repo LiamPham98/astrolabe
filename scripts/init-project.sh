@@ -31,6 +31,6 @@ fi
 echo
 echo "Việc tiếp theo trong repo dự án:"
 echo "  1. Sửa docs/flow-rules.md cho đúng repo."
-echo "  2. Chạy /setup-matt-pocock-skills, chọn lưu spec dạng markdown local."
+echo "  2. Chạy /mattpocock-skills:setup-matt-pocock-skills, chọn lưu spec dạng markdown local."
 echo "  3. Adopt cửa merge_check.py của finolabs-vibecode."
-echo "  4. Cài Java và TLC nếu dùng /statechart."
+echo "  4. Cài Java và TLC nếu dùng /pstack:statechart."

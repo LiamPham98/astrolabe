@@ -1,11 +1,11 @@
 ---
 name: feature-why
-description: Chốt "có nên làm không, làm để đạt gì, lấy gì để biết là đúng" cho một tính năng trước khi grill hoặc spec. Dùng khi feature-flow bật công tắc why, hoặc khi gõ /feature-why.
+description: Chốt "có nên làm không, làm để đạt gì, lấy gì để biết là đúng" cho một tính năng trước khi grill hoặc spec. Dùng khi feature-flow bật công tắc why, hoặc khi gõ /feature-workflow:feature-why.
 ---
 
 # feature-why: có nên làm không
 
-Bước này trả lời câu hỏi mà `/grill-with-docs` mặc định coi như đã có: tính năng này có đáng làm không. Nó phỏng vấn người làm theo từng vòng ngắn, phản biện thẳng, và ghi kết quả vào `docs/features/<slug>/why.md`.
+Bước này trả lời câu hỏi mà `/mattpocock-skills:grill-with-docs` mặc định coi như đã có: tính năng này có đáng làm không. Nó phỏng vấn người làm theo từng vòng ngắn, phản biện thẳng, và ghi kết quả vào `docs/features/<slug>/why.md`.
 
 Cấu trúc bước này tham khảo phần phân tích của vibebiz (finolabs/vibebiz): cây phụ thuộc giữa các mục, xếp hạng câu hỏi, giao thức hỏi, phản biện và luật chống khen. Nội dung viết lại cho team kỹ thuật, không sao chép.
 
@@ -24,7 +24,7 @@ Người làm quyết định; agent tìm dữ kiện. Trước mỗi câu hỏi
 
 1. Mô tả tính năng, `docs/features/<slug>/`, `docs/flow-rules.md`.
 2. Các tính năng khác trong `docs/features/`, `GLOSSARY.md`, ADR.
-3. Code liên quan: đọc trực tiếp để biết hệ thống đang làm gì. Cần hiểu sâu một subsystem thì đề nghị người làm gõ `/how`.
+3. Code liên quan: đọc trực tiếp để biết hệ thống đang làm gì. Cần hiểu sâu một subsystem thì đề nghị người làm gõ `/pstack:how`.
 
 Tìm được thì ghi dữ kiện kèm nguồn, và chỉ hỏi phần quyết định còn lại. Không hỏi lại điều file hoặc code đã trả lời.
 

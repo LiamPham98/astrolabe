@@ -4,9 +4,9 @@
 #   ./scripts/update-vendor.sh <finolabs-vibecode|pstack|mattpocock-skills> <commit>
 #
 # Script thay toàn bộ vendor/<tên>/ bằng nội dung upstream ở commit đó.
-# Với pstack, giữ lại .claude-plugin/plugin.json của repo này (upstream chỉ có
-# manifest cho Cursor). Sau khi chạy: xem git diff, chạy thử luồng, sửa bản ghim
-# trong UPSTREAM.md, rồi commit tất cả trong cùng một MR.
+# pstack lấy bản dựng cho Claude Code (harness/pstack/claude-code), không lấy thư
+# mục pstack/ gốc (bản cho Cursor). Sau khi chạy: xem git diff, chạy thử luồng,
+# sửa bản ghim trong UPSTREAM.md, rồi commit tất cả trong cùng một MR.
 
 set -euo pipefail
 
@@ -15,7 +15,7 @@ NAME="$1"; REF="$2"
 
 case "$NAME" in
   finolabs-vibecode) URL="https://github.com/finolabs/finolabs-vibecode.git"; SUBDIR="." ;;
-  pstack)            URL="https://github.com/cursor/plugins.git";              SUBDIR="pstack" ;;
+  pstack)            URL="https://github.com/cursor/plugins.git";              SUBDIR="harness/pstack/claude-code" ;;
   mattpocock-skills) URL="https://github.com/mattpocock/skills.git";           SUBDIR="." ;;
   *) echo "Không biết bộ: $NAME" >&2; exit 2 ;;
 esac
@@ -29,21 +29,9 @@ git clone -q "$URL" "$TMP/src"
 git -C "$TMP/src" checkout -q "$REF"
 FULL="$(git -C "$TMP/src" rev-parse HEAD)"
 
-KEEP=""
-if [[ "$NAME" == "pstack" && -f "$DEST/.claude-plugin/plugin.json" ]]; then
-  KEEP="$TMP/pstack-plugin.json"
-  cp "$DEST/.claude-plugin/plugin.json" "$KEEP"
-fi
-
 rm -rf "$DEST"
 mkdir -p "$DEST"
 (cd "$TMP/src/$SUBDIR" && tar cf - --exclude=.git .) | (cd "$DEST" && tar xf -)
-
-if [[ -n "$KEEP" ]]; then
-  mkdir -p "$DEST/.claude-plugin"
-  cp "$KEEP" "$DEST/.claude-plugin/plugin.json"
-  echo "Giữ manifest Claude Code của pstack. Nhớ sửa version cho khớp upstream."
-fi
 
 echo "vendor/$NAME giờ ở commit $FULL"
 echo "Sửa bản ghim trong UPSTREAM.md, chạy thử luồng, rồi commit."

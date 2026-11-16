@@ -1,9 +1,11 @@
 # Cheat-sheet: làm một tính năng
 
+Mọi lệnh dưới đây có tiền tố tên plugin (`/pstack:…`, `/mattpocock-skills:…`, `/finolabs-vibecode:…`, `/feature-workflow:…`). Theo tài liệu Claude Code, skill của plugin chạy dưới dạng `/<plugin>:<skill>`, nên luôn gõ đủ tiền tố.
+
 ## 0. Lần đầu trong repo
 
 ```
-/feature-setup
+/feature-workflow:feature-setup
 ```
 
 Kiểm tra, hỏi duyệt, rồi cài phần còn thiếu. Chạy lại được.
@@ -11,7 +13,7 @@ Kiểm tra, hỏi duyệt, rồi cài phần còn thiếu. Chạy lại được
 ## 1. Bắt đầu
 
 ```
-/feature-flow <small|medium|large> <mô tả>
+/feature-workflow:feature-flow <small|medium|large> <mô tả>
 ```
 
 Agent chọn công tắc, đọc `docs/flow-rules.md`, ghi biên lai, rồi trình chuỗi lệnh. Đồng ý thì đi tiếp.
@@ -29,12 +31,12 @@ Agent chọn công tắc, đọc `docs/flow-rules.md`, ghi biên lai, rồi trì
 | Bật khi | Công tắc | Thêm bước |
 |---|---|---|
 | Cần chứng minh giá trị | `why` | `feature-why`, đọc chỉ số sau ra mắt |
-| Yêu cầu mơ hồ | `unclear` | `/grill-with-docs` |
-| Nhiều phiên, người, MR | `multi` | `/to-spec`, `spec-check` |
-| Vượt biên hàm | `cross` | `/architect` |
-| Khó đảo ngược | `contest` | `/interrogate` |
-| Có máy trạng thái | `state` | `/statechart` trước khi code |
-| Tiền, quyền, dữ liệu cá nhân | `sec` | `/security-review-gate` |
+| Yêu cầu mơ hồ | `unclear` | `/mattpocock-skills:grill-with-docs` |
+| Nhiều phiên, người, MR | `multi` | `/mattpocock-skills:to-spec`, `spec-check` |
+| Vượt biên hàm | `cross` | `/pstack:architect` |
+| Khó đảo ngược | `contest` | `/pstack:interrogate` |
+| Có máy trạng thái | `state` | `/pstack:statechart` trước khi code |
+| Tiền, quyền, dữ liệu cá nhân | `sec` | `/finolabs-vibecode:security-review-gate` |
 | Nhiều repo | `repo` | restore-point mỗi repo, merge bên cung cấp trước |
 
 **Bỏ bước Why khi**: sửa bug, refactor, việc nhỏ đã rõ, việc kỹ thuật thuần.
@@ -49,12 +51,12 @@ Agent chọn công tắc, đọc `docs/flow-rules.md`, ghi biên lai, rồi trì
 ## 5. Lệnh hay gõ
 
 ```
-/architect with checkpoint. stop and show me before implementing. Spec: <đường dẫn>
-/restore-point create
-/poteto-mode <mục tiêu>. Cách kiểm: <…>. Một MR mỗi đơn vị kiểm được. Dùng thiết kế đã chốt, bắt đầu từ throughput checkpoint. Spec: <đường dẫn>
-/blast-radius
-/checks
-/review-gate
+/pstack:architect with checkpoint. stop and show me before implementing. Spec: <đường dẫn>
+/finolabs-vibecode:restore-point create
+/pstack:poteto-mode <mục tiêu>. Cách kiểm: <…>. Một MR mỗi đơn vị kiểm được. Dùng thiết kế đã chốt, bắt đầu từ throughput checkpoint. Spec: <đường dẫn>
+/pstack:blast-radius
+/finolabs-vibecode:checks
+/finolabs-vibecode:review-gate
 ```
 
 ## 6. Khi kẹt
@@ -65,6 +67,6 @@ Agent chọn công tắc, đọc `docs/flow-rules.md`, ghi biên lai, rồi trì
 
 ## 7. Không làm
 
-- Không chạy `/how` riêng trước architect (Phase A đã chạy).
-- Không dùng `/implement` của Matt.
+- Không chạy `/pstack:how` riêng trước architect (Phase A đã chạy).
+- Không dùng `/mattpocock-skills:implement` của Matt.
 - Không để agent merge.

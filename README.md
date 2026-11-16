@@ -14,14 +14,14 @@ Bản ghim, giấy phép và thay đổi so với upstream ghi trong [`UPSTREAM.
 ## Luồng
 
 ```
-0  Điều phối         /feature-flow          preset + công tắc, đọc file luật, ghi biên lai
+0  Điều phối         /feature-workflow:feature-flow          preset + công tắc, đọc file luật, ghi biên lai
 1  Có nên làm không? feature-why             (tuỳ chọn)  ── Dừng: chốt có làm
-2  Hiểu yêu cầu      /grill-with-docs → /to-spec → spec-check
+2  Hiểu yêu cầu      /mattpocock-skills:grill-with-docs → /mattpocock-skills:to-spec → spec-check
                                              (tuỳ chọn)  ── Dừng: duyệt spec
-3  Thiết kế          /architect (+ /interrogate, /statechart)
+3  Thiết kế          /pstack:architect (+ /pstack:interrogate, /pstack:statechart)
                                              (tuỳ chọn)  ── Dừng: chốt thiết kế
-   Trước code        /restore-point create
-4  Mỗi MR            /poteto-mode → /blast-radius → /checks → /review-gate → merge_check.py
+   Trước code        /finolabs-vibecode:restore-point create
+4  Mỗi MR            /pstack:poteto-mode → /pstack:blast-radius → /finolabs-vibecode:checks → /finolabs-vibecode:review-gate → merge_check.py
                                                          ── Dừng: duyệt và merge
 5  Sau ra mắt        đọc chỉ số so với mục tiêu và ngưỡng dừng   (khi đã chạy bước 1)
 ```
@@ -50,25 +50,27 @@ Chưa đẩy lên GitHub thì dùng đường dẫn thư mục: `/plugin marketp
 **2. Mở phiên mới trong repo dự án và gõ:**
 
 ```text
-/feature-setup
+/feature-workflow:feature-setup
 ```
 
-`/feature-setup` kiểm tra rồi báo cáo trước, hỏi duyệt, sau đó mới làm:
+`/feature-workflow:feature-setup` kiểm tra rồi báo cáo trước, hỏi duyệt, sau đó mới làm:
 
 - cài ba plugin còn lại, cảnh báo bản trùng cài từ nguồn khác;
 - tạo `docs/features/` và `docs/flow-rules.md`;
 - đọc code và hỏi vài câu để soạn file luật duyệt cho đúng repo;
-- in sẵn `/setup` (finolabs) và `/setup-matt-pocock-skills` để anh gõ, vì hai skill này chỉ người gõ được;
-- kiểm công cụ cho `/statechart`.
+- in sẵn `/finolabs-vibecode:setup` (finolabs) và `/mattpocock-skills:setup-matt-pocock-skills` để anh gõ, vì hai skill này chỉ người gõ được;
+- kiểm công cụ cho `/pstack:statechart`.
 
 Chạy lại bao nhiêu lần cũng được: nó chỉ làm phần còn thiếu, không ghi đè file luật đã có.
 
-**Cài tay (không dùng `/feature-setup`)**: cài thêm `finolabs-vibecode@feature-workflow`, `pstack@feature-workflow`, `mattpocock-skills@feature-workflow`. Sau đó chạy `scripts/init-project.sh <repo-dự-án>`, sửa `docs/flow-rules.md`, rồi gõ `/setup-matt-pocock-skills` và `/setup` trong repo dự án.
+**Cài tay (không dùng `/feature-workflow:feature-setup`)**: cài thêm `finolabs-vibecode@feature-workflow`, `pstack@feature-workflow`, `mattpocock-skills@feature-workflow`. Sau đó chạy `scripts/init-project.sh <repo-dự-án>`, sửa `docs/flow-rules.md`, rồi gõ `/mattpocock-skills:setup-matt-pocock-skills` và `/finolabs-vibecode:setup` trong repo dự án.
 
 ## Dùng
 
+Skill của plugin luôn gọi kèm tên plugin: `/<plugin>:<skill>`. Gõ `/feature-workflow:` rồi Tab để Claude Code gợi ý tên.
+
 ```
-/feature-flow large mở lại kỳ đã khóa
+/feature-workflow:feature-flow large mở lại kỳ đã khóa
 ```
 
 Mỗi tính năng có một thư mục `docs/features/<slug>/` chứa:
@@ -91,7 +93,10 @@ Rồi làm theo các bước trong [`UPSTREAM.md`](UPSTREAM.md). Không sửa tr
 ## Còn treo
 
 - Giấy phép vibebiz: làm rõ trước khi lấy thêm bất kỳ phần nào trực tiếp từ code gốc.
-- `post_review.py` và `merge_check.py` có chạy với MR trên GitLab không.
-- `restore-point` có chụp thay đổi chưa commit không.
 - Có gom `deslop` (plugin `cursor-team-kit`) hay không.
-- pstack lấy từ `cursor/plugins`. Nếu team đang dùng bản mirror `backnotprop/pstack` (đã viết lại một số skill cho trung lập với harness), đổi nguồn trong `scripts/update-vendor.sh` và `UPSTREAM.md`.
+- Repo trên GitLab: `merge_check.py` và `post_review.py` của finolabs chỉ gọi `gh` (GitHub). Ở GitLab, cửa merge và việc đăng review lên MR không chạy được, cần thay thế hoặc bỏ.
+
+## Đã kiểm
+
+- `restore-point` chụp cả thay đổi chưa commit: nó lưu snapshot của working tree lên một ref local, không đụng index, nhánh hay HEAD.
+- Mọi skill luồng này gọi tới đều có trong bản ghim, và cả bốn plugin cài được từ marketplace này (`claude plugin validate`, cài thử trên máy trống).

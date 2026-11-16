@@ -1,6 +1,6 @@
 ---
 name: spec-check
-description: Soát spec của một tính năng trước khi thiết kế (trùng, mâu thuẫn, không đo được, số lệch, thiếu nghiệm thu, lỗ hổng, thuật ngữ lệch) và chấm checklist sẵn sàng. Chỉ đọc, không sửa spec. Dùng khi feature-flow tới cuối giai đoạn 2, hoặc khi gõ /spec-check.
+description: Soát spec của một tính năng trước khi thiết kế (trùng, mâu thuẫn, không đo được, số lệch, thiếu nghiệm thu, lỗ hổng, thuật ngữ lệch) và chấm checklist sẵn sàng. Chỉ đọc, không sửa spec. Dùng khi feature-flow tới cuối giai đoạn 2, hoặc khi gõ /feature-workflow:spec-check.
 ---
 
 # spec-check: soát spec trước khi thiết kế
@@ -60,7 +60,7 @@ Chạy hết tám lượt. Chữ cái là tiền tố mã phát hiện.
 
 ## 5. Đầu ra
 
-Ghi `docs/features/<slug>/spec-check.md`:
+Ghi `docs/features/<slug>/feature-workflow:spec-check.md`:
 
 - **Kết luận**: `qua` hoặc `quay-lại`. Có phát hiện nghiêm trọng hoặc cao, hoặc mục 1, 2, 3, 11 của checklist không đạt, thì là `quay-lại`.
 - **Phát hiện**: mỗi phát hiện một dòng gồm mã (ví dụ `X-02`), mức, chỗ (file và mục), điều sai, và câu cần hỏi để sửa, viết sẵn để đưa vào grill hoặc to-spec.

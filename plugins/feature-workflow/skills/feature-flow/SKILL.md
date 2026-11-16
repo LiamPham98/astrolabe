@@ -1,21 +1,24 @@
 ---
 name: feature-flow
-description: Dẫn một tính năng qua luồng đã chốt (điều phối, có nên làm, hiểu yêu cầu, thiết kế, lặp từng MR, sau ra mắt). Dùng khi gõ /feature-flow hoặc khi bắt đầu làm một tính năng mới.
+description: Dẫn một tính năng qua luồng đã chốt (điều phối, có nên làm, hiểu yêu cầu, thiết kế, lặp từng MR, sau ra mắt). Dùng khi gõ /feature-workflow:feature-flow hoặc khi bắt đầu làm một tính năng mới.
 ---
 
 # feature-flow
 
 Dẫn một tính năng qua luồng làm tính năng của team. Luồng có một xương sống cố định và các giai đoạn tuỳ chọn bật theo đặc điểm tính năng. Phần làm và kiểm lặp lại cho từng MR.
 
-Cách gọi: `/feature-flow <small|medium|large> <mô tả tính năng>`. Thiếu quy mô thì hỏi.
+Cách gọi: `/feature-workflow:feature-flow <small|medium|large> <mô tả tính năng>`. Thiếu quy mô thì hỏi.
 
 ## Nguyên tắc
 
 - **Bốn cửa dừng duyệt**: chốt có làm, duyệt spec, chốt thiết kế, duyệt và merge mỗi MR. Ở bốn cửa này, dừng và chờ người làm trả lời. Ngoài bốn cửa, trình kết quả rồi đi tiếp.
-- **Lệnh chỉ người gõ được**: phần lớn skill của pstack và Matt tắt model-invocation. Với các skill đó, in đúng câu lệnh để người làm gõ, kèm đường dẫn spec hoặc thiết kế cần dùng. Không giả lập skill đó bằng cách tự làm thay.
+- **Tên lệnh có tiền tố plugin**: skill của plugin được gọi bằng `/<plugin>:<skill>`, ví dụ `/pstack:architect`. Mọi lệnh in ra cho người làm đều phải có tiền tố.
+- **Ai chạy skill nào**:
+  - Skill chỉ người gõ được (tắt model-invocation): mọi skill pstack luồng này dùng, `grill-with-docs`, `to-spec`, `to-tickets`, `setup-matt-pocock-skills` của Matt, `restore-point` và `setup` của finolabs. Với các skill này, in đúng câu lệnh để người làm gõ, kèm đường dẫn spec hoặc thiết kế cần dùng. Không giả lập skill đó bằng cách tự làm thay.
+  - Skill agent tự chạy được: `coding-router`, `checks`, `review-gate`, `security-review-gate` của finolabs, cùng `feature-why` và `spec-check` của plugin này. Agent tự load và chạy, không bắt người làm gõ.
 - **Không merge thay người làm.** Không tắt cửa duyệt mà file luật bắt buộc.
 - **Mọi lệnh sau giai đoạn 2 đều kèm đường dẫn spec** (file hoặc link issue).
-- Không dùng `/implement` của Matt hay `none.md implement`. "Không adopt path Matt" chỉ có nghĩa là không dùng chuỗi implement của Matt; vẫn dùng `/grill-with-docs` và `/to-spec`.
+- Không dùng `/mattpocock-skills:implement` của Matt hay `none.md implement`. "Không adopt path Matt" chỉ có nghĩa là không dùng chuỗi implement của Matt; vẫn dùng `/mattpocock-skills:grill-with-docs` và `/mattpocock-skills:to-spec`.
 
 ## Thư mục của một tính năng
 
@@ -28,7 +31,7 @@ Mọi file do luồng này tạo nằm ở `docs/features/<slug>/`, với `<slug
 | `spec-check.md` | skill `spec-check` | Kết quả soát spec |
 | `decisions.md` | mọi bước | Sổ quyết định, chỉ ghi thêm |
 
-Spec nằm ở nơi `/to-spec` lưu (mặc định markdown local theo cấu hình `setup-matt-pocock-skills`). Ghi đường dẫn spec vào `flow.md`.
+Spec nằm ở nơi `/mattpocock-skills:to-spec` lưu (mặc định markdown local theo cấu hình `setup-matt-pocock-skills`). Ghi đường dẫn spec vào `flow.md`.
 
 Mẫu của `flow.md` và `decisions.md` nằm trong thư mục `templates/` cạnh file SKILL.md này. Mẫu `why.md` nằm cạnh skill `feature-why`.
 
@@ -41,12 +44,12 @@ Mẫu của `flow.md` và `decisions.md` nằm trong thư mục `templates/` c�
    | Công tắc | Bật khi | Bật giai đoạn hoặc bước | S | M | L |
    |---|---|---|---|---|---|
    | `why` | tính năng mới tốn công, cần sếp hoặc nghiệp vụ duyệt, có AI, chạm dữ liệu nhạy cảm | giai đoạn 1 và 5 | | | ✓ |
-   | `unclear` | yêu cầu còn mơ hồ, luật nghiệp vụ hoặc thuật ngữ mới | `/grill-with-docs` | | ✓ | ✓ |
-   | `multi` | làm qua nhiều phiên, nhiều người hoặc nhiều MR | `/to-spec`, `spec-check` | | | ✓ |
-   | `cross` | code vượt biên hàm, chạm nhiều module hoặc hợp đồng | `/architect` | | ✓ | ✓ |
-   | `contest` | thiết kế có tranh cãi hoặc khó đảo ngược (schema, migration) | `/interrogate` | | | ✓ |
-   | `state` | có máy trạng thái | `/statechart` | | | ✓ |
-   | `sec` | đụng tiền, quyền, dữ liệu cá nhân | `/security-review-gate` | | | |
+   | `unclear` | yêu cầu còn mơ hồ, luật nghiệp vụ hoặc thuật ngữ mới | `/mattpocock-skills:grill-with-docs` | | ✓ | ✓ |
+   | `multi` | làm qua nhiều phiên, nhiều người hoặc nhiều MR | `/mattpocock-skills:to-spec`, `spec-check` | | | ✓ |
+   | `cross` | code vượt biên hàm, chạm nhiều module hoặc hợp đồng | `/pstack:architect` | | ✓ | ✓ |
+   | `contest` | thiết kế có tranh cãi hoặc khó đảo ngược (schema, migration) | `/pstack:interrogate` | | | ✓ |
+   | `state` | có máy trạng thái | `/pstack:statechart` | | | ✓ |
+   | `sec` | đụng tiền, quyền, dữ liệu cá nhân | `/finolabs-vibecode:security-review-gate` | | | |
    | `repo` | chạm nhiều repo | restore-point mỗi repo, thứ tự merge | | | ✓ |
 
    Hỏi những công tắc chưa rõ từ mô tả, tối đa 4 câu trong một lần hỏi. Đọc code liên quan nếu cần để trả lời thay vì hỏi.
@@ -65,39 +68,39 @@ Preset small bỏ giai đoạn 1, 2, 3: đi thẳng tới restore-point rồi gi
 
 ## Giai đoạn 2: Hiểu yêu cầu (khi bật `unclear` hoặc `multi`)
 
-1. Khi bật `unclear`: in lệnh `/grill-with-docs` cho người làm gõ. Nếu có `why.md`, nhắc rằng grill chỉ hỏi phần `why.md` chưa chốt và đưa đường dẫn `why.md`.
-2. Khi bật `multi`: in lệnh `/to-spec`. Ghi đường dẫn spec vào `flow.md`. Thêm `/to-tickets` nếu người làm muốn tách ticket.
+1. Khi bật `unclear`: in lệnh `/mattpocock-skills:grill-with-docs` cho người làm gõ. Nếu có `why.md`, nhắc rằng grill chỉ hỏi phần `why.md` chưa chốt và đưa đường dẫn `why.md`.
+2. Khi bật `multi`: in lệnh `/mattpocock-skills:to-spec`. Ghi đường dẫn spec vào `flow.md`. Thêm `/mattpocock-skills:to-tickets` nếu người làm muốn tách ticket.
 3. Khi bật `unclear` mà không bật `multi`: sau grill, ghi các quyết định đã chốt vào `decisions.md` thay cho spec.
 4. Khi bật `why` hoặc `multi`: load skill `spec-check` trên spec vừa ghi. Kết quả có phát hiện mức nghiêm trọng hoặc cao thì quay lại grill hoặc to-spec với đúng các câu hỏi `spec-check` nêu.
 5. **Cửa: duyệt spec.** Trình spec cùng kết quả `spec-check`.
 
 ## Giai đoạn 3: Thiết kế (khi bật `cross`, `contest` hoặc `state`)
 
-Không chạy `/how` riêng: Phase A (Ground) của `architect` đã chạy `how`.
+Không chạy `/pstack:how` riêng: Phase A (Ground) của `architect` đã chạy `how`.
 
 1. Khi bật `cross` hoặc `contest`, in lệnh:
-   `/architect with checkpoint. stop and show me before implementing. Spec: <đường dẫn spec>`
+   `/pstack:architect with checkpoint. stop and show me before implementing. Spec: <đường dẫn spec>`
    Mở đầu checkpoint bằng một đoạn nhắc lại mục tiêu tính năng bằng lời của agent, để người làm sửa nếu hiểu sai.
-2. Khi bật `contest`: in lệnh `/interrogate` trên thiết kế vừa ra. Chỉ giữ finding chạy lại được.
-3. Khi bật `state`: in lệnh `/statechart` trên thiết kế, **trước khi viết code**. Đường lỗi TLC tìm ra thì sửa thiết kế ngay ở giai đoạn này.
+2. Khi bật `contest`: in lệnh `/pstack:interrogate` trên thiết kế vừa ra. Chỉ giữ finding chạy lại được.
+3. Khi bật `state`: in lệnh `/pstack:statechart` trên thiết kế, **trước khi viết code**. Đường lỗi TLC tìm ra thì sửa thiết kế ngay ở giai đoạn này.
 4. **Cửa: chốt thiết kế.** Gộp checkpoint của architect, finding của interrogate và kết quả statechart thành một lần duyệt. Ghi quyết định thiết kế vào `decisions.md`.
 
 ## Trước khi code
 
-In lệnh `/restore-point create` cho người làm gõ. Khi bật `repo`, gõ ở từng repo.
+In lệnh `/finolabs-vibecode:restore-point create` cho người làm gõ. Khi bật `repo`, gõ ở từng repo.
 
 ## Giai đoạn 4: Lặp cho từng MR
 
 Chia việc thành các đơn vị kiểm được; mỗi đơn vị một MR. Với mỗi đơn vị, đi hết các bước dưới rồi mới sang đơn vị tiếp theo.
 
 1. In lệnh poteto-mode:
-   - đã qua giai đoạn 3: `/poteto-mode <mục tiêu>. Cách kiểm: <…>. Một MR mỗi đơn vị kiểm được. Dùng thiết kế đã chốt, bắt đầu từ throughput checkpoint. Spec: <đường dẫn>`
-   - không qua giai đoạn 3: `/poteto-mode <mục tiêu>. Cách kiểm: <…>. Một MR mỗi đơn vị kiểm được.`
-2. `/blast-radius` trên MR. Khi bật `state`: phát lại đường lỗi của statechart trên code thật.
-3. `/checks`: đọc output thật, gán PASS, FAIL hoặc PENDING có biên lai.
-4. `/review-gate`. Khi bật `sec`: thêm `/security-review-gate`.
+   - đã qua giai đoạn 3: `/pstack:poteto-mode <mục tiêu>. Cách kiểm: <…>. Một MR mỗi đơn vị kiểm được. Dùng thiết kế đã chốt, bắt đầu từ throughput checkpoint. Spec: <đường dẫn>`
+   - không qua giai đoạn 3: `/pstack:poteto-mode <mục tiêu>. Cách kiểm: <…>. Một MR mỗi đơn vị kiểm được.`
+2. `/pstack:blast-radius` trên MR. Khi bật `state`: phát lại đường lỗi của statechart trên code thật.
+3. Agent tự chạy skill `checks` của finolabs: đọc output thật, gán PASS, FAIL hoặc PENDING có biên lai.
+4. Agent tự chạy skill `review-gate` của finolabs. Khi bật `sec`: chạy thêm `security-review-gate`.
    - Tối đa 2 vòng sửa. Hết 2 vòng mà vẫn REWORK: dừng và hỏi người làm chọn quay lại giai đoạn 3, hoặc chấp nhận rủi ro. Chấp nhận thì ghi `review-risk` vào `decisions.md` kèm lý do.
-5. `merge_check.py` chạy theo cửa của repo. Repo chưa adopt cửa thì nói rõ là MR này không có cửa cứng.
+5. `merge_check.py` do `review-gate` chạy, theo cửa của repo. Script này gọi `gh`, nên **chỉ chạy với pull request trên GitHub**. Repo trên GitLab, hoặc repo chưa adopt cửa, thì nói rõ là MR này không có cửa cứng.
 6. **Cửa: duyệt và merge.** Trình gói: kết quả checks, review-gate, blast-radius và rủi ro đã chấp nhận. Người làm tự merge. Khi bật `repo`, merge repo cung cấp hợp đồng trước, repo dùng hợp đồng sau.
 7. Cập nhật `flow.md` (MR nào đã merge), sang đơn vị tiếp theo.
 
