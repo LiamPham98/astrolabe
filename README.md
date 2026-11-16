@@ -1,27 +1,36 @@
 # astrolabe
 
-Luồng làm tính năng của team, chạy trên Claude Code. Repo, plugin và marketplace cùng tên `astrolabe`; lệnh gõ `/astrolabe:<skill>`. Repo này làm hai việc:
+Luồng làm tính năng của team, chạy trên Claude Code. Repo, plugin và marketplace cùng tên `astrolabe`; lệnh gõ `/astrolabe:<skill>`.
 
-1. **Plugin marketplace** của skill team, cộng script cài ba bộ skill upstream (bản mới nhất, tự cập nhật).
-2. **Repo trung tâm của workspace**: các repo dự án nằm cùng thư mục cha dùng chung luồng, luật duyệt và tài liệu tính năng.
+- **Plugin `astrolabe`**: skill dẫn luồng làm tính năng, cùng script cài ba bộ skill upstream (bản mới nhất, tự cập nhật). Cài thẳng từ GitHub, không cần clone.
+- **Workspace nhiều repo**: các repo dự án nằm cùng thư mục cha dùng chung luồng, luật duyệt và tài liệu tính năng. Repo trung tâm là repo bất kỳ có `workspace.json`: một repo của team, hoặc bản clone của repo này.
 
 ```
 ~/code/
-├─ astrolabe/                  repo này (trung tâm)
+├─ team-hub/                   repo trung tâm (tên ví dụ)
 │  ├─ workspace.json            repo đồng cấp + nơi lưu tài liệu
-│  ├─ upstream.json             bộ skill upstream cần cài và skill luồng cần
 │  ├─ rules/common.md           luật duyệt chung
 │  ├─ features/<slug>/          tài liệu tính năng nhiều repo (docsBackend: local)
-│  ├─ .claude/settings.json     khai báo repo đồng cấp, sinh theo máy (gitignore)
-│  ├─ CLAUDE.md                 ngữ cảnh khi mở phiên ở đây
-│  ├─ plugins/                  plugin của team
-│  ├─ scripts/setup-machine.sh  cài cho máy, chạy một lần
-│  └─ .claude-plugin/marketplace.json
+│  └─ .claude/settings.json     khai báo repo đồng cấp, sinh theo máy
 ├─ my-api/                     repo đồng cấp (tên ví dụ)
-│  ├─ .claude/astrolabe.json  { "workspace": "../astrolabe" }
+│  ├─ .claude/astrolabe.json    { "workspace": "../team-hub" }
 │  ├─ docs/flow-rules.md        luật riêng, bổ sung cho luật chung
 │  └─ docs/features/<slug>/     tài liệu tính năng một repo (docsBackend: local)
 └─ my-web/                     repo đồng cấp (tên ví dụ)
+```
+
+Repo này gồm:
+
+```
+astrolabe/
+├─ .claude-plugin/marketplace.json   marketplace, trỏ tới plugins/astrolabe
+├─ plugins/astrolabe/                plugin
+│  ├─ skills/                        setup, flow, why, spec-check, help, kèm mẫu file
+│  ├─ upstream.json                  bộ skill upstream cần cài và skill luồng cần
+│  └─ scripts/                       setup-machine.sh, init-project.sh
+├─ scripts/                          lối tắt tới plugins/astrolabe/scripts/ cho bản clone
+├─ workspace.json, rules/common.md   để bản clone dùng luôn làm repo trung tâm
+└─ CLAUDE.md                         ngữ cảnh khi mở phiên ở đây
 ```
 
 | Plugin | Cài từ | Nội dung |
@@ -31,7 +40,7 @@ Luồng làm tính năng của team, chạy trên Claude Code. Repo, plugin và 
 | `pstack` | Marketplace `cursor-plugins` (GitHub, tự cập nhật) | Bản dựng cho Claude Code: thiết kế, phản biện thiết kế, statechart, code, blast-radius |
 | `mattpocock-skills` | Marketplace `mattpocock` (GitHub, tự cập nhật) | Skill của Matt Pocock: grill, spec, ticket |
 
-Ba bộ upstream khai trong [`upstream.json`](upstream.json); nguồn, giấy phép và cách cập nhật ghi trong [`UPSTREAM.md`](UPSTREAM.md). Luồng chốt ngày 13/11/2026; chuyển sang bản upstream mới nhất ngày 16/11/2026.
+Ba bộ upstream khai trong [`plugins/astrolabe/upstream.json`](plugins/astrolabe/upstream.json); nguồn, giấy phép và cách cập nhật ghi trong [`UPSTREAM.md`](UPSTREAM.md). Luồng chốt ngày 13/11/2026; chuyển sang bản upstream mới nhất ngày 16/11/2026.
 
 ## Luồng
 
@@ -60,45 +69,63 @@ Người làm vẫn chỉnh từng công tắc. Chi tiết trong [`plugins/astro
 
 ## Cài đặt
 
-**1. Đặt repo này cùng thư mục cha với các repo dự án**, ví dụ `~/code/astrolabe`.
+### Cách 1: cài từ GitHub (đề xuất)
 
-**2. Chạy một lần mỗi máy** (Git Bash trên Windows):
+Không cần clone. Plugin tự cập nhật khi repo này tăng `version`.
 
 ```bash
-./scripts/setup-machine.sh
+claude plugin marketplace add LiamPham98/astrolabe
 ```
 
-Script đọc `upstream.json` và `.claude-plugin/marketplace.json`, ghi marketplace và plugin vào `~/.claude/settings.json` (sao lưu bản cũ), cài plugin của repo này cùng các bộ upstream, bật tự cập nhật cho bộ upstream, gỡ plugin cũ liệt kê trong `retired`, chuyển skill rời trùng tên trong `~/.claude/skills` sang `~/.claude/skills-backup-<ngày>/`, rồi kiểm các skill luồng cần. Chạy lại bao nhiêu lần cũng được.
+```bash
+claude plugin install astrolabe@astrolabe
+```
 
-Bộ skill của Matt cài qua `npx skills` cho Codex, Antigravity nằm ở `~/.agents/skills`; script không đụng tới. Khi `npx skills add` hay `update`, bỏ chọn Claude Code để không sinh lại symlink trùng.
-
-**3. Mở phiên mới ở repo này và gõ:**
+Mở phiên Claude Code mới trong repo của bạn và gõ:
 
 ```text
 /astrolabe:setup
 ```
 
-Ở repo trung tâm, `/astrolabe:setup`:
+`/astrolabe:setup` kiểm máy rồi hỏi duyệt trước khi làm. Được duyệt thì nó:
 
-- kiểm plugin theo `upstream.json` và bản trùng, chỉ lại `scripts/setup-machine.sh` khi thiếu;
+- chạy `scripts/setup-machine.sh` trong thư mục plugin: thêm ba marketplace upstream, cài và cập nhật plugin, bật tự cập nhật, gỡ plugin cũ, chuyển skill rời trùng tên trong `~/.claude/skills` sang `~/.claude/skills-backup-<ngày>/`, rồi kiểm các skill luồng cần;
+- nhận chế độ theo repo đang mở:
+  - repo có `workspace.json` là **repo trung tâm**; repo có `.claude/astrolabe.json` là **repo đồng cấp**;
+  - repo đơn lẻ mà thư mục cha có repo git khác: hỏi có biến repo này thành repo trung tâm không;
 - tìm các repo git cùng thư mục cha, hỏi đưa repo nào vào workspace;
 - hỏi nơi lưu tài liệu (`docsBackend`): `local` (mặc định, file markdown trong git) hay `orrery`; với `orrery`, kiểm phiên có Orrery và thấy space `orrery.space` không;
 - hỏi thư mục local (`featureDocs`):
   - `auto`: tính năng một repo lưu trong repo đó, nhiều repo lưu ở trung tâm;
   - `central`: lưu hết ở trung tâm;
   - `project`: lưu hết trong repo dự án;
-- ghi `workspace.json`, khai báo repo đồng cấp trong `.claude/settings.json`;
+- ghi `workspace.json`, `rules/common.md`, khai báo repo đồng cấp trong `.claude/settings.json`;
 - ghi `.claude/astrolabe.json` và `docs/flow-rules.md` vào từng repo;
 - đọc code và hỏi để soạn luật chung (`rules/common.md`) và luật riêng từng repo;
 - in sẵn lệnh setup của finolabs và Matt cho từng repo (kèm `/cd ../<repo>`).
 
 Chạy lại bao nhiêu lần cũng được: nó chỉ làm phần còn thiếu. Thêm repo mới vào workspace thì chạy lại.
 
-**Cho cả team**: mỗi đồng đội clone repo này và các repo dự án vào cùng thư mục cha, rồi chạy `./scripts/setup-machine.sh`. Plugin upstream cập nhật theo từng máy, nên hai máy có thể đang ở hai bản khác nhau trong một lúc.
+**Cho cả team**: mỗi người chạy hai lệnh `claude plugin` ở trên rồi `/astrolabe:setup`. Plugin cập nhật theo từng máy, nên hai máy có thể đang ở hai bản khác nhau trong một lúc.
 
-**Cài tay**: với mỗi repo dự án chạy `scripts/init-project.sh <đường-dẫn-repo>` từ repo này (repo nên nằm cùng thư mục cha, nhưng ở đâu cũng được, miễn cùng ổ đĩa); rồi gõ `/mattpocock-skills:setup-matt-pocock-skills` và `/finolabs-vibecode:setup` trong từng repo.
+### Cách 2: clone hoặc fork (muốn sửa skill)
 
-**Một repo đơn lẻ, không workspace**: mở phiên trong repo đó và gõ `/astrolabe:setup`; nó nhận ra không có workspace và setup riêng repo đó.
+Đặt bản clone cùng thư mục cha với các repo dự án, ví dụ `~/code/astrolabe`, rồi chạy một lần mỗi máy (Git Bash trên Windows):
+
+```bash
+./scripts/setup-machine.sh
+```
+
+Script nhận ra đang chạy từ bản clone: marketplace `astrolabe` trỏ vào thư mục bản clone, muốn bản mới thì `git pull`. Bản clone dùng luôn được làm repo trung tâm, vì đã có `workspace.json` và `rules/common.md`. Mở phiên mới ở bản clone và gõ `/astrolabe:setup`.
+
+Fork sửa skill xong thì tăng `version` trong `plugins/astrolabe/.claude-plugin/plugin.json`, để máy cài từ GitHub nhận bản mới.
+
+**Cài tay** (không qua `/astrolabe:setup`): trong repo trung tâm, với mỗi repo dự án chạy `init-project.sh <đường-dẫn-repo>` (bản clone: `./scripts/init-project.sh`). Repo nên nằm cùng thư mục cha, nhưng ở đâu cũng được, miễn cùng ổ đĩa. Rồi gõ `/mattpocock-skills:setup-matt-pocock-skills` và `/finolabs-vibecode:setup` trong từng repo.
+
+### Ghi chú
+
+- Bộ skill của Matt cài qua `npx skills` cho Codex, Antigravity nằm ở `~/.agents/skills`; script không đụng tới. Khi `npx skills add` hay `update`, bỏ chọn Claude Code để không sinh lại symlink trùng.
+- **Một repo đơn lẻ, không workspace**: mở phiên trong repo đó, gõ `/astrolabe:setup` và chọn không tạo workspace.
 
 ## Dùng
 
@@ -132,19 +159,19 @@ Mọi thứ riêng của một team nằm trong file cấu hình, không nằm t
 
 | Muốn đổi | Sửa ở |
 |---|---|
-| Thêm, bỏ hay thay bộ skill upstream; skill luồng cần kiểm | `upstream.json` (`upstream[]`: `marketplace`, `repo`, `plugin`, `skills`; `retired[]`, `retiredMarketplaces[]`: plugin và marketplace cũ cần gỡ) |
+| Thêm, bỏ hay thay bộ skill upstream; skill luồng cần kiểm | `plugins/astrolabe/upstream.json` trong fork (`upstream[]`: `marketplace`, `repo`, `plugin`, `skills`; `retired[]`, `retiredMarketplaces[]`: plugin và marketplace cũ cần gỡ) |
 | Nơi lưu tài liệu tính năng | `docsBackend` (`local` hoặc `orrery`) và `featureDocs` (`auto`, `central`, `project`) trong `workspace.json` |
 | Space Orrery (chỉ khi `docsBackend: orrery`) | `orrery.space` trong `workspace.json` |
-| Repo trong workspace | `projects` trong `workspace.json`, hoặc chạy `scripts/init-project.sh` |
+| Repo trong workspace | `projects` trong `workspace.json`, hoặc chạy lại `/astrolabe:setup` |
 | Việc luôn cần người duyệt | `rules/common.md` (chung) và `docs/flow-rules.md` (từng repo) |
 
-`.claude/settings.json` của repo trung tâm sinh theo từng máy nên nằm trong `.gitignore`. Team muốn commit danh sách repo đồng cấp thì bỏ dòng đó trong fork của mình.
+`.claude/settings.json` của repo trung tâm sinh theo từng máy. Repo này để nó trong `.gitignore`; team muốn commit danh sách repo đồng cấp thì bỏ dòng đó.
 
 Orrery là dịch vụ lưu note qua MCP; chỉ cần khi chọn `docsBackend: orrery`.
 
 ## Cập nhật
 
-Các bộ upstream tự cập nhật khi upstream phát hành bản mới (tăng `version`). Sau một lần cập nhật, chạy lại `./scripts/setup-machine.sh` để kiểm skill luồng cần vẫn còn. Chi tiết trong [`UPSTREAM.md`](UPSTREAM.md).
+Plugin `astrolabe` và các bộ upstream tự cập nhật khi nguồn phát hành bản mới (tăng `version`). Sau một lần cập nhật, chạy lại `/astrolabe:setup` (hoặc `./scripts/setup-machine.sh` ở bản clone) để kiểm skill luồng cần vẫn còn. Chi tiết trong [`UPSTREAM.md`](UPSTREAM.md).
 
 ## Còn treo
 
@@ -155,7 +182,7 @@ Các bộ upstream tự cập nhật khi upstream phát hành bản mới (tăng
 ## Đã kiểm
 
 - `restore-point` chụp cả thay đổi chưa commit: nó lưu snapshot của working tree lên một ref local, không đụng index, nhánh hay HEAD.
-- Mọi skill luồng này gọi tới đều có trong bản upstream: `scripts/setup-machine.sh` kiểm ở bước 5 mỗi lần chạy.
+- Mọi skill luồng này gọi tới đều có trong bản upstream: `setup-machine.sh` kiểm ở bước 5 mỗi lần chạy.
 
 ## Giấy phép
 

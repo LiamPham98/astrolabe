@@ -8,13 +8,16 @@ Chưa có bản nào gắn tag.
 
 ### Thay đổi phá vỡ
 
+- `upstream.json`, `setup-machine.sh` và `init-project.sh` chuyển vào `plugins/astrolabe/`; `scripts/` ở gốc repo giờ là lối tắt cho bản clone. Repo trung tâm nhận theo `workspace.json`, không cần `.claude-plugin/marketplace.json`. Việc cần làm: không có với bản clone; lệnh `./scripts/…` vẫn chạy.
 - Đổi tên theo repo: plugin và marketplace `feature-workflow` thành `astrolabe`; skill `feature-setup`, `feature-flow`, `feature-why`, `feature-help` thành `setup`, `flow`, `why`, `help` (`spec-check` giữ tên). Lệnh giờ gõ `/astrolabe:flow`, `/astrolabe:setup`. File trỏ workspace trong repo dự án đổi từ `.claude/feature-workflow.json` thành `.claude/astrolabe.json`. Việc cần làm: chạy lại `./scripts/setup-machine.sh` (script gỡ `feature-workflow@feature-workflow` và marketplace cũ), rồi `/astrolabe:setup` trong từng repo để đổi tên file trỏ.
 - Nơi lưu tài liệu chọn bằng `docsBackend` trong `workspace.json` (hoặc `.claude/astrolabe.json` ở repo đơn lẻ): `local` (mặc định) hoặc `orrery`. Thiếu khoá thì là `local`, nên workspace đang dùng Orrery sẽ chuyển sang ghi file local. Việc cần làm: muốn giữ Orrery thì thêm `"docsBackend": "orrery"` vào `workspace.json`.
 - `.claude/settings.json` của repo trung tâm vào `.gitignore`. Việc cần làm: team muốn commit danh sách repo đồng cấp thì bỏ dòng đó trong fork của mình.
 
 ### Thêm
 
-- `upstream.json`: khai các bộ skill upstream (marketplace, repo, plugin, skill luồng cần) và plugin cũ cần gỡ. `scripts/setup-machine.sh` và `astrolabe:setup` đọc file này thay cho danh sách viết cứng.
+- Cài thẳng từ GitHub, không cần clone: `claude plugin marketplace add LiamPham98/astrolabe`, `claude plugin install astrolabe@astrolabe`, rồi `/astrolabe:setup`. `/astrolabe:setup` tự chạy `setup-machine.sh` trong thư mục plugin khi được duyệt, và biến được một repo bất kỳ của team thành repo trung tâm (tạo `workspace.json`, `rules/common.md` từ mẫu).
+- `setup-machine.sh` nhận ra đang chạy từ plugin đã cài (marketplace nguồn GitHub, bật `autoUpdate`) hay từ bản clone (marketplace nguồn thư mục).
+- `plugins/astrolabe/upstream.json`: khai các bộ skill upstream (marketplace, repo, plugin, skill luồng cần) và plugin cũ cần gỡ. `scripts/setup-machine.sh` và `astrolabe:setup` đọc file này thay cho danh sách viết cứng.
 - `LICENSE` (MIT); `plugin.json` và `marketplace.json` có tác giả, `homepage`, `repository`, `license`.
 - README có mục "Tuỳ biến".
 
