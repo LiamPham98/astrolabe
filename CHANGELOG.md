@@ -6,6 +6,23 @@ Chưa có bản nào gắn tag.
 
 ## [Unreleased]
 
+### Thay đổi phá vỡ
+
+- Nơi lưu tài liệu chọn bằng `docsBackend` trong `workspace.json` (hoặc `.claude/feature-workflow.json` ở repo đơn lẻ): `local` (mặc định) hoặc `orrery`. Thiếu khoá thì là `local`, nên workspace đang dùng Orrery sẽ chuyển sang ghi file local. Việc cần làm: muốn giữ Orrery thì thêm `"docsBackend": "orrery"` vào `workspace.json`.
+- `.claude/settings.json` của repo trung tâm vào `.gitignore`. Việc cần làm: team muốn commit danh sách repo đồng cấp thì bỏ dòng đó trong fork của mình.
+
+### Thêm
+
+- `upstream.json`: khai các bộ skill upstream (marketplace, repo, plugin, skill luồng cần) và plugin cũ cần gỡ. `scripts/setup-machine.sh` và `feature-setup` đọc file này thay cho danh sách viết cứng.
+- `LICENSE` (MIT); `plugin.json` và `marketplace.json` có tác giả, `homepage`, `repository`, `license`.
+- README có mục "Tuỳ biến".
+
+### Sửa
+
+- `init-project.sh` nhận repo ở bất kỳ đâu cùng ổ đĩa, ghi đường dẫn tương đối tính bằng `relpath`, thay cho việc bắt buộc cùng thư mục cha.
+- `init-project.sh` dò `python3` hoặc `python` như `setup-machine.sh`, và chuyển đường dẫn sang dạng Windows trước khi gọi Python, để chạy được trên Git Bash.
+- Tên repo nội bộ trong ví dụ đổi thành `my-api`, `my-web`.
+
 ## [0.4.0] - 2026-11-16
 
 ### Thay đổi phá vỡ
