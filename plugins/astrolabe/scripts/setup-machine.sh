@@ -11,6 +11,10 @@
 # ở thư mục plugin. Thêm, bỏ hay đổi một bộ thì sửa upstream.json, không sửa script này.
 #
 # Script làm:
+#
+# Chạy từ bản clone mà marketplace cùng tên đã có với nguồn khác (ví dụ đã cài từ GitHub), script giữ
+# nguồn đó và báo cách chuyển sang bản clone, không ghi đè.
+#
 # 1. Gỡ plugin cũ ("retired") và marketplace cũ ("retiredMarketplaces") khai trong upstream.json,
 #    ví dụ bản feature-workflow trước khi đổi tên thành astrolabe.
 # 2. Thêm marketplace còn thiếu, cài plugin còn thiếu, cập nhật plugin đã cài lên bản mới nhất.
@@ -45,20 +49,38 @@ PLUGIN_NATIVE="$(native "$PLUGIN")"
 REPO_NATIVE="$(native "$REPO")"
 
 # Cách chạy, in một dòng:
-#   clone <marketplace>                   từ bản clone có .claude-plugin/marketplace.json trỏ tới plugin này
+#   clone <marketplace>                   từ bản clone có .claude-plugin/marketplace.json trỏ tới plugin này,
+#                                         marketplace chưa có hoặc đang trỏ vào chính bản clone
+#   keep <marketplace>                    từ bản clone, nhưng marketplace cùng tên đang dùng nguồn khác
+#                                         (ví dụ GitHub): giữ nguồn đó, không ghi đè
 #   installed <marketplace> <owner/repo>  từ plugin đã cài; marketplace lấy từ claude plugin list
 detect_mode() {
-  "$PY" -I -X utf8 - "$PLUGIN_NATIVE" "$REPO_NATIVE" "$(claude plugin list --json)" <<'PY' | tr -d '\r'
+  "$PY" -I -X utf8 - "$PLUGIN_NATIVE" "$REPO_NATIVE" "$(claude plugin list --json)" \
+    "$(claude plugin marketplace list --json 2>/dev/null || echo '[]')" <<'PY' | tr -d '\r'
 import json, os, re, sys
-plugin, repo, listing = sys.argv[1], sys.argv[2], sys.argv[3]
+plugin, repo, listing, markets = sys.argv[1:5]
 load = lambda p: json.load(open(p, encoding="utf-8-sig"))
 same = lambda a, b: os.path.normcase(os.path.realpath(a)) == os.path.normcase(os.path.realpath(b))
+def parse(text):
+    try:
+        return json.loads(text or "[]")
+    except ValueError:
+        return []
 mkp = os.path.join(repo, ".claude-plugin", "marketplace.json")
 if os.path.exists(mkp):
     mk = load(mkp)
     for p in mk.get("plugins", []):
         if isinstance(p.get("source"), str) and same(os.path.join(repo, p["source"]), plugin):
-            print("clone", mk["name"], "-")
+            cur = next((m for m in parse(markets) if m.get("name") == mk["name"]), None)
+            path = cur and (cur.get("path") or cur.get("installLocation"))
+            if cur and not (cur.get("source") == "directory" and path and same(path, repo)):
+                where = cur.get("repo") or path or cur.get("source")
+                print(f"Marketplace {mk['name']} đang dùng nguồn {cur.get('source')} ({where}), không phải bản clone này; "
+                      f"giữ nguyên nguồn đó. Muốn dùng bản clone: claude plugin marketplace remove {mk['name']}, "
+                      "rồi chạy lại script.", file=sys.stderr)
+                print("keep", mk["name"], "-")
+            else:
+                print("clone", mk["name"], "-")
             sys.exit()
 for p in json.loads(listing or "[]"):
     if same(p.get("installPath", ""), plugin):
